@@ -10,7 +10,21 @@ and set VER at each release.
 2) JS loader — Site settings → Footer code (below).
    prod        = pinned jsDelivr tag (immutable)
    webflow.io  = latest pushed staging bundle (JS + CSS override)
-   dev flag    = localhost:3000 (localStorage bv-dev=1, staging only)
+   dev flag    = the dev machine's server (staging only)
+
+Dev flag — set via URL params on the staging site (works on any
+device, no console needed):
+   ?bv-dev=1                          → dev mode on (persists)
+   ?bv-dev=1&bv-host=192.168.2.35:3000 → dev mode against the dev
+                                        machine over the LAN
+   ?bv-dev=0                          → back to normal
+Console equivalent: localStorage.setItem('bv-dev','1') / removeItem.
+
+LAN caveat: https staging + http LAN server is "mixed content" —
+browsers allow http://localhost but BLOCK http://192.168.x.x by
+default. On the testing device, allow insecure content for the
+webflow.io site (site settings → Insecure content → Allow), or just
+git push and use the staging bundle (~1 min).
 
 At release: bump the @X.Y.Z in BOTH the CSS link and VER below,
 then publish. Rollback = revert both strings.
@@ -20,10 +34,16 @@ then publish. Rollback = revert both strings.
   var VER      = 'X.Y.Z';
   var PROD_JS  = 'https://cdn.jsdelivr.net/gh/brandvm/REPO@' + VER + '/dist/index.js';
   var STAG     = 'https://brandvm.github.io/REPO/';
-  var DEV      = 'http://localhost:3000/';
   var staging = /\.webflow\.io$/.test(location.hostname);
-  var flag = false;
-  try { flag = staging && localStorage.getItem('bv-dev') === '1'; } catch (e) {}
+  var flag = false, devHost = 'localhost:3000';
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.has('bv-dev')) localStorage.setItem('bv-dev', q.get('bv-dev'));
+    if (q.get('bv-host')) localStorage.setItem('bv-host', q.get('bv-host'));
+    flag = staging && localStorage.getItem('bv-dev') === '1';
+    devHost = localStorage.getItem('bv-host') || devHost;
+  } catch (e) {}
+  var DEV = 'http://' + devHost + '/';
   function js(src, fallback) {
     var s = document.createElement('script');
     s.src = src;
