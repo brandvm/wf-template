@@ -19,7 +19,9 @@ if (dev) {
   const ctx = await esbuild.context(config);
   await ctx.watch();
   await ctx.serve({ servedir: 'dist', port: 3000, cors: { origin: '*' } });
-  console.log('dev → http://localhost:3000/index.js');
+  for (const e of config.entryPoints) {
+    console.log('dev → http://localhost:3000/' + e.split('/').pop().replace(/\.ts$/, '.js'));
+  }
 } else {
   await esbuild.build(config);
 }
