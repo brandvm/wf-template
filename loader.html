@@ -1,30 +1,50 @@
-<!-- Paste into Webflow → Site settings → Custom code → Footer code.
-     Replace REPO (2×) and the @X.Y.Z version. -->
+<!-- ============================================================
+Custom-code loading — two pieces. Replace REPO (all occurrences)
+and set VER at each release.
+
+1) CSS base link — Site settings → Head code (or the site's global
+   embed component if one exists):
+
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/brandvm/REPO@X.Y.Z/dist/styles.css" />
+
+2) JS loader — Site settings → Footer code (below).
+   prod        = pinned jsDelivr tag (immutable)
+   webflow.io  = latest pushed staging bundle (JS + CSS override)
+   dev flag    = localhost:3000 (localStorage bv-dev=1, staging only)
+
+At release: bump the @X.Y.Z in BOTH the CSS link and VER below,
+then publish. Rollback = revert both strings.
+============================================================ -->
 <script>
-  (function () {
-    var PROD = "https://cdn.jsdelivr.net/gh/brandvm/REPO@X.Y.Z/dist/index.js";
-    var STAGING = "https://brandvm.github.io/REPO/index.js";
-    var DEV = "http://localhost:3000/index.js";
-    var staging = /\.webflow\.io$/.test(location.hostname);
-    var flag = false;
-    try {
-      flag = staging && localStorage.getItem("bv-dev") === "1";
-    } catch (e) {}
-    function load(src, fallback) {
-      var s = document.createElement("script");
-      s.src = src;
-      if (fallback) s.onerror = fallback;
-      document.head.appendChild(s);
-    }
-    var fresh = STAGING + "?v=" + Date.now();
-    if (flag)
-      load(DEV, function () {
-        load(fresh);
-      });
-    else if (staging)
-      load(fresh, function () {
-        load(PROD);
-      });
-    else load(PROD);
-  })();
+(function () {
+  var VER      = 'X.Y.Z';
+  var PROD_JS  = 'https://cdn.jsdelivr.net/gh/brandvm/REPO@' + VER + '/dist/index.js';
+  var STAG     = 'https://brandvm.github.io/REPO/';
+  var DEV      = 'http://localhost:3000/';
+  var staging = /\.webflow\.io$/.test(location.hostname);
+  var flag = false;
+  try { flag = staging && localStorage.getItem('bv-dev') === '1'; } catch (e) {}
+  function js(src, fallback) {
+    var s = document.createElement('script');
+    s.src = src;
+    if (fallback) s.onerror = fallback;
+    document.head.appendChild(s);
+  }
+  function css(href) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    document.head.appendChild(l); // loads after the base link → overrides it
+  }
+  var v = '?v=' + Date.now();
+  if (flag) {
+    js(DEV + 'index.js', function () { js(STAG + 'index.js' + v); });
+    css(DEV + 'styles.css');
+  } else if (staging) {
+    js(STAG + 'index.js' + v, function () { js(PROD_JS); });
+    css(STAG + 'styles.css' + v);
+  } else {
+    js(PROD_JS);
+  }
+})();
 </script>

@@ -3,7 +3,7 @@ import * as esbuild from 'esbuild';
 const dev = process.argv.includes('--dev');
 
 const config = {
-  entryPoints: ['src/index.ts'],
+  entryPoints: ['src/index.ts', 'src/styles.css'],
   bundle: true,
   outdir: 'dist',
   minify: !dev,
