@@ -52,20 +52,35 @@ pnpm check    # tsc --noEmit
 pnpm build
 git add -f dist && git commit -m "release: vX.Y.Z"
 git tag vX.Y.Z && git push && git push --tags
+git rm -r --cached dist && git commit -m "chore: untrack dist after vX.Y.Z"
+git push
 ```
 
 `dist/` is gitignored for day-to-day work, so the `-f` is required — without
 it the release commit is empty, the tag carries no build, and jsDelivr serves
 a 404 to the live site.
 
+The un-track at the end is not optional tidying. `.gitignore` only governs
+files git is not already *tracking*, so the release commit permanently
+cancels the ignore rule for `dist/`: from that point on every rebuild shows
+as a modification and `git add .` sweeps a minified bundle into whatever
+commit you are writing. `--cached` un-tracks it but leaves the files on
+disk, so the ignore rule applies again. The tag is untouched — it still
+points at the commit that contains the build, and jsDelivr serves that
+forever.
+
 Then bump `VER` in BOTH Webflow snippets (the CSS/config Embed and the footer
 loader) → publish staging → verify → publish prod.
 Rollback = revert the version strings. Never use `@latest` or branch URLs in prod.
 
-**Tag rules (learned the hard way):** `dist/` must be committed *before* the tag
-is pushed, and a pushed tag must **never** be moved (`tag -f`) — jsDelivr
-snapshots a version once and keeps it forever; a half-baked snapshot is
-permanent. Botched release? Cut the next patch version instead.
+**Tag rules (learned the hard way):**
+
+- `dist/` must be committed *before* the tag is pushed
+- A pushed tag must **never** be moved (`tag -f`) — jsDelivr snapshots a
+  version once and keeps it forever, so a half-baked snapshot is permanent.
+  Botched release? Cut the next patch version instead
+- Un-track `dist/` again once the tag is pushed, or the ignore rule stays
+  dead for every commit after the first release
 
 **Before attaching a custom domain,** confirm the repo actually has the tag
 `VER` points at. A site running on `.webflow.io` never touches the prod URLs,

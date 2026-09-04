@@ -1,6 +1,11 @@
 node_modules/
 .DS_Store
 
-# Build output. Rebuilt by CI on every push to master; committed with
-# `git add -f dist` only when cutting a release tag (see README).
+# These repos are public — never let a key reach a commit.
+.env
+
+# Build output. Rebuilt by CI on every push to master. A release commits it
+# with `git add -f dist` and then un-tracks it again with
+# `git rm -r --cached dist` — this rule does nothing while it stays tracked.
+# See the Release section of the README.
 dist
