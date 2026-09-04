@@ -1,4 +1,86 @@
 /* Global site styles — source of truth for custom CSS.
    Built to dist/styles.css (minified) and released via jsDelivr pinned tags.
    Keep Designer classes for layout; this file is for tokens, resets,
-   utilities, and JS-paired styles that Webflow classes cannot express. */
+   utilities, and JS-paired styles that Webflow classes cannot express.
+
+   CASCADE NOTES — read before adding rules.
+   1. This sheet is injected by an HTML Embed in the body (see loader.html),
+      so it lands after webflow.css. Ties on specificity go to us.
+   2. That only works at EQUAL specificity. `h1 {}` beats Webflow's `h1 {}`,
+      but `:where(h1) {}` (0-0-0) loses to it (0-0-1). Use :where() only for
+      our own base layer that Designer classes should be free to override.
+   3. Never wrap overrides in @layer. Webflow's CSS is unlayered, and
+      unlayered always beats layered regardless of order.
+   4. Section order IS the tiebreaker — most of this file sits at 0-1-0
+      (one class, or one attribute selector), so when two rules collide
+      the later one wins. Sections run broad to narrow:
+
+        01 TOKENS               variables only, no output
+        02 BASE                 our reset and element defaults
+        03 WEBFLOW NEUTRALIZERS undo what Webflow's normalize invents
+        04 DOCUMENT STATE       runtime classes on <html>, set by JS
+        05 COMPONENTS & MOTION  named things: .link-underline, marquees
+        06 UTILITIES            single-purpose, must beat components
+        07 ACCESSIBILITY        focus rings and reduced-motion trumps
+        08 EDITOR & DEV SUPPORTS canvas-only escape hatches
+
+      Add rules to the section they belong to, not to the end of the
+      file — appending is how a utility silently stops winning.
+   ============================================================ */
+
+/* ============================================================
+   01. TOKENS
+   Variables only — no declarations that paint. Mirror the Webflow
+   Variables here rather than re-inventing a parallel palette:
+   override a PRIMITIVE and everything aliased downstream moves with it.
+   ============================================================ */
+
+/* ============================================================
+   02. BASE
+   ============================================================ */
+
+/* ============================================================
+   03. WEBFLOW NEUTRALIZERS
+   ============================================================ */
+
+/* ============================================================
+   04. DOCUMENT STATE
+   Runtime classes on <html>. The boot handshake: the head snippet in
+   loader.html adds .is-loading before first paint and src/index.ts
+   drops it once the bundle boots, with a 3s timeout in the snippet as
+   the safety net. Grouped here so the whole handshake reads in one
+   place — if you add a smooth-scroll library, its <html> class belongs
+   beside these, not at the end of the file.
+   ============================================================ */
+
+html.is-loading,
+html.is-loading body {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ============================================================
+   05. COMPONENTS & MOTION
+   ============================================================ */
+
+/* ============================================================
+   06. UTILITIES
+   ============================================================ */
+
+/* ============================================================
+   07. ACCESSIBILITY
+   Focus rings, and the reduced-motion trumps that have to sit after
+   every transition they cancel.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Cancel motion here, not at the rule that defines it. */
+}
+
+/* ============================================================
+   08. EDITOR & DEV SUPPORTS
+   Canvas-only escape hatches. Probe with `background`, never
+   `outline` — an outline on body paints outside the border box,
+   lands outside the canvas iframe and gets clipped, which reads as
+   "the CSS isn't loading" when it is.
+   ============================================================ */
