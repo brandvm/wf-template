@@ -1,2 +1,6 @@
 node_modules/
 .DS_Store
+
+# Build output. Rebuilt by CI on every push to master; committed with
+# `git add -f dist` only when cutting a release tag (see README).
+dist
