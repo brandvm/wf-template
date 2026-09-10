@@ -123,6 +123,14 @@ loader.html           the three Webflow snippets, documented
 Section order is the tiebreaker for same-specificity rules — add to the
 section a rule belongs to, never to the end of the file.
 
+
+The stylesheet includes the shared CSS foundation: fluid root sizing, element
+resets, Webflow default overrides, opt-in effects and utilities, rich-text
+spacing, keyboard focus styles, and reduced-motion support. Tune the sizing
+tokens, wire the accent and container width to the site's Webflow variables,
+and set `--nav-h` when adding a fixed header. Marquees need duplicated tracks;
+read-more controls need their own JavaScript toggle.
+
 TypeScript runs `strict`, targets ES2019, and defines no path aliases —
 imports are relative.
 
