@@ -1,13 +1,21 @@
 // Entry point. Keep this file a manifest: one import and one call per
-// module, so what runs on the site is readable at a glance. Feature code
-// lives in src/modules/<name>.ts and exports a single init function that
-// no-ops when its selector is absent from the page.
+// module. Feature code lives in src/modules/<name>.ts and exports an init
+// function that no-ops when its selector is absent from the page.
+import { initEnvironmentSwitcher } from './modules/environment-switcher';
 
-// import { initExample } from './modules/example';
+function boot() {
+  try {
+    initEnvironmentSwitcher();
+    // Add project feature initializers here.
+  } finally {
+    // Always release the pre-paint scroll lock set by loader.html, even if
+    // a feature throws. The head snippet also has a fallback timeout.
+    document.documentElement.classList.remove('is-loading');
+  }
+}
 
-// initExample();
-
-// Release the pre-paint scroll lock set by the head bootstrap (loader.html).
-// Must stay last, and must stay unconditional — an early return above it
-// leaves the page permanently locked until the snippet's 3s timeout fires.
-document.documentElement.classList.remove('is-loading');
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot, { once: true });
+} else {
+  boot();
+}

@@ -7,7 +7,10 @@ and 3 at each release.
   webflow.io  = latest pushed staging bundle (JS + CSS)
   dev flag    = the dev server on this machine (staging only)
 
-Dev flag — set via URL param on the staging site:
+The bundle includes a compact Dev / Staging switcher in the bottom-left
+corner of *.webflow.io pages. Click the current mode to expand it.
+
+Dev flag — also available via URL param on the staging site:
    ?bv-dev=1   → dev mode on (persists in localStorage)
    ?bv-dev=0   → back to normal
 Console equivalent: localStorage.setItem('bv-dev','1') / removeItem.
@@ -105,12 +108,12 @@ that is not versioned, reviewable, or rollback-able.
     var STAG = "https://brandvm.github.io/REPO/";
     var DEV = "http://localhost:3000/";
     var staging = /\.webflow\.io$/.test(location.hostname);
-    var flag = false;
+    var q = new URLSearchParams(location.search);
+    var flag = staging && q.get("bv-dev") === "1";
     try {
-      var q = new URLSearchParams(location.search);
-      if (q.has("bv-dev")) localStorage.setItem("bv-dev", q.get("bv-dev"));
-      flag = staging && localStorage.getItem("bv-dev") === "1";
-    } catch (e) {}
+      if (staging && q.has("bv-dev")) localStorage.setItem("bv-dev", flag ? "1" : "0");
+      if (staging && !q.has("bv-dev")) flag = localStorage.getItem("bv-dev") === "1";
+    } catch (e) { /* An explicit URL flag still works without storage. */ }
     // Shared config — the footer loader (and the bundle) read this.
     window.BV = { staging: staging, dev: flag, devBase: DEV, stag: STAG };
     // Runs in the same tick as the links above, so neither the staging
@@ -141,6 +144,18 @@ Rollback = revert the two VER strings and publish.
     var PROD_JS =
       "https://cdn.jsdelivr.net/gh/brandvm/REPO@" + VER + "/dist/index.js";
     function js(src, fallback) {
+      var C = window.BV;
+      if (C) {
+        // Set before execution so the switcher sees the bundle that actually
+        // loads, including local -> staging and staging -> pinned fallbacks.
+        C.source = new URL(".", src).href;
+        if (C.source !== C.devBase) {
+          var devCSS = document.getElementById("bv-css-dev");
+          if (devCSS) devCSS.remove();
+          var baseCSS = document.getElementById("bv-css");
+          if (baseCSS) baseCSS.href = C.source + "styles.css" + new URL(src).search;
+        }
+      }
       var s = document.createElement("script");
       s.src = src;
       if (fallback) s.onerror = fallback;
