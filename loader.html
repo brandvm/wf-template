@@ -53,8 +53,8 @@ published.
 <script>
   (function () {
     var RELEASE = null; // the release tag, e.g. "1.0.0" — the only version string
-    var REPO = "REPO";
-    var STAG = "https://brandvm.github.io/" + REPO + "/";
+    var SITE = "REPO"; // this repo's name
+    var STAG = "https://brandvm.github.io/" + SITE + "/";
     var DEV = "http://localhost:3000/";
     var staging = /\.webflow\.io$/.test(location.hostname);
     var q = new URLSearchParams(location.search);
@@ -64,7 +64,7 @@ published.
       if (staging && !q.has("bv-dev")) flag = localStorage.getItem("bv-dev") === "1";
     } catch (e) { /* An explicit URL flag still works without storage. */ }
     var prod = RELEASE
-      ? "https://cdn.jsdelivr.net/gh/brandvm/" + REPO + "@" + RELEASE + "/dist/"
+      ? "https://cdn.jsdelivr.net/gh/brandvm/" + SITE + "@" + RELEASE + "/dist/"
       : STAG;
     if (!staging && !RELEASE)
       console.error("[bv] RELEASE is not set in head code; serving the staging bundle. Tag a release and set RELEASE before launch.");
