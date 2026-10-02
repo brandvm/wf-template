@@ -1,11 +1,19 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
-const loader = readFileSync(new URL('../loader.html', import.meta.url), 'utf8')
-  .replaceAll('REPO', 'wf-example').replaceAll('X.Y.Z', '1.0.0');
-const scripts = [...loader.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[0]);
-const links = [...loader.matchAll(/<link\b[^>]*>/g)].map(match => match[0])
-  .filter(link => /id="bv-css/.test(link)).join('\n');
+// The loader as pasted into Webflow: comments stripped (they contain an
+// example link that must NOT be installed), REPO and RELEASE filled in.
+const source = readFileSync(new URL('../loader.html', import.meta.url), 'utf8')
+  .replace(/<!--[\s\S]*?-->/g, '').replaceAll('REPO', 'wf-example');
+if (!source.includes('var RELEASE = null;')) throw new Error('loader.html must ship with `var RELEASE = null;`');
+function loader(release) {
+  const text = source.replace('var RELEASE = null;', `var RELEASE = ${JSON.stringify(release)};`);
+  return {
+    scripts: [...text.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[0]),
+    links: [...text.matchAll(/<link\b[^>]*>/g)].map(match => match[0])
+      .filter(link => /id="bv-css/.test(link)).join('\n'),
+  };
+}
 const js = readFileSync(new URL('../dist/index.js', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
 const stage = 'https://brandvm.github.io/wf-example/';
@@ -18,10 +26,16 @@ async function setup(page, {
   blockedStorage = false,
   editor = false,
   design = false,
+  release = '1.0.0',
+  requests = [],
+  consoleErrors = [],
 } = {}) {
+  const { scripts, links } = loader(release);
   expect(scripts).toHaveLength(3);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
+  page.on('request', request => requests.push(request.url()));
+  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   if (blockedStorage) await page.addInitScript(() => {
     Object.defineProperty(window, 'localStorage', { get() { throw new Error('Storage blocked'); } });
   });
@@ -136,4 +150,42 @@ for (const scenario of [
   const errors = await setup(page, scenario);
   await expect(page.locator('#bv-environment')).toHaveCount(0);
   expect(errors).toEqual([]);
+});
+
+for (const url of ['https://client.example/', 'https://example.webflow.io/']) test(`public pages never request localhost (${new URL(url).hostname})`, async ({ page }) => {
+  const requests = [];
+  const errors = await setup(page, { url, requests });
+  await expect(page.locator('#bv-css-dev')).toHaveCount(0);
+  expect(requests.filter(request => request.startsWith(local))).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test('dev mode adds the local stylesheet after staging', async ({ page }) => {
+  const requests = [];
+  await setup(page, { url: 'https://example.webflow.io/?bv-dev=1', requests });
+  await expect(page.locator('link#bv-css + link#bv-css-dev')).toHaveAttribute('href', local + 'styles.css');
+  expect(requests).toContain(local + 'styles.css');
+  expect(requests).toContain(local + 'index.js');
+});
+
+test('production uses the single RELEASE for both CSS and JS', async ({ page }) => {
+  const requests = [];
+  await setup(page, { url: 'https://client.example/', requests });
+  await expect(page.locator('#bv-css')).toHaveAttribute('href', release + 'styles.css');
+  expect(requests).toContain(release + 'index.js');
+  expect(requests.filter(request => request.startsWith(stage) && request.endsWith('.js'))).toEqual([]);
+});
+
+test('production without a RELEASE serves staging and logs an error', async ({ page }) => {
+  const requests = [];
+  const consoleErrors = [];
+  await setup(page, { url: 'https://client.example/', release: null, requests, consoleErrors });
+  await expect(page.locator('#bv-css')).toHaveAttribute('href', stage + 'styles.css');
+  expect(requests.some(request => request.startsWith(stage + 'index.js'))).toBe(true);
+  expect(requests.filter(request => request.includes('cdn.jsdelivr.net/gh/'))).toEqual([]);
+  expect(consoleErrors.join('\n')).toContain('RELEASE is not set');
+});
+
+test('the scroll lock is released when the bundle cannot load', async ({ page }) => {
+  await setup(page, { url: 'https://client.example/', unavailable: url => url.endsWith('index.js') });
 });

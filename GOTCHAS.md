@@ -30,6 +30,18 @@ repos to improve `brandvm/wf-template`.
 Inherited from `wf-template`. Found across earlier client repos; listed so
 they are not rediscovered. Status refers to the template.
 
+### 2026-10-02 · Element resets in §02 beat Designer tag styles
+- Area: css
+- Scope: template-candidate
+- Symptom: A Designer tag style ("All H2 Headings", "All Links") margin or
+  colour has no effect.
+- Cause: Webflow emits tag styles as bare element selectors (`h2 {}`),
+  0-0-1 — the same specificity as the §02 resets, which load later and win.
+- Fix: none yet. Options: wrap the resets in `:where()` (then webflow.css
+  defaults return), or drop them and set tag styles in the Designer.
+- Status: open
+- Found by: claude
+
 ### 2026-10-02 · Neutralizers in §03 override Designer styles
 - Area: css
 - Scope: template-candidate
@@ -42,7 +54,7 @@ they are not rediscovered. Status refers to the template.
 - Fix: reformdd removed ten neutralizers so "Webflow's own defaults now stand
   unopposed" (c2e5f4b). Delete a neutralizer the moment it fights the
   Designer.
-- Status: open
+- Status: fixed in template v3 — selectable-component rules removed; only Designer-unselectable internals remain in §03
 - Found by: human
 
 ### 2026-10-02 · Root font-size scale drifts from Designer tokens
@@ -56,7 +68,7 @@ they are not rediscovered. Status refers to the template.
   layout tokens rendering 6.25% short.
 - Fix: none general. Agree the scale with the designer before building, or
   drop it and let Webflow variables own sizing.
-- Status: open
+- Status: fixed in template v3 — the scale is a commented-out opt-in (override-webflow)
 - Found by: human
 
 ### 2026-10-02 · Renaming a Webflow variable silently breaks repo CSS
@@ -69,7 +81,7 @@ they are not rediscovered. Status refers to the template.
   (reformdd 1ca59f6).
 - Fix: avoid referencing Webflow variable names in repo CSS; if one is
   needed, log it here so renames get checked.
-- Status: open
+- Status: fixed in template v3 — the template no longer references Webflow variable names; the AGENTS.md policy forbids new ones without approval
 - Found by: human
 
 ### 2026-10-02 · Removing a rule locally does not remove it on the canvas
@@ -82,7 +94,7 @@ they are not rediscovered. Status refers to the template.
   rule remains.
 - Fix: push and wait for staging, or temporarily comment out the `bv-css`
   link in the Embed.
-- Status: documented (loader.html, AGENTS.md)
+- Status: documented — v3 canvas shows staging only by default; applies only while the temporary localhost link is in use
 - Found by: human
 
 ### 2026-10-02 · Static localhost link is requested by public visitors
@@ -96,7 +108,7 @@ they are not rediscovered. Status refers to the template.
 - Fix: reformd e9f81ab and regenx a66d116 removed the static link
   independently and create it from script only in dev mode. Trade-off: the
   canvas then shows staging CSS only.
-- Status: open in template
+- Status: fixed in template v3 — the Embed has no static localhost link; the dev link is created by script in dev mode only
 - Found by: human
 
 ### 2026-10-02 · VER lives in two snippets and a placeholder 404s at launch
@@ -107,7 +119,7 @@ they are not rediscovered. Status refers to the template.
   must bump VER in both the Embed and the footer snippet.
 - Fix: regenx keeps one `RELEASE` value in the head config (`null` until the
   first tag) that the other snippets read.
-- Status: open
+- Status: fixed in template v3 — one RELEASE in head code; null serves staging with a console error instead of 404ing
 - Found by: human
 
 ### 2026-10-02 · The add -f dist / untrack release ritual is error-prone
@@ -119,7 +131,7 @@ they are not rediscovered. Status refers to the template.
   v1.1.1 with a tree identical to v1.1.0.
 - Fix: brandvm, adaria and nexplan commit `dist/` permanently and fail CI on
   `git diff --exit-code -- dist`.
-- Status: open
+- Status: fixed in template v3 — dist/ is committed; CI fails on drift; dev builds stay in memory
 - Found by: human
 
 ### 2026-10-02 · One throwing module leaves the page scroll-locked
@@ -129,7 +141,7 @@ they are not rediscovered. Status refers to the template.
 - Cause: `src/index.ts` runs modules as a chain.
 - Fix: reformdd and brandvm wrap each init in `run(name, init)` with
   try/catch; the template only has `finally` around the lock release.
-- Status: partly fixed
+- Status: fixed in template v3 — run(name, init) isolates each module; the lock is released before modules run; the head timeout no longer waits for load
 - Found by: human
 
 ### 2026-10-02 · CDN `defer` scripts cannot be ordered against the bundle

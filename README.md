@@ -21,10 +21,15 @@ pnpm install
 ## Commands
 
 ```bash
-pnpm dev      # esbuild watch + server on :3000 (unminified, sourcemaps)
-pnpm build    # minified -> dist/
+pnpm dev      # esbuild watch + server on :3000 (in memory, sourcemaps)
+pnpm build    # minified -> dist/ (commit the result)
 pnpm check    # tsc --noEmit
+pnpm test     # build + browser checks
 ```
+
+`dist/` is committed. `pnpm dev` serves from memory and never touches it;
+run `pnpm build` and commit `dist/` together with any `src/` change — CI
+fails the push if they disagree, and staging does not deploy until it passes.
 
 ## New project checklist
 
@@ -33,9 +38,10 @@ pnpm check    # tsc --noEmit
 3. Repo Settings → Pages → Source: **GitHub Actions**
 4. Repo → Settings → Collaborators and teams → add the `developers` team (Write)
 5. Paste the three snippets from `loader.html` into Webflow, replacing `REPO`
-   with this repo's name in each — head code, an **Embed on the canvas**, and
-   footer code. Piece 2 must be an Embed inside a component that appears on
-   every page; site custom code does not render in the Designer.
+   with this repo's name in pieces 1 and 2 — head code, an **Embed on the
+   canvas**, and footer code. Leave `RELEASE = null` until the first tag.
+   Piece 2 must be an Embed inside a component that appears on every page;
+   site custom code does not render in the Designer.
 6. Publish to staging and confirm the canvas picks up `styles.css`
 7. Fill in the **Project facts** at the top of `AGENTS.md` (site ID, URLs)
 
@@ -61,7 +67,7 @@ is ready. It has no runtime dependencies or client-specific URLs.
 
 New projects created from this template include it automatically. Existing
 projects can copy the module, merge the types from `src/globals.d.ts`, add the initializer, and update
-the CSS/config Embed and footer from `loader.html` (keep their own REPO/VER values).
+all three snippets from `loader.html` (move their version into `RELEASE`).
 The loader's `window.BV.source` field records fallback selection before the bundle
 runs. A JS fallback also removes local CSS and selects the fallback stylesheet.
 
@@ -79,43 +85,30 @@ and host/editor restrictions without starting a local server.
 ## Release (launch / retainer updates)
 
 ```
-pnpm build
-git add -f dist && git commit -m "release: vX.Y.Z"
+pnpm build                      # dist/ must match src/ — CI checks this too
+git commit -am "release: vX.Y.Z" # only if the build changed anything
 git tag vX.Y.Z && git push && git push --tags
-git rm -r --cached dist && git commit -m "chore: untrack dist after vX.Y.Z"
-git push
 ```
 
-`dist/` is gitignored for day-to-day work, so the `-f` is required — without
-it the release commit is empty, the tag carries no build, and jsDelivr serves
-a 404 to the live site.
+`dist/` is always committed, so every tag carries its build and jsDelivr can
+serve it. There is no force-add or un-track step.
 
-The un-track at the end is not optional tidying. `.gitignore` only governs
-files git is not already *tracking*, so the release commit permanently
-cancels the ignore rule for `dist/`: from that point on every rebuild shows
-as a modification and `git add .` sweeps a minified bundle into whatever
-commit you are writing. `--cached` un-tracks it but leaves the files on
-disk, so the ignore rule applies again. The tag is untouched — it still
-points at the commit that contains the build, and jsDelivr serves that
-forever.
-
-Then bump `VER` in BOTH Webflow snippets (the CSS/config Embed and the footer
-loader) → publish staging → verify → publish prod.
-Rollback = revert the version strings. Never use `@latest` or branch URLs in prod.
+Then set `RELEASE = "X.Y.Z"` in the head code snippet — the only version
+string — and publish staging → verify → publish prod.
+Rollback = set `RELEASE` back to the previous tag and publish. Never use
+`@latest` or branch URLs in prod.
 
 **Tag rules (learned the hard way):**
 
-- `dist/` must be committed *before* the tag is pushed
+- Tag a commit whose CI run passed — that proves `dist/` matches `src/`
 - A pushed tag must **never** be moved (`tag -f`) — jsDelivr snapshots a
   version once and keeps it forever, so a half-baked snapshot is permanent.
   Botched release? Cut the next patch version instead
-- Un-track `dist/` again once the tag is pushed, or the ignore rule stays
-  dead for every commit after the first release
 
-**Before attaching a custom domain,** confirm the repo actually has the tag
-`VER` points at. A site running on `.webflow.io` never touches the prod URLs,
-so a placeholder `VER = "X.Y.Z"` stays invisible until the moment the domain
-goes live — and then both CSS and JS 404 at once.
+**Before attaching a custom domain,** set `RELEASE`. While it is `null` a
+custom domain serves the *staging* bundle and logs a console error, so the
+site still renders — but staging changes on every push and must never be
+what production runs on.
 
 ## How the files reach the page
 
@@ -124,7 +117,7 @@ before touching any of them.
 
 | Environment    | Source                  |
 | -------------- | ----------------------- |
-| Production     | pinned jsDelivr tag     |
+| Production     | pinned jsDelivr tag (`RELEASE`) |
 | `*.webflow.io` | GitHub Pages staging    |
 | `?bv-dev=1`    | `http://localhost:3000` |
 
@@ -134,9 +127,16 @@ not and gets blocked as mixed content. To check work on another device, push
 and use the staging bundle.
 
 Pushing to `master` triggers
-[`.github/workflows/staging.yml`](.github/workflows/staging.yml), which runs
-`pnpm build` and publishes `dist/` to GitHub Pages. Production is pinned to a
-tag, so a staging deploy never touches the live site.
+[`.github/workflows/staging.yml`](.github/workflows/staging.yml): type check,
+build, browser tests and the `dist/` check, then — only if all pass — publish
+`dist/` to GitHub Pages. Pull requests run the same checks without deploying.
+Production is pinned to a tag, so a staging deploy never touches the live
+site.
+
+The Designer canvas shows the **staging** stylesheet, so seeing a CSS change
+there means push → ~1 min → reload the Designer tab. There is no static
+localhost link in the Embed (public visitors' browsers used to request it);
+`loader.html` explains how to add one temporarily while designing.
 
 ## Project structure
 
@@ -154,12 +154,18 @@ Section order is the tiebreaker for same-specificity rules — add to the
 section a rule belongs to, never to the end of the file.
 
 
-The stylesheet includes the shared CSS foundation: fluid root sizing, element
-resets, Webflow default overrides, opt-in effects and utilities, rich-text
-spacing, keyboard focus styles, and reduced-motion support. Tune the sizing
-tokens, wire the accent and container width to the site's Webflow variables,
-and set `--nav-h` when adding a fixed header. Marquees need duplicated tracks;
-read-more controls need their own JavaScript toggle.
+The stylesheet includes the shared CSS foundation: element resets, fixes for
+Webflow internals the Designer cannot select, opt-in effects and utilities,
+rich-text spacing, keyboard focus styles, and reduced-motion support. It does
+**not** restyle Webflow components the Designer can style, set the root
+font-size, or read Webflow variable names — those beat or silently break
+Designer styling (see `GOTCHAS.md`). A fluid root scale is available as a
+commented-out opt-in in §01. Set `--nav-h` when adding a fixed header.
+Marquees need duplicated tracks; read-more controls need their own JavaScript
+toggle.
+
+Modules run through `run(name, init)` in `src/index.ts`: one that throws is
+logged and skipped, and the rest still initialize.
 
 TypeScript runs `strict`, targets ES2019, and defines no path aliases —
 imports are relative.
