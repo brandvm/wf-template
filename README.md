@@ -37,6 +37,7 @@ pnpm check    # tsc --noEmit
    footer code. Piece 2 must be an Embed inside a component that appears on
    every page; site custom code does not render in the Designer.
 6. Publish to staging and confirm the canvas picks up `styles.css`
+7. Fill in the **Project facts** at the top of `AGENTS.md` (site ID, URLs)
 
 ## Daily
 
@@ -162,6 +163,30 @@ read-more controls need their own JavaScript toggle.
 
 TypeScript runs `strict`, targets ES2019, and defines no path aliases —
 imports are relative.
+
+## AI agents
+
+- [`AGENTS.md`](AGENTS.md) — the agent rules: ownership, the Designer-first
+  CSS policy, canvas facts, release, Webflow MCP limits. Codex and similar
+  tools read it directly.
+- [`CLAUDE.md`](CLAUDE.md) — imports `AGENTS.md` and `GOTCHAS.md` for Claude
+  Code. Edit `AGENTS.md`, not this file.
+- [`GOTCHAS.md`](GOTCHAS.md) — a log agents append to when something costs
+  time. Entries tagged `template-candidate` feed back into this template.
+
+Every repo CSS rule carries a `/* repo-css: <tag> — why */` comment; the
+allowed tags are listed in `AGENTS.md`. Styling the Designer can express
+belongs in the Designer.
+
+To collect template improvements from client repos:
+
+```bash
+gh search code "Scope: template-candidate" --owner brandvm --filename GOTCHAS.md
+```
+
+Code search only covers public repos. For private ones, read each
+`GOTCHAS.md` directly (`gh repo list brandvm`, then
+`gh api repos/brandvm/<repo>/contents/GOTCHAS.md`).
 
 ## Webflow MCP
 

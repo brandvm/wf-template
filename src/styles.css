@@ -3,6 +3,13 @@
    Keep Designer classes for layout; this file is for tokens, resets,
    utilities, and JS-paired styles that Webflow classes cannot express.
 
+   REPO-CSS POLICY — see AGENTS.md. If the Designer can express a style,
+   it belongs in the Designer, not here. Every rule here, or the section
+   header covering it, carries a reason comment starting "repo-css:"
+   with one tag — js-state, designer-cant, third-party, canvas-preview,
+   approved-base or override-webflow — then a short why.
+   override-webflow needs explicit approval and a GOTCHAS.md entry.
+
    CASCADE NOTES — read before adding rules.
    1. This sheet is injected by an HTML Embed in the body (see loader.html),
       so it lands after webflow.css. Ties on specificity go to us.
@@ -32,6 +39,8 @@
    01. TOKENS
    ============================================================ */
 
+/* repo-css: approved-base — variables consumed by the rules below; no output except the root scale, tagged separately */
+
 :root {
   /* Fluid scale — sets the root font-size so every rem value coming out
      of the Designer scales with the viewport. Ideal = the width the
@@ -51,6 +60,8 @@
     var(--size-container) / (var(--size-container-ideal) / var(--size-unit))
   );
 
+  /* repo-css: override-webflow — rescales every rem/em from the Designer.
+     See GOTCHAS.md "Root font-size scale drifts from Designer tokens". */
   font-size: var(--size-font);
 
   /* Colour — wire these to the Webflow variables once the palette is in
@@ -115,6 +126,8 @@
 /* ============================================================
    02. BASE
    ============================================================ */
+
+/* repo-css: approved-base — element resets below class specificity (0-0-1), so Designer classes always win */
 
 *,
 *::before,
@@ -186,6 +199,8 @@ svg {
 /* ============================================================
    03. WEBFLOW NEUTRALIZERS
    ============================================================ */
+
+/* repo-css: override-webflow — these beat Designer styles on source order; delete any rule that fights the Designer. See GOTCHAS.md "Neutralizers in §03 override Designer styles" */
 
 /* Clearfix pseudos. Webflow puts ::before/::after on most wrappers;
    inside a flex or grid parent they become phantom items and eat gap. */
@@ -340,6 +355,8 @@ svg {
    04. DOCUMENT STATE
    ============================================================ */
 
+/* repo-css: js-state — classes the loader and modules toggle on <html> */
+
 /* The head bootstrap in loader.html adds .is-loading before first paint.
    src/index.ts removes it when the bundle boots; the head timeout provides
    a fallback if the bundle cannot load. */
@@ -352,6 +369,8 @@ html.is-loading body {
 /* ============================================================
    05. COMPONENTS & MOTION
    ============================================================ */
+
+/* repo-css: designer-cant — @keyframes, pseudo-element effects and opt-in classes paired with JS */
 
 .link-underline {
   position: relative;
@@ -512,6 +531,8 @@ html.is-loading body {
    06. UTILITIES
    ============================================================ */
 
+/* repo-css: designer-cant — line clamp, masks, gradient text, scrollbar hiding */
+
 /* Anchor offset for the fixed header */
 :where([id]) {
   scroll-margin-top: var(--nav-h);
@@ -665,6 +686,8 @@ html.is-loading body {
    07. ACCESSIBILITY
    ============================================================ */
 
+/* repo-css: designer-cant — :focus-visible and prefers-reduced-motion overrides */
+
 :focus:not(:focus-visible) {
   outline: none;
 }
@@ -702,6 +725,8 @@ html.is-loading body {
 /* ============================================================
    08. EDITOR & DEV SUPPORTS
    ============================================================ */
+
+/* repo-css: canvas-preview — Designer canvas and editor escape hatches */
 
 /* Optional class for code-only embeds that should occupy no layout space. */
 .g-embed-code {
