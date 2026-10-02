@@ -14,7 +14,7 @@ Fill these in when the repo is created from `brandvm/wf-template`.
 - Staging site: `https://<SLUG>.webflow.io`
 - Staging bundles: `https://brandvm.github.io/<REPO>/`
 - Production domain: `<DOMAIN or "not attached yet">`
-- Production release: `<VER or "none yet">`
+- Production release: `<RELEASE in the head snippet, or "none yet">`
 
 ## Who owns what
 
@@ -73,8 +73,9 @@ Before writing any CSS, decide where it belongs.
 - `loader.html` — the three snippets pasted into Webflow (head code, the
   CSS/config Embed on the canvas, footer code). Read it before touching any
   of them.
-- `src/index.ts` is a manifest of module imports and init calls. Features go
-  in `src/modules/`, one file each, exporting an init function that no-ops
+- `src/index.ts` is a manifest: one `run('<name>', init<Name>)` call per
+  module, so a module that throws is logged and the rest still run. Features
+  go in `src/modules/`, one file each, exporting an init function that no-ops
   when its target markup is absent.
 - `src/styles.css` opens with cascade notes. Add rules to the section they
   belong to, never to the end of the file.
@@ -87,10 +88,12 @@ Before writing any CSS, decide where it belongs.
 - **The Designer canvas never runs scripts.** Anything shown only after JS
   runs is invisible there; use a `canvas-preview` rule if the Designer needs
   to see it.
-- **The canvas loads two stylesheets — staging and localhost — and they are
-  additive.** Adding a rule locally shows up; *removing* one does not,
-  because staging's copy still applies. Deletions can only be verified after
-  a push, or by temporarily commenting out the `bv-css` link.
+- **The canvas shows the staging stylesheet only.** Seeing a CSS change in
+  the Designer means push → ~1 min → reload the Designer tab. Never add a
+  static `http://localhost` link to the Embed for good — every public
+  visitor's browser would request it. `loader.html` describes the temporary
+  opt-in; if one is in use, the local and staging sheets are additive and a
+  deleted rule keeps applying from staging until pushed.
 - No live reload on the canvas. Reload the Designer tab.
 - Debug "is my CSS loading?" with `background`, not `outline` — outlines on
   `body` paint outside the canvas iframe and get clipped.
@@ -110,11 +113,15 @@ pnpm check    # tsc --noEmit
 pnpm test     # build + Playwright checks
 ```
 
-Node 22 and the pinned pnpm in `package.json`. Run `pnpm check` and
-`pnpm build` before pushing. Release exactly as the README describes:
-`dist/` is committed for the release commit and tag, then un-tracked. Never
-move a pushed tag; cut the next patch. Never use `@latest` or a branch URL in
-production.
+Node 22 and the pinned pnpm in `package.json`. `dist/` is committed: after
+any `src/` change run `pnpm build` and commit `dist/` with it — CI fails the
+push otherwise, and staging only deploys after `pnpm check`, the browser
+tests and the `dist/` check pass. `pnpm dev` builds in memory and never
+touches `dist/`.
+
+Release as the README describes: tag a commit whose CI passed, then set
+`RELEASE` in the head snippet — the only version string. Never move a pushed
+tag; cut the next patch. Never use `@latest` or a branch URL in production.
 
 ## Webflow MCP limits
 

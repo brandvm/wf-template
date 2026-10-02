@@ -24,7 +24,7 @@
 
         01 TOKENS               variables only, no output
         02 BASE                 our reset and element defaults
-        03 WEBFLOW NEUTRALIZERS undo what Webflow's normalize invents
+        03 WEBFLOW INTERNALS    Webflow parts the Designer cannot select
         04 DOCUMENT STATE       runtime classes on <html>, set by JS
         05 COMPONENTS & MOTION  named things: .link-underline, marquees
         06 UTILITIES            single-purpose, must beat components
@@ -39,34 +39,16 @@
    01. TOKENS
    ============================================================ */
 
-/* repo-css: approved-base — variables consumed by the rules below; no output except the root scale, tagged separately */
+/* repo-css: approved-base — variables consumed by the rules below; no output */
 
 :root {
-  /* Fluid scale — sets the root font-size so every rem value coming out
-     of the Designer scales with the viewport. Ideal = the width the
-     design was built at. These starting widths come from the reference;
-     tune them to match each project's design. */
+  /* Base unit for the Figma width passthrough in §06. Not a root scale:
+     the root font-size is left to the browser and the Designer. */
   --size-unit: 16;
-  --size-container-ideal: 1440;
-  --size-container-min: 991px;
-  --size-container-max: 1440px;
 
-  --size-container: clamp(
-    var(--size-container-min),
-    100vw,
-    var(--size-container-max)
-  );
-  --size-font: calc(
-    var(--size-container) / (var(--size-container-ideal) / var(--size-unit))
-  );
-
-  /* repo-css: override-webflow — rescales every rem/em from the Designer.
-     See GOTCHAS.md "Root font-size scale drifts from Designer tokens". */
-  font-size: var(--size-font);
-
-  /* Colour — wire these to the Webflow variables once the palette is in
-     the Designer (`var(--_colors--accent, …)`). Until then they inherit,
-     so nothing renders wrong. */
+  /* Colour — inherits by default. Avoid wiring this to a Webflow variable
+     name (`var(--_colors---…)`): Webflow cannot update this bundle when
+     the variable is renamed, so the reference breaks silently. */
   --color-accent: currentColor;
 
   /* Motion */
@@ -96,32 +78,30 @@
   --image-zoom-scale: 1.12;
 }
 
-/* Tablet */
+/* Opt-in fluid root scale — OFF by default.
+   Setting font-size on :root rescales every rem/em value coming out of the
+   Designer, so Designer token names ("Max Width - 1280px") stop matching
+   what renders, and the scale ends up retuned project after project. Only
+   enable it with the user's approval, as override-webflow, and log it in
+   GOTCHAS.md. To enable, uncomment and tune the widths to the design:
+
+:root {
+  --size-container-ideal: 1440;
+  --size-container-min: 991px;
+  --size-container-max: 1440px;
+  --size-container: clamp(var(--size-container-min), 100vw, var(--size-container-max));
+  font-size: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
+}
 @media screen and (max-width: 991px) {
-  :root {
-    --size-container-ideal: 834;
-    --size-container-min: 768px;
-    --size-container-max: 991px;
-  }
+  :root { --size-container-ideal: 834; --size-container-min: 768px; --size-container-max: 991px; }
 }
-
-/* Mobile landscape */
 @media screen and (max-width: 767px) {
-  :root {
-    --size-container-ideal: 430;
-    --size-container-min: 480px;
-    --size-container-max: 767px;
-  }
+  :root { --size-container-ideal: 430; --size-container-min: 480px; --size-container-max: 767px; }
 }
-
-/* Mobile portrait */
 @media screen and (max-width: 479px) {
-  :root {
-    --size-container-ideal: 430;
-    --size-container-min: 320px;
-    --size-container-max: 428px;
-  }
+  :root { --size-container-ideal: 430; --size-container-min: 320px; --size-container-max: 428px; }
 }
+*/
 
 /* ============================================================
    02. BASE
@@ -197,10 +177,17 @@ svg {
 }
 
 /* ============================================================
-   03. WEBFLOW NEUTRALIZERS
+   03. WEBFLOW INTERNALS
    ============================================================ */
 
-/* repo-css: override-webflow — these beat Designer styles on source order; delete any rule that fights the Designer. See GOTCHAS.md "Neutralizers in §03 override Designer styles" */
+/* repo-css: designer-cant — pseudo-elements, generated children and runtime
+   classes of Webflow components that the Designer cannot select.
+
+   Rules that restyled selectable Webflow defaults (Container max-width,
+   forms, checkbox/radio, nav, slider, tabs, dropdown toggle, CMS empty
+   state) were removed in v3: loading after webflow.css, they beat the
+   Designer on source order, so a style set in the Designer did nothing.
+   Style those in the Designer. See GOTCHAS.md. */
 
 /* Clearfix pseudos. Webflow puts ::before/::after on most wrappers;
    inside a flex or grid parent they become phantom items and eat gap. */
@@ -227,90 +214,12 @@ svg {
   display: none;
 }
 
-/* Container ships a 940px cap and its own breakpoints; swap both for the
-   Layout token so a bare Container inherits the system width. Width
-   variants must be COMBO classes — a lone class on a Container is 0-1-0
-   and loses to this rule on source order. Fallback is `none`, so a
-   renamed collection/group/variable degrades to uncapped, not to 940. */
-.w-layout-blockcontainer {
-  max-width: var(--_layout---container--max-width, none);
-}
-
-/* Forms — Webflow hardcodes a #3898ec focus ring and grey/pink
-   success/error panels. The form :focus-visible rules in §07 restore the
-   outline that Webflow's :focus rule removes. */
-.w-form {
-  margin: 0;
-}
-
-.w-form-done,
-.w-form-fail {
-  margin: 0;
-  padding: 0;
-  background: none;
-  text-align: inherit;
-}
-
-.w-input,
-.w-select {
-  font: inherit;
-  color: inherit;
-}
-
-.w-input:focus,
-.w-select:focus {
-  border-color: currentColor;
-}
-
-.w-checkbox,
-.w-radio {
-  display: block;
-  margin: 0;
-  padding: 0;
-}
-
-.w-checkbox-input,
-.w-radio-input {
-  float: none;
-  margin: 0;
-}
-
-/* Components. Only the defaults that are always in the way — navbar
-   internals are left alone deliberately, since Webflow's floats are
-   load-bearing for the built-in nav. */
-.w-nav {
-  background-color: transparent;
-}
-
-.w-slider {
-  height: auto;
-  background: transparent;
-}
-
-.w-tab-link {
-  padding: 0;
-  background: none;
-}
-
-.w-tab-content,
-.w-tab-pane {
-  overflow: visible;
-}
-
-.w-dropdown-toggle {
-  padding: 0;
-}
-
+/* The <video> inside a Background Video is generated, not selectable. */
 .w-background-video > video {
   object-fit: cover;
 }
 
-/* CMS empty states */
-.w-dyn-empty {
-  padding: 0;
-  background: none;
-}
-
+/* Added at runtime to CMS-bound elements whose field is empty. */
 .w-dyn-bind-empty {
   display: none;
 }
