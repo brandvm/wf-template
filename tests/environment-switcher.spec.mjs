@@ -180,7 +180,8 @@ test('production without a RELEASE serves staging and logs an error', async ({ p
   const requests = [];
   const consoleErrors = [];
   await setup(page, { url: 'https://client.example/', release: null, requests, consoleErrors });
-  await expect(page.locator('#bv-css')).toHaveAttribute('href', stage + 'styles.css');
+  // Staging changes on every push, so it is cache-busted like on webflow.io.
+  await expect(page.locator('#bv-css')).toHaveAttribute('href', new RegExp('^' + stage + 'styles\\.css\\?v=\\d+$'));
   expect(requests.some(request => request.startsWith(stage + 'index.js'))).toBe(true);
   expect(requests.filter(request => request.includes('cdn.jsdelivr.net/gh/'))).toEqual([]);
   expect(consoleErrors.join('\n')).toContain('RELEASE is not set');
