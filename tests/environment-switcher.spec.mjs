@@ -1,0 +1,195 @@
+import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+// The loader as pasted into Webflow: comments stripped (they contain an
+// example link that must NOT be installed), REPO and RELEASE filled in.
+const source = readFileSync(new URL('../loader.html', import.meta.url), 'utf8')
+  .replace(/<!--[\s\S]*?-->/g, '').replaceAll('ORG', 'example-org').replaceAll('REPO', 'wf-example');
+// Client repos fill REPO (and maybe the org) in, so read them back.
+const repo = source.match(/var SITE = "([^"]+)"/)[1];
+const org = source.match(/var OWNER = "([^"]+)"/)[1];
+if (!source.includes('var RELEASE = null;')) throw new Error('loader.html must ship with `var RELEASE = null;`');
+function loader(release) {
+  const text = source.replace('var RELEASE = null;', `var RELEASE = ${JSON.stringify(release)};`);
+  return {
+    scripts: [...text.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[0]),
+    links: [...text.matchAll(/<link\b[^>]*>/g)].map(match => match[0])
+      .filter(link => /id="wfc-css/.test(link)).join('\n'),
+  };
+}
+const js = readFileSync(new URL('../dist/index.js', import.meta.url), 'utf8');
+const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
+const stage = `https://${org}.github.io/${repo}/`;
+const local = 'http://localhost:3000/';
+const release = `https://cdn.jsdelivr.net/gh/${org}/${repo}@1.0.0/dist/`;
+
+async function setup(page, {
+  url = 'https://example.webflow.io/',
+  unavailable = () => false,
+  blockedStorage = false,
+  editor = false,
+  design = false,
+  release = '1.0.0',
+  requests = [],
+  consoleErrors = [],
+} = {}) {
+  const { scripts, links } = loader(release);
+  expect(scripts).toHaveLength(3);
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('request', request => requests.push(request.url()));
+  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+  if (blockedStorage) await page.addInitScript(() => {
+    Object.defineProperty(window, 'localStorage', { get() { throw new Error('Storage blocked'); } });
+  });
+  const html = `<!doctype html><html><head>${scripts[0]}</head><body>
+    ${links}${scripts[1]}<h1>Example client website</h1>
+    <script>window.Webflow={env:mode=>mode==='editor'?${editor}:mode==='design'?${design}:false};</script>
+    ${scripts[2]}</body></html>`;
+  await page.route('**/*', route => {
+    const request = route.request();
+    if (request.isNavigationRequest()) return route.fulfill({ contentType: 'text/html', body: html });
+    if (unavailable(request.url())) return route.abort();
+    const style = new URL(request.url()).pathname.endsWith('.css');
+    return route.fulfill({ contentType: style ? 'text/css' : 'text/javascript', body: style ? css : js });
+  });
+  await page.goto(url);
+  await expect(page.locator('html')).not.toHaveClass(/is-loading/);
+  return errors;
+}
+
+for (const width of [1440, 390]) test(`switches sources and keeps the page URL at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
+  const errors = await setup(page, { url: 'https://example.webflow.io/services?tab=one#section' });
+  const launcher = page.getByRole('button', { name: 'Choose environment (Staging)' });
+  await launcher.click();
+  await expect(page.getByRole('button', { name: 'Staging', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Dev', exact: true }).click();
+  await expect(page).toHaveURL('https://example.webflow.io/services?tab=one&wfc-dev=1#section');
+  await page.getByRole('button', { name: 'Choose environment (Dev)' }).click();
+  expect(await page.evaluate(() => window.WFC.source)).toBe(local);
+  await page.getByRole('button', { name: 'Staging', exact: true }).click();
+  await expect(page).toHaveURL('https://example.webflow.io/services?tab=one&wfc-dev=0#section');
+  await expect(launcher).toBeVisible();
+  expect(await page.evaluate(() => window.WFC.source)).toBe(stage);
+  expect(await page.evaluate(() => localStorage.getItem('wfc-dev'))).toBe('0');
+  expect(errors).toEqual([]);
+});
+
+test('mode persists on another page without a query flag', async ({ page }) => {
+  await setup(page);
+  await page.getByRole('button', { name: 'Choose environment (Staging)' }).click();
+  await page.getByRole('button', { name: 'Dev', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Choose environment (Dev)' })).toBeVisible();
+  await page.goto('https://example.webflow.io/about');
+  await expect(page.getByRole('button', { name: 'Choose environment (Dev)' })).toBeVisible();
+  expect(await page.evaluate(() => window.WFC.source)).toBe(local);
+});
+
+test('URL selection works when localStorage is blocked', async ({ page }) => {
+  const errors = await setup(page, { blockedStorage: true });
+  await page.getByRole('button', { name: 'Choose environment (Staging)' }).click();
+  await page.getByRole('button', { name: 'Dev', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Choose environment (Dev)' })).toBeVisible();
+  expect(await page.evaluate(() => window.WFC.source)).toBe(local);
+  expect(errors).toEqual([]);
+});
+
+test('local JS failure shows staging and removes the local stylesheet', async ({ page }) => {
+  const errors = await setup(page, {
+    url: 'https://example.webflow.io/?wfc-dev=1',
+    unavailable: url => url.startsWith(local) && url.includes('index.js'),
+  });
+  await page.getByRole('button', { name: 'Choose environment (Staging)' }).click();
+  await expect(page.getByRole('status')).toHaveText('Dev unavailable · using staging');
+  await expect(page.locator('#wfc-css-dev')).toHaveCount(0);
+  await expect(page.locator('#wfc-css')).toHaveAttribute('href', new RegExp('^' + stage));
+  await page.getByRole('button', { name: 'Staging', exact: true }).click();
+  await expect(page).toHaveURL('https://example.webflow.io/?wfc-dev=0');
+  await page.getByRole('button', { name: 'Choose environment (Staging)' }).click();
+  await expect(page.getByRole('status')).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test('staging failure identifies the pinned release and allows a retry', async ({ page }) => {
+  let failStage = true;
+  const errors = await setup(page, { unavailable: url => failStage && url.startsWith(stage) && url.includes('index.js') });
+  await page.getByRole('button', { name: 'Choose environment (Staging)' }).click();
+  await expect(page.getByRole('status')).toHaveText('Staging unavailable · using release');
+  expect(await page.evaluate(() => window.WFC.source)).toBe(release);
+  await expect(page.locator('#wfc-css')).toHaveAttribute('href', release + 'styles.css');
+  failStage = false;
+  await page.getByRole('button', { name: 'Staging', exact: true }).click();
+  await expect(page).toHaveURL('https://example.webflow.io/?wfc-dev=0');
+  await page.getByRole('button', { name: 'Choose environment (Staging)' }).click();
+  expect(await page.evaluate(() => window.WFC.source)).toBe(stage);
+  await expect(page.getByRole('status')).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test('supports keyboard access, Escape, outside clicks, and duplicate initialization', async ({ page }) => {
+  const errors = await setup(page);
+  const launcher = page.getByRole('button', { name: 'Choose environment (Staging)' });
+  await launcher.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('button', { name: 'Staging', exact: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(launcher).toBeFocused();
+  await expect(page.getByRole('group', { name: 'Code environment' })).toBeHidden();
+  await launcher.click();
+  await page.locator('h1').click();
+  await expect(launcher).toBeVisible();
+  await page.addScriptTag({ content: js });
+  await expect(page.locator('#wfc-environment')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
+for (const scenario of [
+  { label: 'production', url: 'https://client.example/?wfc-dev=1' },
+  { label: 'localhost', url: 'http://localhost:3000/' },
+  { label: 'Webflow editor', editor: true },
+  { label: 'Designer', design: true },
+]) test(`hidden in ${scenario.label}`, async ({ page }) => {
+  const errors = await setup(page, scenario);
+  await expect(page.locator('#wfc-environment')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+for (const url of ['https://client.example/', 'https://example.webflow.io/']) test(`public pages never request localhost (${new URL(url).hostname})`, async ({ page }) => {
+  const requests = [];
+  const errors = await setup(page, { url, requests });
+  await expect(page.locator('#wfc-css-dev')).toHaveCount(0);
+  expect(requests.filter(request => request.startsWith(local))).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test('dev mode adds the local stylesheet after staging', async ({ page }) => {
+  const requests = [];
+  await setup(page, { url: 'https://example.webflow.io/?wfc-dev=1', requests });
+  await expect(page.locator('link#wfc-css + link#wfc-css-dev')).toHaveAttribute('href', local + 'styles.css');
+  expect(requests).toContain(local + 'styles.css');
+  expect(requests).toContain(local + 'index.js');
+});
+
+test('production uses the single RELEASE for both CSS and JS', async ({ page }) => {
+  const requests = [];
+  await setup(page, { url: 'https://client.example/', requests });
+  await expect(page.locator('#wfc-css')).toHaveAttribute('href', release + 'styles.css');
+  expect(requests).toContain(release + 'index.js');
+  expect(requests.filter(request => request.startsWith(stage) && request.endsWith('.js'))).toEqual([]);
+});
+
+test('production without a RELEASE serves staging and logs an error', async ({ page }) => {
+  const requests = [];
+  const consoleErrors = [];
+  await setup(page, { url: 'https://client.example/', release: null, requests, consoleErrors });
+  // Staging changes on every push, so it is cache-busted like on webflow.io.
+  await expect(page.locator('#wfc-css')).toHaveAttribute('href', new RegExp('^' + stage + 'styles\\.css\\?v=\\d+$'));
+  expect(requests.some(request => request.startsWith(stage + 'index.js'))).toBe(true);
+  expect(requests.filter(request => request.includes('cdn.jsdelivr.net/gh/'))).toEqual([]);
+  expect(consoleErrors.join('\n')).toContain('RELEASE is not set');
+});
+
+test('the scroll lock is released when the bundle cannot load', async ({ page }) => {
+  await setup(page, { url: 'https://client.example/', unavailable: url => url.endsWith('index.js') });
+});

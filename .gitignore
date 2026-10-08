@@ -1,0 +1,18 @@
+node_modules/
+.DS_Store
+
+# These repos are public — never let a key reach a commit.
+.env
+
+# dist/ is committed on purpose: release tags need the built files for
+# jsDelivr, and CI fails if dist/ does not match a fresh build of src/.
+
+# Browser verification artifacts
+test-results/
+playwright-report/
+
+# webflow-build skill output (screenshots)
+.webflow-build/
+
+# Harvest drafts from client repos (contain client details)
+.harvest/

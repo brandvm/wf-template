@@ -1,0 +1,22 @@
+name: Bug
+description: The loader, switcher, a script or a skill doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Keep it generic — no client names, URLs, copy or credentials.
+  - type: input
+    id: version
+    attributes:
+      label: Template version
+      description: From `.wf-template.json` (and `skills.version` if updated).
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual
+    validations: { required: true }
