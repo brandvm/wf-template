@@ -1,0 +1,30 @@
+{
+  "name": "wf-template",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "dev": "node build.mjs --dev",
+    "build": "node build.mjs",
+    "check": "tsc --noEmit && node scripts/check-repo.mjs",
+    "test": "pnpm build && playwright test && node --test tests/new-project.check.mjs",
+    "new-project": "node scripts/new-project.mjs",
+    "update-skills": "node scripts/update-skills.mjs",
+    "harvest": "node scripts/harvest.mjs",
+    "wf:compare": "node .claude/skills/webflow-build/scripts/compare.mjs",
+    "wf:pass": "node .claude/skills/webflow-build/scripts/pass.mjs",
+    "wf:anchors": "node .claude/skills/webflow-build/scripts/anchors.mjs",
+    "wf:outline": "node .claude/skills/webflow-build/scripts/outline.mjs",
+    "wf:film": "node .claude/skills/webflow-build/scripts/load-film.mjs",
+    "wf:transitions": "node .claude/skills/webflow-build/scripts/transitions.mjs",
+    "wf:a11y": "node .claude/skills/webflow-build/scripts/a11y.mjs",
+    "wf:links": "node .claude/skills/webflow-build/scripts/links.mjs",
+    "wf:baseline": "node .claude/skills/webflow-build/scripts/baseline.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "axe-core": "4.10.3",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

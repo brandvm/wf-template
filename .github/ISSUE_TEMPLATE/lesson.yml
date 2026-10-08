@@ -1,0 +1,29 @@
+name: Lesson
+description: Something that cost time on a Webflow build, for the skill's lessons
+labels: [lesson]
+body:
+  - type: markdown
+    attributes:
+      value: Keep it generic — no client names, URLs, copy or credentials.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [mcp, designer, css, js, loader, release, ci, perf]
+    validations: { required: true }
+  - type: textarea
+    id: symptom
+    attributes:
+      label: Symptom
+      description: What you saw.
+    validations: { required: true }
+  - type: textarea
+    id: cause
+    attributes:
+      label: Cause
+      description: Why it happened, if known.
+  - type: textarea
+    id: fix
+    attributes:
+      label: Fix or workaround
+    validations: { required: true }

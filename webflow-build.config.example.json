@@ -1,0 +1,8 @@
+{
+  "prototypeUrl": "http://127.0.0.1:5173",
+  "stagingUrl": "https://<slug>.webflow.io",
+  "repoDir": ".",
+  "bundlePattern": "<org>\\.github\\.io/<repo>/(index\\.js|styles\\.css)",
+  "widths": [[1440, 900], [820, 1180], [390, 844]],
+  "pages": ["/"]
+}

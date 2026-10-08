@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Style guide</title>
+<!-- @include partials/head.html -->
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body>
+<!-- Every class in webflow.css and new-classes.css is applied to at least
+     one element on this page (pnpm check:style-guide), so Webflow's "Clean
+     up unused styles" can't delete a class that only the CMS, a script or an
+     unbuilt page uses. Sections: colours, typography, spacing and radius,
+     buttons and states, forms, components, page components
+     (conventions.md §12). -->
+<div class="g-page-w">
+  <!-- @include partials/nav.html -->
+  <div class="g-main-w">
+    <main id="main">
+      <section class="section is-top" id="colours">
+        <div class="s-wrapper">
+          <h1 class="d1">Style guide</h1>
+        </div>
+      </section>
+    </main>
+    <!-- @include partials/footer.html -->
+  </div>
+</div>
+</body>
+</html>
