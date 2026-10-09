@@ -107,9 +107,10 @@ published.
    code the canvas would show blank boxes where every icon should be.
 
    The canvas shows the STAGING stylesheet: push, wait ~1 min, reload
-   the Designer tab. Everywhere else the 2b script rewrites the href
-   (pinned tag on prod, cache-busted staging on webflow.io) and adds
-   the localhost sheet only when the dev flag is on.
+   the Designer tab. Everywhere else the 2b script swaps in the right
+   sheet (pinned tag on prod, cache-busted staging on webflow.io) without
+   an unstyled gap, and adds the localhost sheet only when the dev flag
+   is on.
 
    There is deliberately no static localhost <link> here. It used to
    let the canvas show unsaved local CSS, but every public visitor's
@@ -140,7 +141,8 @@ published.
 <!-- ============================================================
 2b) Second HTML Embed, directly after 2a in the same component: this
     script only. The canvas never runs it (2a still shows the staging
-    CSS there); on published pages it settles the stylesheet URL.
+    CSS there); on published pages it swaps in the right stylesheet and
+    defines WFC.setCSS, which piece 3 uses for its fallbacks.
 ------------------------------------------------------------ -->
 <script>
   (function () {
@@ -148,15 +150,38 @@ published.
     var base = document.getElementById("wfc-css");
     if (!C) return console.error("[wfc] Head code config missing; the stylesheet stays on staging.");
     if (!base) return;
-    // Runs right after 2a, before anything paints, so the staging sheet
-    // never applies on prod — the href is settled before first paint.
-    base.href = C.staging ? C.stag + "styles.css?v=" + Date.now() : C.prod + "styles.css";
+    // Swap stylesheets without an unstyled gap. The staging sheet from 2a
+    // is already loading (or applied) when this runs, so the swap is NOT
+    // settled before first paint. Assigning a new href to a <link> drops
+    // its rules until the new file arrives; this sheet scales the type
+    // (§01), so pages re-rendered at the wrong scale and jumped — a
+    // full-page layout shift, measured at CLS 0.2–0.5 on desktop. Instead
+    // the target loads next to the current sheet; the old one goes only
+    // once the new one has loaded, and stays if the new one fails. The id
+    // moves at once, so later lookups (piece 3) find the target. Same
+    // URL = no-op.
+    C.setCSS = function (href) {
+      var cur = document.getElementById("wfc-css");
+      if (!cur) return;
+      var url = new URL(href, location.href).href;
+      if (cur.href === url) return;
+      var next = document.createElement("link");
+      next.rel = "stylesheet";
+      next.href = url;
+      cur.removeAttribute("id");
+      next.id = "wfc-css";
+      next.onload = function () { if (cur.parentNode) cur.parentNode.removeChild(cur); };
+      next.onerror = function () { if (next.parentNode) next.parentNode.removeChild(next); cur.id = "wfc-css"; };
+      cur.parentNode.insertBefore(next, cur.nextSibling);
+    };
+    C.setCSS(C.staging ? C.stag + "styles.css?v=" + Date.now() : C.prod + "styles.css");
     if (C.dev && !document.getElementById("wfc-css-dev")) {
       var dev = document.createElement("link");
       dev.id = "wfc-css-dev";
       dev.rel = "stylesheet";
       dev.href = C.devBase + "styles.css";
-      base.parentNode.insertBefore(dev, base.nextSibling); // second, so it wins
+      var css = document.getElementById("wfc-css");
+      css.parentNode.insertBefore(dev, css.nextSibling); // after the active sheet, so it wins
     }
   })();
 </script>
@@ -186,7 +211,11 @@ Rollback = set RELEASE in piece 1 back to the previous tag and publish.
         var devCSS = document.getElementById("wfc-css-dev");
         if (devCSS) devCSS.remove();
         var baseCSS = document.getElementById("wfc-css");
-        if (baseCSS) baseCSS.href = C.source + "styles.css" + new URL(src).search;
+        var cssURL = C.source + "styles.css" + new URL(src).search;
+        // setCSS (piece 2b) swaps without an unstyled gap and skips an
+        // unchanged URL; fall back to a plain href if 2b is an older copy.
+        if (C.setCSS) C.setCSS(cssURL);
+        else if (baseCSS) baseCSS.href = cssURL;
       }
       var s = document.createElement("script");
       s.src = src;

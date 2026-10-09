@@ -140,7 +140,10 @@ git tag vX.Y.Z && git push && git push --tags
 serve it. There is no force-add or un-track step.
 
 Then set `RELEASE = "X.Y.Z"` in the head code snippet — the only version
-string — and publish staging → verify → publish prod.
+string — and publish staging → verify → publish prod. Set it in Webflow
+only: `loader.html` keeps `RELEASE = null` (the browser tests enforce it,
+so committing a version fails CI and stops staging deploying). Record the
+installed version in `AGENTS.md` › Project facts.
 Rollback = set `RELEASE` back to the previous tag and publish. Never use
 `@latest` or branch URLs in prod.
 

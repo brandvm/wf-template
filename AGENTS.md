@@ -108,7 +108,10 @@ Before writing any CSS, decide where it belongs.
 
 A push updates the JS/CSS bundles only. Any change to `loader.html` must be
 re-pasted into Webflow and published to take effect — say so in the commit
-or PR description, and keep `loader.html` identical to what is installed.
+or PR description, and keep `loader.html` identical to what is installed,
+**except `RELEASE`**: it stays `null` in the repo (the browser tests fail
+otherwise, and with them CI and the staging deploy). The installed version
+lives only in the Webflow head code; record it in Project facts above.
 
 ## Commands and release
 
