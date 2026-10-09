@@ -7,7 +7,8 @@ rebuilt in Webflow class for class.
 It mirrors Webflow on purpose:
 - **URLs:** each page is `folder/index.html` at its Webflow URL, served
   without a trailing slash.
-- **Breakpoints:** 991, 767 and 479px.
+- **Breakpoints:** 991, 767 and 479px, plus Webflow's larger ones (1280,
+  1440, 1920px, min-width) when the snapshot uses them.
 - **Structure:** the page shell and section structure from `conventions.md`
   §1–2. Nav and Footer are one partial each (one Webflow Component each).
 - **CSS:** the CSS Webflow already has is generated from a snapshot and
@@ -42,7 +43,7 @@ address, so the check scripts can compare staging with it.
 | `src/css/tokens.css`, `webflow.css` | **Generated** from the snapshot (`pnpm css`). Never edit |
 | `src/css/proposed.css` | Changes to existing variables and class bindings, as P1, P2… old → new |
 | `src/css/new-classes.css` | New classes, grouped by component (more files: `new-classes-*.css`) |
-| `src/css/prototype.css` | Stand-ins for what Webflow ships, and the tag styles; never moved |
+| `src/css/prototype.css` | Stand-ins for what Webflow ships, and the tag styles; never moved. Element rules are in `:where()`, so a site's real tag styles in `webflow.css` win |
 | `src/main.ts`, `src/modules/` | The module manifest and one file per module |
 | `CLASSES.md` | **Generated** (`pnpm classes`): every new class with its Designer name |
 
@@ -98,8 +99,11 @@ published CSS).
    "variableModes": { "main": { "Typography Styles": "H2" } } }]
 ```
 
-- Keys are `<breakpoint>[:<state>]`: `main`, `medium` (991), `small` (767),
-  `tiny` (479).
+- Keys are `<breakpoint>[:<state>]`: `main`, `large` (min 1280), `xl`
+  (min 1440), `xxl` (min 1920), `medium` (991), `small` (767), `tiny`
+  (479). A state is a pseudo-class (`hover`, `focus-visible`…) or one of
+  the states Webflow publishes as a class: `current` (`.w--current`),
+  `redirected-checked` and `redirected-focus` (custom checkbox and radio).
 - `var:<Collection>/<Variable>` binds a variable.
 - `variableModes` sets a collection's mode on that class (the Typography
   Styles pattern in `conventions.md` §4). The body tag style is

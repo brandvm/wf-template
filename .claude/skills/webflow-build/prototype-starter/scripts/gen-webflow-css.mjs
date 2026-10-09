@@ -12,6 +12,12 @@ const load = (f) => JSON.parse(fs.readFileSync(path.join(root, 'webflow-snapshot
 const V = load('variables.json');
 const S = load('styles.json');
 const BP = { medium: 991, small: 767, tiny: 479 };
+// Webflow's larger breakpoints (min-width), emitted before the max-width
+// ones, as Webflow publishes them.
+const BP_UP = { large: 1280, xl: 1440, xxl: 1920 };
+// Webflow states that publish as a class, not a pseudo-class: Current
+// (links), and Checked / Focused on custom checkboxes and radios.
+const STATE_CLASS = { current: '.w--current', 'redirected-checked': '.w--redirected-checked', 'redirected-focus': '.w--redirected-focus' };
 // The collection whose modes classes switch per role (conventions.md §4).
 const STYLES_COLLECTION = 'Typography Styles';
 
@@ -60,11 +66,15 @@ const propValue = (p) => (typeof p === 'string' && p.startsWith('var:')
 const modeDecls = (modes = {}) => Object.entries(modes).flatMap(([c, m]) => (coll[c] ? decls(coll[c], m) : []));
 function selector(st, pseudo) {
   let sel = st.name === 'body' || !st.selector ? 'body' : st.selector;
-  if (pseudo) sel += ['placeholder', 'before', 'after'].includes(pseudo) ? `::${pseudo}` : `:${pseudo}`;
+  if (pseudo && STATE_CLASS[pseudo]) {
+    // `.a:where(.w-variant-x)` + current → `.a.w--current:where(.w-variant-x)`
+    const at = sel.indexOf(':where(');
+    sel = at < 0 ? sel + STATE_CLASS[pseudo] : sel.slice(0, at) + STATE_CLASS[pseudo] + sel.slice(at);
+  } else if (pseudo) sel += ['placeholder', 'before', 'after'].includes(pseudo) ? `::${pseudo}` : `:${pseudo}`;
   return sel;
 }
 
-const blocks = { main: [], medium: [], small: [], tiny: [] };
+const blocks = { main: [], large: [], xl: [], xxl: [], medium: [], small: [], tiny: [] };
 for (const st of S) {
   const props = st.properties ?? {};
   const modes = st.variableModes ?? {};
@@ -82,6 +92,9 @@ for (const st of S) {
   }
 }
 const out = ['/* GENERATED from webflow-snapshot/styles.json by `pnpm css` — do not edit.\n   Every rule here exists as a class in the Webflow Designer. */', ...blocks.main];
+for (const bp of ['large', 'xl', 'xxl']) {
+  if (blocks[bp].length) out.push(`@media screen and (min-width: ${BP_UP[bp]}px) {\n${blocks[bp].join('\n')}\n}`);
+}
 for (const bp of ['medium', 'small', 'tiny']) {
   if (blocks[bp].length) out.push(`@media screen and (max-width: ${BP[bp]}px) {\n${blocks[bp].join('\n')}\n}`);
 }
