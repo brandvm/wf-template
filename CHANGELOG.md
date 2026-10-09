@@ -40,6 +40,13 @@ manual step.
   (`inline-div-N` combos, API uploads stuck at size 0, CMS image URL
   re-hosting, box-shadow with a variable); designer (image Load setting
   and preload); css (the two prototype starter fixes).
+- Lessons from adopting the template on a live site: mcp (asset upload
+  without a public URL, `set_attributes` on Image elements, `publish_site`
+  domain ids and rate limit), designer (CMS bindings in JSON-LD, phone hero
+  video framing), css (measure preloads), js (moving off IX3, Finsweet
+  outside index.js). Merged with the loader entries above: one entry for
+  the Embed 2a staging link (render-blocking and a second download), one
+  for RELEASE in the repo.
 
 ## 0.1.0 — 2026-10-08 (not tagged)
 

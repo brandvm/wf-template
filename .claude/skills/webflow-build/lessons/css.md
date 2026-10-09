@@ -6,6 +6,19 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-09 · Measure preloads; font preloads can make it worse
+- Area: css, perf
+- Symptom: font preloads for the heading and body fonts (both
+  `font-display: swap`) were expected to help LCP.
+- Cause: they compete with the render-blocking CSS for bandwidth.
+- Fix: A/B by injecting the `<link>`s into production HTML with Playwright
+  route interception (7 runs, median, 4× CPU, slow 4G): fonts gave
+  −20–40 ms LCP but +30–100 ms FCP, so they were dropped; an image preload
+  for a lazy LCP hero image gave −420 ms on one page and nothing on others
+  (a 5 KB SVG; a hero hidden behind IX3). Keep only measured wins.
+- Status: done
+- Found by: claude
+
 ### 2026-10-05 · Horizontal scrollers drag vertically
 - Area: css
 - Symptom: Slider Track could be dragged up and down while scrolling.

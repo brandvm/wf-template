@@ -45,34 +45,44 @@ refer to the project the lesson came from; Status is that project's.
 - Found by: claude
 
 ### 2026-10-09 · Setting RELEASE in loader.html breaks CI
-- Area: release
-- Symptom: every push after the first release failed CI with
-  "loader.html must ship with `var RELEASE = null;`", so staging stopped
-  deploying (production was unaffected; it is pinned to the tag).
-- Cause: the release commit wrote `RELEASE = "0.0.1"` into `loader.html`
-  because AGENTS.md said to keep it "identical to what is installed". The
-  repo copy must keep `null`; the browser tests enforce it. The installed
-  version exists only in the head code pasted into Webflow.
-- Fix: `loader.html` back to `null`; the installed release is recorded in
-  AGENTS.md › Project facts. AGENTS.md › Snippets are not versioned and
-  README › Release now say "identical except RELEASE".
+- Area: release, ci
+- Symptom: two projects hit it. On a new project, every push after the
+  first release failed CI with "loader.html must ship with
+  `var RELEASE = null;`", so staging stopped deploying (production was
+  unaffected; it is pinned to the tag). On a site adopting the template
+  while already live, the tests threw from the start, because a live site
+  always has a release set.
+- Cause: AGENTS.md said to keep `loader.html` "identical to what is
+  installed", so the release value was committed. The repo copy must keep
+  `null`; the browser tests enforce it. The installed version exists only
+  in the head code pasted into Webflow.
+- Fix: `loader.html` keeps `RELEASE = null`; the installed release is
+  recorded in AGENTS.md › Project facts and set only in the pasted
+  snippet. AGENTS.md › Snippets are not versioned and README › Release
+  now say "identical except RELEASE".
 - Status: fixed in the template's AGENTS.md and README
 - Found by: claude
 
-### 2026-10-09 · The staging link in Embed 2a is render-blocking on production
-- Area: loader
-- Symptom: on production pages Lighthouse lists the staging `styles.css`
-  (GitHub Pages) as a render-blocking request, ~1.4 s on simulated slow
-  4G, although 2b immediately swaps in the release sheet.
+### 2026-10-09 · The staging link in Embed 2a costs production a render-blocking request and a second CSS download
+- Area: loader, perf
+- Symptom: on production pages of two sites, `styles.css` came from
+  github.io (staging) **and** jsDelivr (the release): 3 of 3 Chromium runs
+  fetched both, and Lighthouse lists the staging sheet as render-blocking
+  (~1.4 s on simulated slow 4G), although 2b swaps in the release sheet.
 - Cause: 2a is a static `<link>` to the staging sheet so the Designer
-  canvas can show repo CSS. The browser starts fetching it as soon as it
-  parses the Embed, and a stylesheet in the body blocks rendering of the
+  canvas can show repo CSS. The preload scanner requests it as soon as it
+  sees the Embed, and a stylesheet in the body blocks rendering of the
   content after it until it has loaded, even once the swap has removed it.
-- Fix: not implemented. Proposed: the head code writes the release
-  stylesheet `<link id="wfc-css">` itself when `RELEASE` is set and the
-  page is not on `*.webflow.io`; 2b then removes the 2a link (the canvas
-  never runs 2b, so it keeps showing staging). Needs a test that public
-  pages never request the staging sheet once a release is set.
+- Fix: not in the template yet. Proposed: the head code writes the release
+  `<link id="wfc-css">` itself when `RELEASE` is set and the page is not on
+  `*.webflow.io`; 2b then removes the 2a link (the canvas never runs 2b, so
+  it keeps showing staging). Needs a test that public pages never request
+  the staging sheet once a release is set. A per-project workaround that
+  worked: put the pinned release URL in 2a's static href, have 2b rewrite
+  only when the URL differs (staging, dev) and log an error when 2a's
+  `@x.y.z` ≠ `RELEASE`. Its cost: a release changes two strings, and the
+  canvas shows the release CSS. Hiding `body` until the CSS loads delays
+  LCP, so don't use it on a site where PageSpeed matters.
 - Status: open
 - Found by: claude
 

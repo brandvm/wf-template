@@ -6,6 +6,59 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-09 · Upload a local file as an asset without a public URL
+- Area: mcp
+- Symptom: `asset_tool › upload_image_by_url` only takes a public URL, so a
+  locally optimised image or video seemed to need a commit/push or a manual
+  upload.
+- Cause: the Designer-side tool fetches remotely; the Data API route is
+  not obvious.
+- Fix: `data_assets_tool › create_asset` with the file name and the **MD5
+  hex** of the bytes returns `uploadUrl` + `uploadDetails`; POST them as
+  multipart form fields with curl (`-F key=… -F Policy=… -F
+  X-Amz-Signature=… -F Content-Type=… -F "file=@path;type=…"`), expect
+  201. The file is on `cdn.prod.website-files.com` at once and answers byte
+  ranges (206), so MP4s work in Safari. Then set it: an Image element via
+  `set_image_asset`, a component Image prop via
+  `set_component_instance_prop_values` with `type: "string"` and the asset
+  id. An instance showing `hasOverride: false` uses the component default —
+  override that instance rather than changing the default, which other
+  instances inherit. Caution: on another project, uploads made this way
+  stayed at size 0 with no variants and components kept showing their
+  default image (see "API-uploaded assets stay size 0 and don't render in
+  components"). After uploading, check `get_asset` size and variants and
+  look at the published page before relying on it.
+- Status: worked around
+- Found by: claude
+
+### 2026-10-09 · `set_attributes` works on DOM elements, fails on Image elements
+- Area: mcp
+- Symptom: `crossorigin` on an Image element failed with an internal error
+  (twice, Designer connected); Image settings expose no attributes key.
+- Cause: unknown; Image elements don't take custom attributes over the API.
+- Fix: the same call works on DOM elements (`video` `poster`, `source`
+  `src`/`type`/`media`), on Links (`aria-label`, also inside component
+  definitions with `scope_component_id`), on form labels (`for` — Webflow
+  emits `for=""` by default, and the attribute replaces it) and on DOM
+  `button`s. For an Image, add the attribute in the Designer (manual
+  step). CMS-bound attribute values (e.g. `aria-label` = item title on a
+  card link) go through `set_settings` › `attributes` with `value_binding`
+  — it replaces the whole list, so read the existing attributes first.
+- Status: worked around
+- Found by: claude
+
+### 2026-10-09 · `publish_site` wants custom domain IDs, and counts toward the 1/min limit
+- Area: mcp
+- Symptom: `customDomains: ["www.example.com"]` → 400 "valid custom domain
+  ID"; a retry straight after → 429 "at most once per minute".
+- Cause: the parameter takes the domain IDs from `get_site` ›
+  `customDomains[].id`, not hostnames; staging and production publishes
+  share the per-site limit.
+- Fix: read the IDs once (`get_site`); wait out the limit with a timed
+  loop. Staging-only = `publishToWebflowSubdomain: true, customDomains: []`.
+- Status: worked around
+- Found by: claude
+
 ### 2026-10-02 · Only one collection can take breakpoint auto-modes
 - Area: mcp
 - Symptom: `create_variable_mode` with `breakpoint_id` worked for Typography

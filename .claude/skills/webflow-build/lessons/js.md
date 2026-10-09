@@ -6,6 +6,60 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-09 · Moving off IX3: decode the published interactions, then replay them
+- Area: js
+- Symptom: rebuilding IX3 motion by eye drifts from the approved timing,
+  and the MCP's interaction tool isn't needed to read it.
+- Cause/fix: the published site ships every IX3 interaction and timeline
+  in `webflow.achunk.*.js` (find the chunk containing `"i-` ids; the
+  `[{id:"i-…"}]` and `[{id:"t-…"}]` arrays are plain JS literals). Decode
+  them once to JSON and generate a spec; a small module replays it with
+  bundled GSAP + ScrollTrigger + SplitText + CustomEase. Details that
+  matter for a faithful replay:
+  - eases are indexes into IX3's table (`"none","power1.in","power1.out",
+    "power1.inOut",…`; 3 = power1.inOut, 6 = power2.inOut, 12 =
+    power4.inOut); custom eases are SVG paths in a 160 box (y down);
+  - most triggers have `clamp: true` → `start: "clamp(top bottom)"`;
+  - **no ease** on a step means GSAP's default `power1.out`, not linear;
+  - `tt`: 0 to, 1 from, 2 fromTo, 3 set; `null` = current value; no
+    `position` = append;
+  - `conditionalPlayback` `dont-animate` per breakpoint → `matchMedia`;
+  - IX3's SplitText uses `span`s with `gsap_split_word/letter/line`
+    classes, splits words as inline blocks (no line break at hyphens) and
+    **keeps the split** after the reveal — the live line breaks and page
+    heights depend on that, so match it.
+  Load interactions (hero, page header) are better as CSS `@keyframes`
+  gated on `html:not(.w-mod-ix3)`: they start at first paint instead of
+  after IX3's `visibility:hidden` gate (the main mobile LCP cost). Bundled
+  GSAP never overwrites Webflow's `window.gsap` (it only installs when none
+  exists), so the module can stay off while `window.gsap !== gsap` — no
+  double animation before the cutover. Build timelines lazily
+  (IntersectionObserver one screen ahead) and batch one
+  `ScrollTrigger.refresh()` after each build. Verifying by blocking IX3 on
+  staging with Playwright is only approximate: Webflow also writes IX3
+  start styles inline, so check the real cutover on staging by eye.
+- Status: code done in the project; cutover pending
+- Found by: claude
+
+### 2026-10-09 · Finsweet recipe: keep it out of index.js
+- Area: js, perf
+- Symptom: following `recipes/finsweet`, List + Custom Select + Social
+  Share added ~118 KB to `index.js`, so every page paid for attributes used
+  on two.
+- Cause: the registry's `import()`s are inlined in the single IIFE bundle;
+  importing the registry anywhere in index.js (even for its keys) pulls all
+  of Finsweet in.
+- Fix: a second esbuild entry (`src/fs-bundle.ts` → `dist/fs-bundle.js`)
+  that runs `initFinsweet()`, and a tiny loader in index.js that checks for
+  `[fs-<name>-element]` (names as a literal list, kept in step by a test)
+  and appends `<script src>` with the same base and query as index.js, so
+  each release loads its matching version. Guard: do nothing while a
+  Finsweet CDN `<script>` is still on the page, or both copies initialise
+  the same elements during the migration. v1 (`fs-cmsload/cmsfilter/
+  cmssort`) markup has to be renamed to v2 `fs-list-*` in Webflow.
+- Status: fixed in the project; recipe not updated
+- Found by: claude
+
 ### 2026-10-06 · Finsweet Combo Box 2.7.1 differs from its docs
 - Area: js
 - Symptom: With the bundled `@finsweet/attributes@2.7.1` (an earlier

@@ -6,6 +6,37 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-09 · CMS text bindings inside JSON-LD can break the schema
+- Area: designer
+- Symptom: adding `"alternativeHeadline": "{{wf subheading}}"` to a CMS
+  template's BlogPosting JSON-LD made it invalid on items whose field ends
+  with a line break (caught only by validating every CMS page).
+- Cause: Webflow inserts PlainText field values raw into custom code: line
+  breaks are not escaped (invalid JSON) and apostrophes become `&#39;`
+  (valid JSON, wrong text).
+- Fix: bind only single-line fields (name, slug, dates, image) in JSON-LD;
+  validate every CMS page after a schema change, not a sample.
+- Status: open (Webflow behaviour)
+- Found by: claude
+
+### 2026-10-09 · Phone hero video: serve what `object-fit: cover` actually shows
+- Area: designer, perf
+- Symptom: a full-screen 16:9 hero video downloaded the same 6–7 MB file
+  on phones, where portrait `cover` shows only the centre strip; the WebM
+  source was listed first and was the larger file.
+- Fix: first `<source>` = a centre crop (e.g. 540×720 of a 1280×720 file,
+  `ffmpeg -vf crop=540:720`) with `media="(max-width: 767px) and
+  (orientation: portrait)"`; a 3:4 crop covers every portrait aspect up to
+  0.75, so `cover` still fills the box with the same framing (SSIM 0.99
+  vs the same crop of the original). Then the desktop MP4; drop the WebM if
+  it is larger. Add `poster` = the video's first frame (WebP, a few KB).
+  `<source media>` works in Chrome/Firefox 120+ and Safari. Re-encoding the
+  desktop files at matching quality saved nothing. A muted preview loop
+  that is a full-length YouTube download (with audio) should be a short
+  clip instead: 56 MB → 4 MB.
+- Status: done
+- Found by: claude
+
 ### 2026-10-05 · A two-class combo can't be edited from a three-class element
 - Area: designer
 - Symptom: The value for Section + Is Hero had to be entered, but every
