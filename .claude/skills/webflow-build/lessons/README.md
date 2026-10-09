@@ -6,11 +6,11 @@ of them every session.
 
 | File | Covers | Entries |
 | --- | --- | --- |
-| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 25 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 13 |
-| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 7 |
+| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 29 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 14 |
+| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 9 |
 | [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 10 |
-| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 5 |
+| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 10 |
 
 ## Titles
 
@@ -41,6 +41,10 @@ of them every session.
 - Filled slots read back empty
 - Slots: the MCP can work beside a plain element, never start one
 - Element snapshots can show stale styles
+- WHTML importer turns inline styles into `inline-div-N` combos
+- API-uploaded assets stay size 0 and don't render in components
+- CMS image fields re-host an image from a public URL
+- A box-shadow with a variable can't be set through the API
 
 **Designer and canvas** ([designer.md](designer.md))
 
@@ -57,6 +61,7 @@ of them every session.
 - em spacing moved from a button to its wrapper changes size
 - Removing a rule locally does not remove it on the canvas
 - An Embed with a script hides its stylesheet link on the canvas
+- Image Load (lazy/eager) is per instance; preload doesn't fix render delay
 
 **Repo CSS** ([css.md](css.md))
 
@@ -67,6 +72,8 @@ of them every session.
 - Neutralizers in §03 override Designer styles
 - Root font-size scale drifts from Designer tokens
 - Renaming a Webflow variable silently breaks repo CSS
+- Prototype generators lose large breakpoints and `.w--` states
+- Prototype stand-ins override an existing site's tag styles
 
 **JavaScript modules** ([js.md](js.md))
 
@@ -84,6 +91,11 @@ of them every session.
 **Loader, release and CI** ([loader-release-ci.md](loader-release-ci.md))
 
 - Filling in REPO in loader.html breaks the browser tests
+- Swapping the stylesheet href in 2b causes a full-page layout shift
+- Setting RELEASE in loader.html breaks CI
+- The staging link in Embed 2a is render-blocking on production
+- A parity check on settled pages misses layout shifts
+- Lighthouse and PageSpeed don't emulate prefers-reduced-motion
 - Body Embed stylesheet: page paints unscaled, then jumps
 - Static localhost link is requested by public visitors
 - VER lives in two snippets and a placeholder 404s at launch

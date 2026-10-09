@@ -24,6 +24,86 @@ refer to the project the lesson came from; Status is that project's.
 
 <!-- Add new entries here, newest first. -->
 
+### 2026-10-09 · Swapping the stylesheet href in 2b causes a full-page layout shift
+- Area: loader
+- Symptom: after a site was cut over to the template's loader, Lighthouse
+  CLS on desktop rose from ~0.001 to 0.2–0.5 (0.52, 0.28 and 0.22 on three
+  page types). The parity check missed it (see the parity entry below).
+- Cause: Embed 2b set `base.href` from the staging URL to the release URL,
+  and the footer loader set it again. Assigning a new href to a `<link>`
+  drops its rules until the new file arrives. Repo CSS scales the type, so
+  the page rendered at the wrong scale, then jumped. The 2b comment said
+  the href was "settled before first paint"; it isn't, the staging sheet
+  from 2a is already in flight.
+- Fix: `WFC.setCSS` in 2b loads the target next to the current sheet and
+  removes the old one on `load` (keeps it on `error`); the id moves at
+  once and an unchanged URL is a no-op. The footer loader calls it, with
+  a plain-href fallback for an older 2b. `tests/css-swap.spec.mjs` covers
+  it. CLS back to 0.001–0.003 on the same pages.
+- Status: fixed in the template's loader.html (2b and footer code must be
+  re-pasted into Webflow)
+- Found by: claude
+
+### 2026-10-09 · Setting RELEASE in loader.html breaks CI
+- Area: release
+- Symptom: every push after the first release failed CI with
+  "loader.html must ship with `var RELEASE = null;`", so staging stopped
+  deploying (production was unaffected; it is pinned to the tag).
+- Cause: the release commit wrote `RELEASE = "0.0.1"` into `loader.html`
+  because AGENTS.md said to keep it "identical to what is installed". The
+  repo copy must keep `null`; the browser tests enforce it. The installed
+  version exists only in the head code pasted into Webflow.
+- Fix: `loader.html` back to `null`; the installed release is recorded in
+  AGENTS.md › Project facts. AGENTS.md › Snippets are not versioned and
+  README › Release now say "identical except RELEASE".
+- Status: fixed in the template's AGENTS.md and README
+- Found by: claude
+
+### 2026-10-09 · The staging link in Embed 2a is render-blocking on production
+- Area: loader
+- Symptom: on production pages Lighthouse lists the staging `styles.css`
+  (GitHub Pages) as a render-blocking request, ~1.4 s on simulated slow
+  4G, although 2b immediately swaps in the release sheet.
+- Cause: 2a is a static `<link>` to the staging sheet so the Designer
+  canvas can show repo CSS. The browser starts fetching it as soon as it
+  parses the Embed, and a stylesheet in the body blocks rendering of the
+  content after it until it has loaded, even once the swap has removed it.
+- Fix: not implemented. Proposed: the head code writes the release
+  stylesheet `<link id="wfc-css">` itself when `RELEASE` is set and the
+  page is not on `*.webflow.io`; 2b then removes the 2a link (the canvas
+  never runs 2b, so it keeps showing staging). Needs a test that public
+  pages never request the staging sheet once a release is set.
+- Status: open
+- Found by: claude
+
+### 2026-10-09 · A parity check on settled pages misses layout shifts
+- Area: ci
+- Symptom: after a loader change, a check comparing computed styles and
+  boxes between the old and new install passed 1:1, while Lighthouse CLS
+  had gone from ~0.001 to 0.2–0.5.
+- Cause: the check waits for the page to settle, so a transient state
+  (no stylesheet for a few hundred ms) is never seen.
+- Fix: after any change to the loader snippets or how CSS reaches the
+  page, also run Lighthouse (or PageSpeed) CLS on a few page types, before
+  and after, on the same host. Compare like with like (mobile/desktop,
+  same throttling).
+- Status: documented
+- Found by: claude
+
+### 2026-10-09 · Lighthouse and PageSpeed don't emulate prefers-reduced-motion
+- Area: ci
+- Symptom: after the page loader was skipped under
+  `prefers-reduced-motion: reduce`, Lighthouse and PageSpeed runs still
+  showed it, so the change could not be verified there.
+- Cause: Lighthouse and PageSpeed run with the default `no-preference`;
+  neither has a setting for the media feature.
+- Fix: measure reduced-motion behaviour separately (Playwright
+  `page.emulateMedia({ reducedMotion: 'reduce' })` or Chrome DevTools
+  Rendering › Emulate CSS media feature). Don't count a reduced-motion
+  change as a score improvement: the score reflects the full-motion path.
+- Status: documented
+- Found by: claude
+
 ### 2026-10-06 · Body Embed stylesheet: page paints unscaled, then jumps
 - Area: loader
 - Symptom: the designer saw the hero (and every page) flash. A filmstrip showed

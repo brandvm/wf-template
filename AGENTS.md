@@ -148,8 +148,9 @@ Worked around, not fixed — do not rediscover these.
 - The WHTML importer keeps classes that already exist, but drops the whole
   class list if any one is missing (create classes first, then re-check
   `styleNames`). It drops every `<img>` attribute and the asset link, turns
-  `<button>` into a Link and every `<span>` into a text Span, and trims a
-  space before `<br>`. The webflow-build skill's `lessons/mcp.md` has the
+  `<button>` into a Link and every `<span>` into a text Span, turns every
+  `style` attribute into an `inline-div-N` combo class, and trims a space
+  before `<br>`. The webflow-build skill's `lessons/mcp.md` has the
   fixes.
 - `get_all_elements` does not descend into component definitions — pass the
   component scope. An element "missing" from a page is usually inside one.

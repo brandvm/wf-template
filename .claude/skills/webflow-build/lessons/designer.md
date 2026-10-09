@@ -193,3 +193,21 @@ refer to the project the lesson came from; Status is that project's.
   any canvas-visible markup (stylesheets, icon fonts) out of script Embeds.
 - Status: fixed in the template's loader.html
 - Found by: human
+
+### 2026-10-09 · Image Load (lazy/eager) is per instance; preload doesn't fix render delay
+- Area: designer
+- Symptom: the LCP image (a hero, or a CMS image on a template page) was
+  lazy-loaded. The image element's Load setting (Lazy / Eager) isn't
+  exposed through the MCP or the API, and on a component it is set per
+  instance.
+- Cause: Designer-only setting.
+- Fix: set Load › Eager on each LCP instance in the Designer (a manual
+  step). To start the download earlier, page head code can add
+  `<link rel="preload" as="image" href="…">`; on a CMS template page the
+  href can bind a field with
+  `{{wf {&quot;path&quot;:&quot;<field-slug>&quot;,&quot;type&quot;:&quot;ImageRef&quot;\} }}`.
+  That only moves the download: when Lighthouse shows LCP "render delay",
+  the cause is render-blocking resources (stylesheets and scripts before
+  the image), which preload does not change.
+- Status: documented
+- Found by: claude
