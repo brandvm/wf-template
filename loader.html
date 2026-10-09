@@ -171,7 +171,12 @@ published.
       cur.removeAttribute("id");
       next.id = "wfc-css";
       next.onload = function () { if (cur.parentNode) cur.parentNode.removeChild(cur); };
-      next.onerror = function () { if (next.parentNode) next.parentNode.removeChild(next); cur.id = "wfc-css"; };
+      // On error, give the id back only if no newer swap has taken it
+      // (a second setCSS call while this one was still loading).
+      next.onerror = function () {
+        if (next.parentNode) next.parentNode.removeChild(next);
+        if (!document.getElementById("wfc-css")) cur.id = "wfc-css";
+      };
       cur.parentNode.insertBefore(next, cur.nextSibling);
     };
     C.setCSS(C.staging ? C.stag + "styles.css?v=" + Date.now() : C.prod + "styles.css");

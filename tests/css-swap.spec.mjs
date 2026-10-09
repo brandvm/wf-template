@@ -41,3 +41,22 @@ test('2b keeps the current stylesheet when the target fails', async ({ page }) =
   await expect(page.locator('#wfc-css')).toHaveAttribute('href', stage + 'styles.css?v=1');
   expect(await sheet()).toBe('stage');
 });
+
+test('2b keeps one #wfc-css when an earlier swap fails while a newer one loads', async ({ page }) => {
+  const other = 'https://cdn.test/wf-example@9.9.8/dist/styles.css';
+  let fail, loadOther;
+  const failed = new Promise((r) => (fail = r));
+  const otherReady = new Promise((r) => (loadOther = r));
+  await page.route(other, async (r) => { await otherReady; r.fulfill({ contentType: 'text/css', body: ':root{--sheet:other}' }); });
+  const sheet = await setup(page, async (r) => { await failed; r.abort(); });
+  // A second swap (piece 3's fallback) starts while the first is still loading…
+  await page.evaluate((url) => window.WFC.setCSS(url), other);
+  // …then the first fails before the second has loaded.
+  fail();
+  await expect.poll(() => page.locator('link[href*="9.9.9"]').count()).toBe(0);
+  await expect(page.locator('#wfc-css')).toHaveCount(1);
+  await expect(page.locator('#wfc-css')).toHaveAttribute('href', other);
+  loadOther();
+  await expect.poll(sheet).toBe('other');
+  await expect(page.locator('#wfc-css')).toHaveCount(1);
+});
