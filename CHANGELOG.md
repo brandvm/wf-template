@@ -13,6 +13,16 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.4.5 — 2026-10-13
+
+No manual step for client repos.
+
+- One icon component: **Icon** (the colour layer, the one to insert) wraps
+  **Icon Size** (was Icon). Color variants gain Success, Warning and Error.
+- New variables: `Colors` › `Status/Success`, `Warning`, `Error` and the
+  semantic `Status/*` roles that point at them. Starter site, snapshot,
+  specimens and docs updated.
+
 ## 0.4.4 — 2026-10-13
 
 No manual step for client repos.

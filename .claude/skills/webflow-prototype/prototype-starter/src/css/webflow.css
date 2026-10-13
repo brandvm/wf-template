@@ -402,6 +402,18 @@ body {
   color: var(--_colors-semantic---text--accent);
 }
 
+.icon-color:where(.w-variant-4663668c-f120-d980-d6f4-f27fc46a04ac) {
+  color: var(--_colors-semantic---status--success);
+}
+
+.icon-color:where(.w-variant-d980425f-e2db-d7cd-c4e4-1d1a482d9b54) {
+  color: var(--_colors-semantic---status--warning);
+}
+
+.icon-color:where(.w-variant-07005628-cef0-2f8f-31e4-39433574714e) {
+  color: var(--_colors-semantic---status--error);
+}
+
 .icon-glyph {
   display: inline-flex;
   width: 1em;
@@ -621,6 +633,9 @@ h2 {
   --_colors-semantic---button--background-hover: var(--_colors---brand--accent);
   --_colors-semantic---form--focus: var(--_colors---brand--accent);
   --_colors-semantic---link--hover: var(--_colors---brand--accent);
+  --_colors-semantic---status--success: var(--_colors---status--success);
+  --_colors-semantic---status--warning: var(--_colors---status--warning);
+  --_colors-semantic---status--error: var(--_colors---status--error);
   position: relative;
 }
 

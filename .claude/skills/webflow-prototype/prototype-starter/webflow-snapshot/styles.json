@@ -620,6 +620,33 @@
   }
  },
  {
+  "name": "Icon Color · Success",
+  "selector": ".icon-color:where(.w-variant-4663668c-f120-d980-d6f4-f27fc46a04ac)",
+  "properties": {
+   "main": {
+    "color": "var:Colors Semantic/Status/Success"
+   }
+  }
+ },
+ {
+  "name": "Icon Color · Warning",
+  "selector": ".icon-color:where(.w-variant-d980425f-e2db-d7cd-c4e4-1d1a482d9b54)",
+  "properties": {
+   "main": {
+    "color": "var:Colors Semantic/Status/Warning"
+   }
+  }
+ },
+ {
+  "name": "Icon Color · Error",
+  "selector": ".icon-color:where(.w-variant-07005628-cef0-2f8f-31e4-39433574714e)",
+  "properties": {
+   "main": {
+    "color": "var:Colors Semantic/Status/Error"
+   }
+  }
+ },
+ {
   "name": "Icon Glyph",
   "selector": ".icon-glyph",
   "properties": {

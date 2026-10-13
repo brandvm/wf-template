@@ -13,6 +13,9 @@
   --_colors---paper-tint--paper-24: #ffffff3d;
   --_colors---paper-tint--paper-48: #ffffff7a;
   --_colors---paper-tint--paper-64: #ffffffa3;
+  --_colors---status--success: #1a7f4b;
+  --_colors---status--warning: #b45309;
+  --_colors---status--error: #c62828;
   /* Colors Semantic */
   --_colors-semantic---background--page: var(--_colors---brand--paper);
   --_colors-semantic---background--surface: var(--_colors---ink-tint--ink-4);
@@ -26,6 +29,9 @@
   --_colors-semantic---button--background-hover: var(--_colors---brand--accent);
   --_colors-semantic---form--focus: var(--_colors---brand--accent);
   --_colors-semantic---link--hover: var(--_colors---brand--accent);
+  --_colors-semantic---status--success: var(--_colors---status--success);
+  --_colors-semantic---status--warning: var(--_colors---status--warning);
+  --_colors-semantic---status--error: var(--_colors---status--error);
   /* Typography Scale */
   --_typography-scale---family--base: "Geist", system-ui, sans-serif;
   --_typography-scale---size--12: 0.75em;

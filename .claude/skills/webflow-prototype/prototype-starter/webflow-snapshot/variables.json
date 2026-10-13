@@ -100,6 +100,30 @@
     "values": {
      "Base": "#ffffffa3"
     }
+   },
+   {
+    "name": "Status/Success",
+    "type": "Color",
+    "cssName": "--_colors---status--success",
+    "values": {
+     "Base": "#1a7f4b"
+    }
+   },
+   {
+    "name": "Status/Warning",
+    "type": "Color",
+    "cssName": "--_colors---status--warning",
+    "values": {
+     "Base": "#b45309"
+    }
+   },
+   {
+    "name": "Status/Error",
+    "type": "Color",
+    "cssName": "--_colors---status--error",
+    "values": {
+     "Base": "#c62828"
+    }
    }
   ]
  },
@@ -216,6 +240,33 @@
     "alias": {
      "Base": "Colors/Brand/Accent",
      "Dark": "Colors/Brand/Accent"
+    }
+   },
+   {
+    "name": "Status/Success",
+    "type": "Color",
+    "cssName": "--_colors-semantic---status--success",
+    "alias": {
+     "Base": "Colors/Status/Success",
+     "Dark": "Colors/Status/Success"
+    }
+   },
+   {
+    "name": "Status/Warning",
+    "type": "Color",
+    "cssName": "--_colors-semantic---status--warning",
+    "alias": {
+     "Base": "Colors/Status/Warning",
+     "Dark": "Colors/Status/Warning"
+    }
+   },
+   {
+    "name": "Status/Error",
+    "type": "Color",
+    "cssName": "--_colors-semantic---status--error",
+    "alias": {
+     "Base": "Colors/Status/Error",
+     "Dark": "Colors/Status/Error"
     }
    }
   ]

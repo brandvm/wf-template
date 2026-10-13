@@ -287,7 +287,7 @@ has been set on it), then bind through the MCP:
   sliders and lightboxes are not in the starter: they are built when a
   site needs one, from a recipe where there is one (`recipes/`; the
   searchable select is `recipes/finsweet/searchable-select.md`).
-- **Icons** are the Icon component: type `ph ph-<name>` into its prop
+- **Icons** are the Icon component (colour and size on one component): type `ph ph-<name>` into its prop
   (`recipes/phosphor/`). Brand and social logos are uploaded SVGs.
 
 - **Make a component when behaviour should appear only where you place it.**

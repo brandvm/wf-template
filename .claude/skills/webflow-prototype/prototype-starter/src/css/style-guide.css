@@ -117,6 +117,9 @@
 .sg-swatch-color.is-paper-tint-paper-24 { background-color: var(--_colors---paper-tint--paper-24); }
 .sg-swatch-color.is-paper-tint-paper-48 { background-color: var(--_colors---paper-tint--paper-48); }
 .sg-swatch-color.is-paper-tint-paper-64 { background-color: var(--_colors---paper-tint--paper-64); }
+.sg-swatch-color.is-status-success { background-color: var(--_colors---status--success); }
+.sg-swatch-color.is-status-warning { background-color: var(--_colors---status--warning); }
+.sg-swatch-color.is-status-error { background-color: var(--_colors---status--error); }
 .sg-bar.is-none { width: var(--_spacing---none); }
 .sg-bar.is-hairline { width: var(--_spacing---hairline); }
 .sg-bar.is-2 { width: var(--_spacing---2); }

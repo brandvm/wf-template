@@ -59,8 +59,8 @@ one variable.
 
 | Collection | Modes | Contents |
 | --- | --- | --- |
-| Colors | Base | `Brand/Ink`, `Brand/Paper`, `Brand/Accent`; `Ink Tint/Ink 4…64`, `Paper Tint/Paper 12…64` |
-| Colors Semantic | Base, Dark | `Background/Page`, `Background/Surface`, `Background/Overlay`, `Text/Primary`, `Text/Secondary`, `Text/Accent`, `Border/Subtle`, `Button/Background`, `Button/Text`, `Button/Background Hover`, `Form/Focus`, `Link/Hover`, each an alias of a Colors variable |
+| Colors | Base | `Brand/Ink`, `Brand/Paper`, `Brand/Accent`; `Status/Success`, `Status/Warning`, `Status/Error`; `Ink Tint/Ink 4…64`, `Paper Tint/Paper 12…64` |
+| Colors Semantic | Base, Dark | `Background/Page`, `Background/Surface`, `Background/Overlay`, `Text/Primary`, `Text/Secondary`, `Text/Accent`, `Border/Subtle`, `Button/Background`, `Button/Text`, `Button/Background Hover`, `Form/Focus`, `Link/Hover`, `Status/Success`, `Status/Warning`, `Status/Error`, each an alias of a Colors variable |
 | Typography Scale | Base | `Family/Base`, `Size/12…96`, `Weight/Thin` (100), `Extra Light`, `Light`, `Regular`, `Medium`, `Semibold`, `Bold`, `Extra Bold`, `Black` (900): every weight is there as a variable, though only Regular, Medium and Bold are used by a role, `Line Height/Tight`, `Snug`, `Normal`, `Letter Spacing/Tight`, `Normal`, `Wide` |
 | Typography Role | Base + Tablet, Mobile Landscape, Mobile (breakpoint auto-modes) | `Family`, `Size`, `Weight`, `Line Height`, `Letter Spacing` for Display, H1–H6, Body, Body Large, Body Small, Label, Button |
 | Typography Styles | Base (= Body) + one per other role | the five properties, each mode aliasing its role |
@@ -118,8 +118,8 @@ them and restyles them, it does not rebuild them.
 
 | Component | Structure | Props and variants |
 | --- | --- | --- |
-| **Icon** (Controls) | div Icon › `i` Icon Glyph whose `class` attribute is bound to a prop | Icon (`ph ph-<name>`); size variants **12px, 16px (base), 20px, 24px, 32px, 48px, 64px**: named by the size at 16px text, valued in em (0.75em … 4em), so the name tells a designer what they get and the icon still scales with the type. The glyph is a 1em × 1em box, so it follows the font size around it, and it holds a space as its text so the Designer canvas doesn't draw it as an empty element (published as a non-breaking space, which is why the glyph is aligned to flex-start in its box, not centred: `recipes/phosphor/`); the variants only change font size. Colour is the text colour |
-| **Icon Color** (Controls) | div Icon Color › Icon | Icon; variants Inherit, Primary, Secondary, Accent (the semantic text colours, so they follow the theme). Use it where an icon needs its own colour; inside buttons the plain Icon takes the button's text colour |
+| **Icon** (Controls) | div Icon Color › Icon Size | **The icon to insert.** Icon (`ph ph-<name>`); Color variants Inherit, Primary, Secondary, Accent, Success, Warning, Error (semantic colours, so they follow the theme); Size linked up from Icon Size |
+| **Icon Size** (Controls) | div Icon › `i` Icon Glyph whose `class` attribute is bound to a prop | Icon; size variants **12px, 16px (base), 20px, 24px, 32px, 48px, 64px**: named by the size at 16px text, valued in em (0.75em … 4em). The glyph is a 1em × 1em box holding a space, aligned to flex-start (`recipes/phosphor/`). Used directly inside buttons, where it takes the button's text colour |
 | **Button Content** (Button) | div › Button Icon › Icon, the label, Button Icon › Icon | Label, Icon, Icon Before, Icon After (each icon holder's visibility is bound to its switch) |
 | **Button Size** (Button) | div › Button Content | pass-through props; variants Default, Small |
 | **Button Color** (Button) | div › Button Size | pass-through props; variants Primary, Secondary. Hover and pressed are states on the class |
@@ -137,7 +137,8 @@ them and restyles them, it does not rebuild them.
   Color instance inside it, and on its Variant prop choose *Link to new
   prop* (name it Color); the same on Button Color for Button Size's
   Variant (Size), then link that one up to C | Button too. The same on
-  **Icon Color** for the inner Icon's Variant (Size). The API can't
+  **Icon** for the inner Icon Size's Variant (Size): with that one link,
+  Icon has both Color and Size. The API can't
   expose a variant from a nested instance.
 - Forms are classes, not a component: a field's name and placeholder
   can't be bound to props, and form controls can't live outside a Form
