@@ -55,9 +55,10 @@ Claude finds the site through the Webflow connector, runs
 `pnpm new-project`, lists the steps below that are yours, collects the
 inputs (design frame, CMS, SEO, states, content), and builds the
 prototype page by page. From the second session on, open Claude in
-`<Client>/`, not in the repo. The `webflow-build` skill
-([SKILL.md](.claude/skills/webflow-build/SKILL.md) › Project setup) has
-the details.
+`<Client>/`, not in the repo. The `webflow-prototype` skill
+([SKILL.md](.claude/skills/webflow-prototype/SKILL.md) › Project setup)
+has the details; the Webflow build then starts in its own session with
+the `webflow-build` skill.
 
 ## New project checklist
 
@@ -199,9 +200,14 @@ loader.html           the three Webflow snippets, documented
 scripts/              new-project setup and the repo checks
 tests/                Playwright checks and the new-project test
 docs/handoff/         HANDOFF, MANUAL-TODO and BUILD-NOTES for this project
-.claude/skills/       webflow-build (workflow, checklists, conventions,
-                      lessons, prototype starter, check scripts) and
+.claude/skills/       webflow-prototype (project setup, inputs, the
+                      localhost prototype and its starter, Figma),
+                      webflow-build (the Webflow build: checklists,
+                      conventions, lessons, check scripts, shared rules),
+                      webflow-style-guide (the fixed style guide layout,
+                      its generator and check),
                       webflow-launch (QA, launch, handoff, first 30 days)
+                      and webflow-audit (live sites and one-off fixes)
 AGENTS.md             agent rules; CLAUDE.md imports it
 GOTCHAS.md            the project's log of things that cost time
 webflow-build.config.json   URLs for the check scripts (pnpm new-project)
@@ -243,14 +249,25 @@ imports are relative.
   read by area. Entries tagged `template-candidate` are collected there.
 - [`docs/handoff/`](docs/handoff/HANDOFF.md) — the design handoff, manual
   Designer steps and build notes, kept current during the build.
-- [`.claude/skills/webflow-build`](.claude/skills/webflow-build/SKILL.md) —
-  the build workflow for Claude Code: design handoff → Webflow section by
-  section, checks against the prototype at three widths (`pnpm wf:*`), the
-  conventions, the lessons and a prototype starter.
-  [`webflow-launch`](.claude/skills/webflow-launch/SKILL.md) takes over at
-  the build handoff. Every repo from this template has both. Improvements are welcome from anyone with a
-  GitHub account: fork, change the skill, open a pull request (see the
-  skill's Contributing section).
+- The skills in `.claude/skills/`, one per phase, for Claude Code:
+  - [`webflow-prototype`](.claude/skills/webflow-prototype/SKILL.md):
+    project setup, the inputs, and the design built as a localhost
+    prototype (it never writes to Webflow);
+  - [`webflow-style-guide`](.claude/skills/webflow-style-guide/SKILL.md):
+    the style guide page in one fixed layout, the first page of the
+    prototype and of the build;
+  - [`webflow-build`](.claude/skills/webflow-build/SKILL.md): the Webflow
+    build, section by section, checked against the prototype at three
+    widths (`pnpm wf:*`), with the conventions, the lessons and the rules
+    all skills share;
+  - [`webflow-launch`](.claude/skills/webflow-launch/SKILL.md): from the
+    build handoff through launch and the first 30 days;
+  - [`webflow-audit`](.claude/skills/webflow-audit/SKILL.md): a site that
+    is already live (audit, small verified batches, one-off fixes).
+
+  Every repo from this template has them. Improvements are welcome from anyone with a
+  GitHub account: fork, change the skill, open a pull request (see
+  [`rules.md`](.claude/skills/webflow-build/rules.md) › Contributing).
 
 Every repo CSS rule carries a `/* repo-css: <tag> — why */` comment; the
 allowed tags are listed in `AGENTS.md`. Styling the Designer can express

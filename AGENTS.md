@@ -122,7 +122,8 @@ pnpm check    # tsc --noEmit + repo checks (scripts parse, skill links)
 pnpm test     # build + Playwright checks + the new-project test
 pnpm new-project --client "<Client>" --slug <site> --org <org>   # once, after creating the repo
 pnpm wf:pass /   # webflow-build checks: wf:compare, wf:pass, wf:anchors, wf:outline,
-                 # wf:film, wf:transitions, wf:a11y, wf:links, wf:baseline
+                 # wf:film, wf:transitions, wf:a11y, wf:links, wf:baseline,
+                 # wf:html, wf:perf; on the prototype: wf:preflight, wf:styles
 pnpm update-skills   # skills from the latest template release (ask first)
 ```
 

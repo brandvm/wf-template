@@ -12,27 +12,50 @@ in its workspace; its site ID stays out of this repo.
    staging subdomain.
 2. [Claude] Find the copy by name through the Webflow connector (site ID,
    staging subdomain) and run `pnpm new-project` with those values
-   (SKILL.md › Project setup).
+   (`webflow-prototype` › Project setup).
 3. [Claude] Point Embeds 2a and 2b in G | Components at the repo:
    replace `ORG` and `REPO` with the values in `loader.html` (a Webflow
    change, so after the go-ahead). The canvas shows the repo CSS once the
    first push has deployed.
-4. [Claude] Take the snapshot for the prototype (prototype-starter ›
-   Webflow snapshot). The starter's values are neutral placeholders: the
+4. [Claude] Take the snapshot for the prototype (`webflow-prototype` ›
+   prototype-starter › Webflow snapshot). The starter's values are neutral placeholders: the
    design's colours, type and spacing replace them as old → new
    proposals, like any other variable change.
 
 ## What it holds
 
 Built from `conventions.md`, in the order the Designer needs (each batch
-approved before it is written). Values are neutral: a system font stack,
+approved before it is written). Values are neutral: Geist as the default font,
 greys plus one accent, a spacing scale, all sizes in em. Writing a batch
 this size through the MCP hits the rate limit: send about 20 writes per
 call (`lessons/mcp.md`). Webflow names every collection's first mode
 "Base mode" and the MCP can't rename it; its default "Base collection"
 can't be deleted and stays empty.
 
-**A. Variables** (§4)
+**A. Variables** (§4). These collections, names and values are the
+standard starting point and the standard way to use variables, not a limit:
+a project changes any value, and adds, renames or removes variables, modes
+and collections when its design needs to (proposed as old → new, like any
+variable change). The style guide follows whatever the site has.
+
+The default font is **Geist**, with `Family/Base` = `Geist` (a font
+variable holds one family name; the fallback stack comes after it in the
+published CSS). A project with its own typeface replaces the font and that
+one variable.
+
+- **Upload the file, don't pick Geist from Google Fonts.** Site settings ›
+  Fonts › Custom fonts: upload
+  `webflow-prototype/prototype-starter/public/fonts/Geist-Variable.woff2` (the official
+  variable file, weights 100 to 900, SIL Open Font License, licence text
+  next to it), family name `Geist`, font display Swap. Google Fonts'
+  build of Geist has no stylistic sets, so the feature setting below would
+  do nothing with it (checked 2026-10-13 in the font's feature table).
+- **Font features, set once.** Body (All Pages) tag style › Custom
+  properties: `font-feature-settings` = `"ss03" on, "ss08" on`
+  (alternate l, round dots). It is inherited, so no class repeats it. The
+  style guide's Typography section shows a "Font features" row whenever
+  the Body style sets it; check that row on staging (an l with a curved
+  foot and round dots on i and j mean it is on).
 
 | Collection | Modes | Contents |
 | --- | --- | --- |
@@ -89,8 +112,12 @@ the Designer (a `calc()` with variables can't go through the MCP).
   project pastes its head code, staging logs "[wfc] Head code config
   missing" and the 2a stylesheet 404s; both are expected in the starter.
 
-**E. Reserved classes page.** No style guide ships with the starter; each
-project makes its own ([style-guide.md](style-guide.md)). The page
+**E. Style guide page.** The style guide has one layout on every site
+(the `webflow-style-guide` skill). The starter is where its frame belongs:
+the page, the **Sg** layout classes from the skill's `sg.css`, and the
+Current state on **Sg Sidebar Link**, so a project fills rows instead of
+building a layout. Until the starter holds them, a project creates the Sg
+classes itself (the skill's "In Webflow", step 2). Today the page
 `/design/style-guide` holds one section with h1–h6 and a Form (class
 **Form**, its label **Label**, submit **Button**), so the reserved classes,
 which only the Designer can create, survive duplication. Its head code has
@@ -99,4 +126,5 @@ classes are on no element until a project's style guide applies them.
 
 The starter is never published to a custom domain and holds no client
 content. When `conventions.md` changes, update the starter in the same
-round of work, then refresh `prototype-starter/webflow-snapshot/` from it.
+round of work, then refresh the `webflow-prototype` skill's
+`prototype-starter/webflow-snapshot/` from it.

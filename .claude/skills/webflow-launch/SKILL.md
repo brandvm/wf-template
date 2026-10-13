@@ -109,5 +109,5 @@ All [Person], Claude can prepare the documents:
 - [Claude] Before every later release: `pnpm wf:baseline compare --live`
   after publishing to staging; every change is expected or fixed.
 - [Claude] Offer the project's new `template-candidate` GOTCHAS to the
-  template (webflow-build › Contributing); the template collects them with
+  template (webflow-build › rules.md › Contributing); the template collects them with
   `pnpm harvest`.

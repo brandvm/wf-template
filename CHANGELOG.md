@@ -13,6 +13,146 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.3.0 — 2026-10-13
+
+The workflow is now one skill per phase, with the style guide first, new
+gates and five new checks.
+
+**For a client repo already in use** (two steps by hand, once; a repo
+created from this version needs neither):
+
+1. Copy `scripts/update-skills.mjs` from the template, then run
+   `pnpm update-skills`. The new script also adds the new `wf:*`
+   shortcuts to `package.json` and links the new skills in the workspace
+   folder; the old one copies the skills only.
+2. A prototype folder made before this version keeps its own copies of
+   the old style guide scripts. To move it to the fixed layout, copy
+   `scripts/skill.mjs`, `scripts/check-snapshot.mjs`,
+   `src/modules/style-guide-nav.ts` and the `style-guide`,
+   `check:style-guide` and `check:snapshot` scripts in `package.json`
+   from the prototype starter, then move what was in
+   `design/style-guide/components.html` into items or page blocks.
+
+Skills:
+
+- **`webflow-prototype` (new, split out of `webflow-build`):** project
+  setup, the inputs, the localhost prototype and the handoff pack. It never
+  writes to Webflow. `prototype-starter/` and `figma.md` moved into it;
+  `pnpm new-project` copies the starter from there. It ends with a
+  **Prototype handoff** gate and the message that starts the build session.
+- **`webflow-build`** now covers the Webflow build only. The rules every
+  skill shares (standing rules, wrap-up, handing work over, contributing)
+  are one file, `webflow-build/rules.md`.
+- **`webflow-audit` (new):** a site that is already live. Read-only audit
+  (baselines with a noise floor, speed medians, accessibility, links,
+  published HTML, SEO, inventory), a tracker in the client's wording, a
+  rollback point, a parity release, then small batches: staging, verify,
+  "what else would go live", the person types "publish", verify
+  production. Also the short procedure for a one-off fix.
+
+Order and gates:
+
+- **Build order:** variables → tag styles → classes → CMS → repo port and
+  loader → the style guide page → the media page (when a page plays a
+  video) → components from real page markup → pages → style guide final
+  check. In the prototype the style guide is also the first page.
+- **New gates:** Prototype page done (tablet and phone, states, outline,
+  keyboard, every way of arriving, pre-flight), Prototype handoff,
+  Foundation done, Media done, Component done. **Before the prototype**
+  gains the component plan and the video list; **Build handoff** gains the
+  style guide final check and the speed numbers.
+- **Media page** (`webflow-build/media.md`): `/design/media`, where a
+  person uploads each video as a Background Video so Webflow converts and
+  hosts it; the real pages play the hosted files through the Video
+  component.
+- **Rules:** publishing is split (new build: staging is fine; live site: a
+  publish is site-wide, wait for the word "publish"); after every Webflow
+  write batch say "reload the Designer" and what is not published; scripts
+  live in the repo; the wrap-up report has a fixed short shape.
+- `docs/handoff/MANUAL-TODO.md` opens with the seven kinds of step to
+  expect, so they are found at the start and not at the end.
+
+Checks (`pnpm wf:*`, in `webflow-build/scripts/`):
+
+- `wf:preflight`: reads the prototype's markup and reports what the
+  importer or the publisher will change, as FIX (change the markup now) or
+  PLAN (a known extra build step). `--strict` gates the handoff.
+- `wf:styles`: sorts every declaration of the new classes into what the
+  connector can create, what a person sets by hand in the Designer, and
+  what goes to repo CSS, in creation order. It replaces a converter that
+  was written in a session's scratch folder on an earlier build and lost.
+- `wf:html`: the published page against what the build expects: default
+  field names, links standing in for buttons, a variant whose class is on
+  no element, classes no stylesheet defines, script hooks the prototype has
+  and the published page lost.
+- `wf:perf`: Lighthouse as the median of several runs, mobile and
+  desktop, with the range (Lighthouse is fetched by npx, not a dependency).
+- `pnpm check:snapshot` (prototype): the hand-written snapshot is
+  consistent (every alias and binding resolves, modes exist) and the
+  generated CSS matches it.
+- `pnpm update-skills` also adds new `wf:*` shortcuts to `package.json`
+  and links new skills in the workspace.
+- Prototype starter: the nav partial is a plain placeholder (its made-up
+  classes had no CSS), so a new project passes the pre-flight.
+
+Not in this version: an automatic export of the Webflow snapshot (it is
+still written from the connector's output; `check:snapshot` checks it),
+and reading a `.fig` file without the Figma connector.
+
+Style guide:
+
+- New skill `webflow-style-guide`: the style guide page has one layout on
+  every site. A sticky sidebar lists the sections; each section is a list of
+  rows (name, class and note on the left, the live specimen on the right).
+  Eleven sections in a fixed order (`scripts/sections.mjs`); a section with
+  no content is left out, nothing can be added. The page's own layout is the
+  skill's `sg.css` (Sg classes only, no project class in the frame).
+- The generator and the check moved from the prototype starter into the
+  skill (`scripts/gen-style-guide.mjs`, `check-style-guide.mjs`), so
+  `pnpm update-skills` updates them for every project. The prototype runs
+  them through `scripts/skill.mjs`.
+- Specimens replace the hand-written `components.html`: items in
+  `design/style-guide/items/*.html`, or `<!-- sg:start … -->` blocks taken
+  from the real pages, which stay in step with them. Specimens lose their
+  ids and script hooks and are `inert`. Page sections show at half size.
+- Colour and radius swatches use one generated combo per variable instead
+  of inline styles, so the prototype page and the Webflow page are built
+  the same way (the importer turned each inline style into a junk combo).
+- `pnpm check:style-guide` also fails on an unknown or out-of-order
+  section, a sidebar that doesn't match the sections, a section without
+  rows, more than one h1, or an inline style.
+- The style guide is the first page built, in the prototype and in Webflow;
+  every later class or component adds its row in the same piece of work.
+  `webflow-build/style-guide.md` is removed; `conventions.md` §12,
+  `starter-site.md` §E and the prototype starter README point at the skill.
+- The style guide follows whatever variables a site has: the template's
+  collections, names and values are a standard, not a limit
+  (`conventions.md` §4, `starter-site.md` §A). Collections named
+  differently are mapped in `design/style-guide/config.json`; collections
+  the generator doesn't know are shown as tables. The Typography section
+  also shows the native tag styles (headings, paragraphs, links).
+- The layout is written for someone new to the site: Overview explains how
+  to use the page (four cards), then shows counts, fonts, variable
+  collections and breakpoints; every section opens with its number, title
+  and one line on what it is for; specimens sit on a panel, class names
+  read as code, a row's name stays in view beside a long table, and each
+  spacing variable has a bar of its size (one more generated combo family,
+  Sg Bar + Is …).
+- Default font: **Geist** (`Typography Scale` › `Family/Base`), with
+  `font-feature-settings: "ss03" on, "ss08" on` on the Body
+  tag style. The font is the official variable file, shipped in the
+  prototype starter's `public/fonts/` with its licence and uploaded to
+  Webflow as a custom font: Google Fonts' build of Geist has no stylistic
+  sets. A project with its own typeface replaces it. This also fixes the starter
+  snapshot, whose `Family/Base` held a whole font stack: a font variable
+  holds one family name, so the generated CSS quoted the stack as a single
+  (invalid) family and pages fell back to a serif. **The starter Webflow
+  site still needs the same change** (upload Geist in Site settings › Fonts,
+  set `Family/Base` and the Body style's font features), and the style guide frame (`starter-site.md` §E).
+- Prototype starter: default button and form specimens, and
+  `style-guide-nav.ts` (the sidebar's current-section highlight; Webflow
+  does this with the link's Current state).
+
 ## 0.2.0 — 2026-10-09
 
 Client repos must re-paste loader pieces 2b and 3 (footer code) into

@@ -1,36 +1,14 @@
 # Build checklists
 
-Gates for a Webflow build, from the agency's project checklist. Setup,
-discovery and design work (contracts, kickoff, research, client access) are
-people work and stay in the agency's own checklist; these lists start where
-the build needs inputs and end at the build handoff.
+Gates for the Webflow build, from the agency's project checklist. The
+gates before it (the inputs, each prototype page, the prototype handoff)
+are in the `webflow-prototype` skill
+([checklists.md](../webflow-prototype/checklists.md)); these lists start
+at the design handoff and end at the build handoff.
 
 Tags: **[Claude]** Claude does it · **[Claude checks]** Claude verifies and
 reports · **[Person]** a person does it; Claude may track it, never claim it.
 Commands are the check scripts (`pnpm wf:*`, see SKILL.md › Checks).
-
-## Before the prototype (inputs first)
-
-Run once, right after Project setup and before any prototype page. These
-inputs change the structure of everything after them, so they come
-before code. Missing → ask; Claude never fills them in with guesses.
-
-- [Person] The design: a Figma link with a frame per breakpoint for every
-  page ([figma.md](figma.md)), or the agreement to design in the
-  prototype.
-- [Person] The desktop design frame and the width range it scales over,
-  for the fluid scaling in `src/styles.css` §01 (default 1680, scaling
-  1440–1680). [Claude] sets `--size-container-ideal`, `-min` and `-max`
-  from it, and the Webflow variables stay in em.
-- [Person] CMS structure: collections, fields (with types), references,
-  sort order, and which pages list or template them.
-- [Person] SEO per page: title, meta description, H1, slug.
-- [Person] States for every control and component: hover, focus,
-  pressed, disabled, error, empty, open.
-- [Person] Final content placed in the designs (no lorem ipsum), or a
-  dated list of what is still to come and from whom.
-- [Claude] Records the answers in `docs/handoff/HANDOFF.md` (Pages, CMS,
-  Decisions) and the gaps in Open decisions.
 
 ## Before building (design handoff, approved in writing)
 
@@ -42,8 +20,9 @@ ask.
 - [Person] Component library with its rules, including hover, focus,
   error and disabled states.
 - [Person] Interaction and animation specs; prototypes for key flows.
-- [Claude checks] Everything in **Before the prototype** is still
-  current (content, SEO fields, CMS structure).
+- [Claude checks] Everything in **Before the prototype**
+  (`webflow-prototype`) is still current: content, SEO fields, CMS
+  structure, the component plan, the video list.
 - [Person] Assets exported with licences (images, icons, fonts with a web
   licence).
 - [Person] Forms spec: fields, where submissions go, who is notified,
@@ -56,6 +35,45 @@ ask.
 - [Claude] Staging password-protected and set to noindex (Page/Site
   settings, or the `noindex` meta in head code if the plan can't).
 
+## Foundation done (once, before the style guide page)
+
+- [Claude] Variables, tag styles, classes and CMS collections are in
+  Webflow, each batch approved; the prototype's snapshot is refreshed and
+  `pnpm css` shows no difference left to propose.
+- [Claude] The repo holds the prototype's modules and the CSS the Designer
+  can't express (each rule with its `repo-css:` tag); `pnpm check`,
+  `pnpm build` and `pnpm test` pass; committed and pushed with an OK.
+- [Person] Loader pasted (head code, Embeds 2a and 2b, footer code).
+  [Claude checks] staging loads the bundle and the stylesheet with no
+  console errors.
+- [Claude] `MANUAL-TODO.md` lists every value the API couldn't set
+  (calc, gradient and shadow values, reserved names, tag styles), and
+  [Person] has done them.
+
+Then the style guide page: the `webflow-style-guide` skill's **Style
+guide base done** gate.
+
+## Media done (once, when any page plays a video)
+
+- [Claude] The media page exists (`/design/media`, noindex, out of
+  search and the sitemap) and lists every video from the video list.
+- [Person] Each video uploaded there as a Background Video.
+- [Claude checks] Each hosted address and poster is recorded in
+  `BUILD-NOTES.md` and plays on staging; the Video component uses them.
+
+Procedure: [media.md](media.md).
+
+## Component done (per component, before it is used on a page)
+
+- [Claude] Built from the real page markup, with its `data-*` hooks, ids
+  and aria attributes (never from a style guide preview).
+- [Claude] Props follow `conventions.md` §10; every prop is tried once
+  with a non-default value on staging.
+- [Claude checks] The published HTML is what the module expects
+  (`pnpm wf:html`): roles, attributes, variant and conditional classes.
+- [Claude] Its row is on the style guide page, as an instance.
+- [Claude] Designer-only wiring is in `MANUAL-TODO.md`.
+
 ## Page done (per page, before showing it for review)
 
 - [Claude checks] `pass` and `compare` match the design at all three
@@ -66,6 +84,8 @@ ask.
   its section.
 - [Claude checks] `a11y` at all widths: no serious or critical failures;
   `links`: no broken links (`#` placeholders listed in the known issues).
+- [Claude checks] `html`: nothing Webflow rewrote on publish breaks the
+  page (roles, dropped attributes, form field names, variant classes).
 - [Claude] States built and checked: hover, focus-visible, active,
   disabled, error; animations as specced; reduced motion respected.
 - [Claude] Forms: validation, spam protection, success and error messages,
@@ -88,6 +108,11 @@ notes, integrations, changes log, redirect map and known issues.
 
 
 - [Claude] Staging link with every page complete.
+- [Claude checks] Style guide final check: `pnpm check:style-guide`
+  passes and the published style guide holds every class; page section
+  previews whose page now exists are removed.
+- [Claude checks] `pnpm wf:perf` on the key pages, mobile and desktop
+  (the median of several runs); the numbers go in `BUILD-NOTES.md`.
 - [Claude] CMS notes: how to edit what (collections, fields, conditional
   sections, components and their props).
 - [Claude] Integration list and configuration notes (no credentials).

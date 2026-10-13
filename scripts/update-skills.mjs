@@ -2,10 +2,14 @@
 //   pnpm update-skills [--ref <tag|branch>] [--repo <owner/repo>] [--dry-run]
 // Downloads .claude/skills from the template on GitHub (default: the
 // latest release tag, else master), replaces the local copy, and records
-// the version in .wf-template.json. Everything else in the repo is left
-// alone. Local edits to a skill are overwritten, so the script lists what
+// the version in .wf-template.json. Two things follow the skills, because
+// a new skill or check is useless without them: `wf:*` shortcuts the
+// template's package.json has and this one lacks are added (existing
+// scripts are never changed), and a skill folder that is new gets its link
+// in the workspace around the repo (<Client>/.claude/skills), when that
+// workspace links the others. Everything else in the repo is left alone. Local edits to a skill are overwritten, so the script lists what
 // changes first; contribute local improvements to the template instead
-// (webflow-build › Contributing).
+// (webflow-build › rules.md › Contributing).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -77,10 +81,33 @@ if (!dry && changes.length) {
   fs.rmSync(local, { recursive: true, force: true });
   fs.cpSync(incoming, local, { recursive: true });
 }
+// Shortcuts for checks that are new in this version.
+const pkgFile = path.join(root, 'package.json');
+const theirs = JSON.parse(fs.readFileSync(path.join(tmp, top, 'package.json'), 'utf8')).scripts ?? {};
+const pkg = JSON.parse(fs.readFileSync(pkgFile, 'utf8'));
+const added = Object.keys(theirs).filter((k) => k.startsWith('wf:') && !(pkg.scripts ?? {})[k]);
+if (added.length) {
+  console.log(`${dry ? 'Would add' : 'Added'} to package.json scripts: ${added.join(', ')}`);
+  if (!dry) {
+    pkg.scripts = { ...pkg.scripts, ...Object.fromEntries(added.map((k) => [k, theirs[k]])) };
+    fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n');
+  }
+}
+// New skills, linked where the workspace links the others.
+const wsSkills = path.join(path.dirname(root), '.claude/skills');
+const isLink = (p) => { try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; } };
+if (fs.existsSync(wsSkills) && fs.readdirSync(wsSkills).some((n) => isLink(path.join(wsSkills, n)))) {
+  for (const skill of fs.readdirSync(incoming)) {
+    const p = path.join(wsSkills, skill);
+    if (fs.existsSync(p) || isLink(p)) continue;
+    console.log(`${dry ? 'Would link' : 'Linked'} ../.claude/skills/${skill}`);
+    if (!dry) fs.symlinkSync(path.join('..', '..', path.basename(root), '.claude/skills', skill), p, 'dir');
+  }
+}
 if (!dry) {
   meta.template = repo;
   meta.skills = { version, commit, updated: new Date().toISOString().slice(0, 10) };
   fs.writeFileSync(metaFile, JSON.stringify(meta, null, 2) + '\n');
-  if (changes.length) console.log('Review the diff, then commit .claude/skills and .wf-template.json.');
+  if (changes.length || added.length) console.log('Review the diff, then commit .claude/skills, .wf-template.json and package.json.');
 }
 fs.rmSync(tmp, { recursive: true, force: true });

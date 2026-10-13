@@ -161,7 +161,7 @@ if (!flag('no-workspace')) {
         catch { fs.cpSync(path.join(root, '.claude/skills', skill), p, { recursive: true }); console.log(`  (copied: no symlink permission; re-copy after pnpm update-skills)`); }
       });
     }
-    make('prototype', (p) => fs.cpSync(path.join(root, '.claude/skills/webflow-build/prototype-starter'), p, { recursive: true }));
+    make('prototype', (p) => fs.cpSync(path.join(root, '.claude/skills/webflow-prototype/prototype-starter'), p, { recursive: true }));
     make('Assets/figma', (p) => fs.mkdirSync(p, { recursive: true }));
   }
 }
@@ -175,7 +175,7 @@ Claude is opened in this folder, one level above the repo. Written by
 - \`${repoDir}/\` — the GitHub repo: custom code, the skills, the handoff
   docs. Paths in its \`AGENTS.md\` are relative to it; run \`pnpm\` and
   \`git\` there.
-- \`prototype/\` — the localhost prototype (webflow-build ›
+- \`prototype/\` — the localhost prototype (webflow-prototype ›
   prototype-starter). Not in git.
 - \`Assets/\` — design exports, brand files and fonts; Figma frame
   screenshots in \`Assets/figma/\`. Not in git.

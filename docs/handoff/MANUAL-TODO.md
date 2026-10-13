@@ -22,6 +22,28 @@ variables.
 Letters run A, B, C… then AA, AB… and are never reused, so a letter
 mentioned in GOTCHAS or a commit stays unambiguous.
 
+Categories to expect on every build. Go through them at the start and
+again at each gate, so the steps are found early and not at the end:
+
+1. **Values with variables in a calc, gradient or shadow** (negative
+   section padding, nav height + padding, gradient stops).
+2. **Reserved class names** (Label, Form) and **tag styles** never set
+   before (All H1–H6 Headings, All Paragraphs, All Links): one property
+   set by hand, then the API can do the rest.
+3. **CMS bindings:** lists from a multi-reference or multi-image field,
+   "exclude current item", links to the current item, conditional
+   visibility, decimal number formats, date bindings.
+4. **Component wiring:** slots made and named, variant props exposed from
+   a nested instance, variant styles on an element with a combo class,
+   conditional classes (typed text: check the published class list).
+5. **Forms:** field names (type a value that differs from the one shown),
+   placeholders, the notification address, the success and error states.
+6. **Page settings:** sitemap and search exclusion, the 404 and password
+   pages (the API can't reach utility pages), Open Graph images for CMS
+   templates.
+7. **Site settings:** fonts uploaded, head and footer code pasted, the
+   staging password.
+
 | ID | Where (page › element or class) | Breakpoint | Set | Why the API can't | Done |
 | --- | --- | --- | --- | --- | --- |
 | A | | Desktop | | | ☐ |

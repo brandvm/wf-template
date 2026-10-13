@@ -27,7 +27,8 @@ current during the build. Agents read it after `AGENTS.md` and `GOTCHAS.md`.
 | `/` | <prototype file or Figma frame> | Home | |
 | `/<page>` | | | |
 | `/<collection>/<item>` | | <Collection> template | CMS template |
-| `/design/style-guide` | | Style guide (folder `design`) | excluded from search |
+| `/design/style-guide` | | Style guide (folder `design`) | first page built; excluded from search |
+| `/design/media` | | Media (folder `design`) | only when a page plays a video; excluded from search |
 
 Breakpoints: 991 (tablet), 767 (mobile landscape), 479 (mobile). Checked at
 <widths>.
