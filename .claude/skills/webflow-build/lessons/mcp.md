@@ -668,3 +668,20 @@ refer to the project the lesson came from; Status is that project's.
 - Status: workaround confirmed
 - Found by: claude
 
+### 2026-10-13 · Element builder: a DOM element's attributes can't be set at creation; `query_elements` style and text filters find nothing
+- Area: mcp
+- Symptom: creating a `DOM` element (a `source`) with `settings`
+  holding `attributes` failed: "Setting attributes is not applicable to
+  this element". Separately, `query_elements` with `element_filter.style`
+  ("Form Input") or `.text` returned no match for elements that exist on
+  the page.
+- Cause: not known; the builder accepts the `settings` list only for
+  some keys at creation.
+- Fix: create the element bare, then write `attributes` (with prop
+  bindings) through `set_settings` and visibility through
+  `set_visibility`. To find elements, filter by `attribute_name` /
+  `attribute_value` (a section's id) or `type`, or pass `element_id`
+  with `children_depth`, and walk down from there.
+- Status: workaround confirmed
+- Found by: claude
+

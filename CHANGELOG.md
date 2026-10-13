@@ -13,6 +13,40 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.5.0 — 2026-10-13
+
+**Manual step for client repos, once:** replace `scripts/update-skills.mjs`
+with this version (copy it from the template), then run
+`pnpm update-skills`. From then on the script updates itself.
+
+- **`pnpm update-skills` brings the tooling too.** Besides the skills it
+  now replaces the template's own files (`build.mjs`,
+  `scripts/update-skills.mjs`, `scripts/phosphor.mjs`,
+  `scripts/check-repo.mjs`), adds the package scripts and devDependencies
+  a repo lacks, and seeds the icon font (`src/phosphor.css`,
+  `src/phosphor/`, the import in `src/styles.css`) when it is missing.
+  It lists every change first; `--skills-only` keeps the old behaviour;
+  `--from <folder>` reads a local copy of the template. The Phosphor
+  parts of 0.4.0 no longer need copying by hand.
+- **`pnpm check:drift`** (prototype): compares the snapshot with the
+  stylesheet the staging site publishes and lists variables and classes
+  that exist on one side only and every value that differs, per
+  breakpoint, state and mode. Taking the snapshot is still done through
+  the connector; this is what tells you it is right and when it has gone
+  stale. Its first run found a stale class in the starter's own snapshot.
+- **`pnpm fig <file.fig>`** (prototype): reads a saved Figma file when
+  there is no connector: pages, frames, layers, auto layout, text, fonts,
+  colours, images (`webflow-prototype` › figma.md).
+- **Starter site:** status colours get an `On Dark` twin and the Dark
+  mode of `Status/*` points at it (the base colours were 3.4–3.8:1 on the
+  dark background); the utility set is filled in (Weight Regular and
+  Bold, Leading Snug and Normal, Tracking Tight, Text Accent, Center and
+  Balance); Form Input is documented as the one class for inputs, selects
+  and textareas, with the combo Is Textarea; C | Video takes an optional
+  WebM source (props WebM and Has WebM).
+- Style guide generator: a specimen name may contain a pipe
+  (`name=C | Button` was read as "C").
+
 ## 0.4.5 — 2026-10-13
 
 No manual step for client repos.

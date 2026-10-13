@@ -799,6 +799,18 @@
   }
  },
  {
+  "name": "Is Textarea",
+  "selector": ".form-input.is-textarea",
+  "properties": {
+   "main": {
+    "height": "auto",
+    "min-height": "8em",
+    "padding-top": "var:Spacing/12",
+    "padding-bottom": "var:Spacing/12"
+   }
+  }
+ },
+ {
   "name": "Section",
   "selector": ".section",
   "properties": {
@@ -1177,9 +1189,11 @@
   "properties": {
    "main": {
     "display": "flex",
-    "width": "260px",
+    "width": "20em",
     "flex-direction": "column",
-    "text-align": "center"
+    "text-align": "center",
+    "grid-column-gap": "1em",
+    "grid-row-gap": "1em"
    }
   }
  },
@@ -1253,6 +1267,78 @@
   "variableModes": {
    "main": {
     "Typography Styles": "Display"
+   }
+  }
+ },
+ {
+  "name": "Weight Regular",
+  "selector": ".weight-regular",
+  "properties": {
+   "main": {
+    "font-weight": "var:Typography Scale/Weight/Regular"
+   }
+  }
+ },
+ {
+  "name": "Weight Bold",
+  "selector": ".weight-bold",
+  "properties": {
+   "main": {
+    "font-weight": "var:Typography Scale/Weight/Bold"
+   }
+  }
+ },
+ {
+  "name": "Leading Snug",
+  "selector": ".leading-snug",
+  "properties": {
+   "main": {
+    "line-height": "var:Typography Scale/Line Height/Snug"
+   }
+  }
+ },
+ {
+  "name": "Leading Normal",
+  "selector": ".leading-normal",
+  "properties": {
+   "main": {
+    "line-height": "var:Typography Scale/Line Height/Normal"
+   }
+  }
+ },
+ {
+  "name": "Tracking Tight",
+  "selector": ".tracking-tight",
+  "properties": {
+   "main": {
+    "letter-spacing": "var:Typography Scale/Letter Spacing/Tight"
+   }
+  }
+ },
+ {
+  "name": "Text Center",
+  "selector": ".text-center",
+  "properties": {
+   "main": {
+    "text-align": "center"
+   }
+  }
+ },
+ {
+  "name": "Text Accent",
+  "selector": ".text-accent",
+  "properties": {
+   "main": {
+    "color": "var:Colors Semantic/Text/Accent"
+   }
+  }
+ },
+ {
+  "name": "Text Balance",
+  "selector": ".text-balance",
+  "properties": {
+   "main": {
+    "text-wrap": "balance"
    }
   }
  }

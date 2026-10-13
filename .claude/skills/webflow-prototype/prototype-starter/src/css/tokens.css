@@ -16,6 +16,9 @@
   --_colors---status--success: #1a7f4b;
   --_colors---status--warning: #b45309;
   --_colors---status--error: #c62828;
+  --_colors---status--success-on-dark: #4ade80;
+  --_colors---status--warning-on-dark: #fbbf24;
+  --_colors---status--error-on-dark: #f87171;
   /* Colors Semantic */
   --_colors-semantic---background--page: var(--_colors---brand--paper);
   --_colors-semantic---background--surface: var(--_colors---ink-tint--ink-4);

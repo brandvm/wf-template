@@ -10,7 +10,9 @@
     "classes": "node scripts/gen-class-list.mjs",
     "check:style-guide": "node scripts/skill.mjs webflow-style-guide check-style-guide.mjs",
     "style-guide": "node scripts/skill.mjs webflow-style-guide gen-style-guide.mjs",
-    "check:snapshot": "node scripts/check-snapshot.mjs"
+    "check:snapshot": "node scripts/check-snapshot.mjs",
+    "check:drift": "node scripts/check-drift.mjs",
+    "fig": "node scripts/fig.mjs"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

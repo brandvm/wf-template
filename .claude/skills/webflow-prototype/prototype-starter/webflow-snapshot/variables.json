@@ -124,6 +124,30 @@
     "values": {
      "Base": "#c62828"
     }
+   },
+   {
+    "name": "Status/Success On Dark",
+    "type": "Color",
+    "cssName": "--_colors---status--success-on-dark",
+    "values": {
+     "Base": "#4ade80"
+    }
+   },
+   {
+    "name": "Status/Warning On Dark",
+    "type": "Color",
+    "cssName": "--_colors---status--warning-on-dark",
+    "values": {
+     "Base": "#fbbf24"
+    }
+   },
+   {
+    "name": "Status/Error On Dark",
+    "type": "Color",
+    "cssName": "--_colors---status--error-on-dark",
+    "values": {
+     "Base": "#f87171"
+    }
    }
   ]
  },
@@ -248,7 +272,7 @@
     "cssName": "--_colors-semantic---status--success",
     "alias": {
      "Base": "Colors/Status/Success",
-     "Dark": "Colors/Status/Success"
+     "Dark": "Colors/Status/Success On Dark"
     }
    },
    {
@@ -257,7 +281,7 @@
     "cssName": "--_colors-semantic---status--warning",
     "alias": {
      "Base": "Colors/Status/Warning",
-     "Dark": "Colors/Status/Warning"
+     "Dark": "Colors/Status/Warning On Dark"
     }
    },
    {
@@ -266,7 +290,7 @@
     "cssName": "--_colors-semantic---status--error",
     "alias": {
      "Base": "Colors/Status/Error",
-     "Dark": "Colors/Status/Error"
+     "Dark": "Colors/Status/Error On Dark"
     }
    }
   ]

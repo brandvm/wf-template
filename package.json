@@ -7,7 +7,7 @@
     "dev": "node build.mjs --dev",
     "build": "node build.mjs",
     "check": "tsc --noEmit && node scripts/check-repo.mjs",
-    "test": "pnpm build && playwright test && node --test tests/new-project.check.mjs",
+    "test": "pnpm build && playwright test && node --test tests/new-project.check.mjs tests/update-skills.check.mjs",
     "new-project": "node scripts/new-project.mjs",
     "update-skills": "node scripts/update-skills.mjs",
     "harvest": "node scripts/harvest.mjs",

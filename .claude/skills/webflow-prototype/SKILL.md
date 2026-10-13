@@ -116,7 +116,9 @@ duplicated the starter site under the client's name
 - **It reads the site's variables** from a snapshot of Webflow
   ([prototype-starter/README.md](prototype-starter/README.md) › Webflow
   snapshot). After writing or refreshing the snapshot: `pnpm css`, then
-  `pnpm check:snapshot`.
+  `pnpm check:snapshot`, then `pnpm check:drift`, which compares the
+  snapshot with the stylesheet the staging site publishes and lists every
+  variable, class and value that differs (publish to staging first).
 - **Variable changes are proposed, never made:** as old → new in
   `proposed.css`, grouped and lettered for approval. New classes go in
   `new-classes*.css`, written as the Designer can hold them.
@@ -127,7 +129,7 @@ duplicated the starter site under the client's name
 
 **Order.**
 
-1. Snapshot, `pnpm css`, `pnpm check:snapshot`.
+1. Snapshot, `pnpm css`, `pnpm check:snapshot`, `pnpm check:drift`.
 2. **The style guide** (`webflow-style-guide` skill), approved before any
    content page.
 3. Pages, one at a time. For each: build it; add the row for every class

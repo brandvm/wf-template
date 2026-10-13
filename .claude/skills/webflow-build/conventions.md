@@ -146,7 +146,9 @@ Section (section, id="<anchor>")     + combos: Is Hero, Is Top, Is Media, theme
   them.
 - **Utilities** mirror a variable and are named after it: **Size 16**,
   **Weight Medium**, **Leading Tight**, **Tracking Wide**,
-  **Text Secondary**, **Text Uppercase**, **Max Width Text**.
+  **Text Secondary**, **Text Uppercase**, **Max Width Text**. The starter
+  ships a fixed set (`starter-site.md` §C); add to it in the same
+  pattern, one property per class.
 - **Typography classes** use the role names:
   **D0–D6** (display and headings), **Body L** and **Body S** (body is the
   default), **Label Text**, **Chip**.

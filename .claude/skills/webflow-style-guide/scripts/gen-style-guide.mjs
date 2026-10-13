@@ -255,7 +255,7 @@ ${rad.map(({ v }) => {
 //   <!-- sg:start section=components | name=Card | note=… --> … <!-- sg:end -->
 const HAND = new Set(SPECIMEN_SECTIONS);
 const meta = (text, where) => {
-  const m = Object.fromEntries(text.split('|').map((p) => p.trim()).filter(Boolean).map((p) => { const i = p.indexOf('='); return i < 0 ? [p, ''] : [p.slice(0, i).trim(), p.slice(i + 1).trim()]; }));
+  const m = Object.fromEntries(text.split(/\|(?=\s*[a-z]+\s*=)/).map((p) => p.trim()).filter(Boolean).map((p) => { const i = p.indexOf('='); return i < 0 ? [p, ''] : [p.slice(0, i).trim(), p.slice(i + 1).trim()]; }));
   if (!HAND.has(m.section)) { console.error(`${where}: section must be one of ${[...HAND].join(', ')} (got "${m.section ?? ''}")`); process.exit(1); }
   if (!m.name) { console.error(`${where}: an item needs name=…`); process.exit(1); }
   return m;

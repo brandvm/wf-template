@@ -59,8 +59,8 @@ one variable.
 
 | Collection | Modes | Contents |
 | --- | --- | --- |
-| Colors | Base | `Brand/Ink`, `Brand/Paper`, `Brand/Accent`; `Status/Success`, `Status/Warning`, `Status/Error`; `Ink Tint/Ink 4…64`, `Paper Tint/Paper 12…64` |
-| Colors Semantic | Base, Dark | `Background/Page`, `Background/Surface`, `Background/Overlay`, `Text/Primary`, `Text/Secondary`, `Text/Accent`, `Border/Subtle`, `Button/Background`, `Button/Text`, `Button/Background Hover`, `Form/Focus`, `Link/Hover`, `Status/Success`, `Status/Warning`, `Status/Error`, each an alias of a Colors variable |
+| Colors | Base | `Brand/Ink`, `Brand/Paper`, `Brand/Accent`; `Status/Success`, `Status/Warning`, `Status/Error`, each with an `On Dark` twin (a lighter value that keeps contrast on a dark background); `Ink Tint/Ink 4…64`, `Paper Tint/Paper 12…64` |
+| Colors Semantic | Base, Dark | `Background/Page`, `Background/Surface`, `Background/Overlay`, `Text/Primary`, `Text/Secondary`, `Text/Accent`, `Border/Subtle`, `Button/Background`, `Button/Text`, `Button/Background Hover`, `Form/Focus`, `Link/Hover`, `Status/Success`, `Status/Warning`, `Status/Error` (Dark points at the `On Dark` colour), each an alias of a Colors variable |
 | Typography Scale | Base | `Family/Base`, `Size/12…96`, `Weight/Thin` (100), `Extra Light`, `Light`, `Regular`, `Medium`, `Semibold`, `Bold`, `Extra Bold`, `Black` (900): every weight is there as a variable, though only Regular, Medium and Bold are used by a role, `Line Height/Tight`, `Snug`, `Normal`, `Letter Spacing/Tight`, `Normal`, `Wide` |
 | Typography Role | Base + Tablet, Mobile Landscape, Mobile (breakpoint auto-modes) | `Family`, `Size`, `Weight`, `Line Height`, `Letter Spacing` for Display, H1–H6, Body, Body Large, Body Small, Label, Button |
 | Typography Styles | Base (= Body) + one per other role | the five properties, each mode aliasing its role |
@@ -80,16 +80,29 @@ each breakpoint.
 **Is Media**, **Is Dark**; **S Bg**, **S Bg Media**, **S Bg Overlay**;
 **S Wrapper** with **Is Wide**; **G | Page W**, **G | Nav W**,
 **G | Main W**, **G | Footer W**; **D0–D6**, **Body L**, **Body S**,
-**Label Text**, **Chip**; **Skip Link**; the utilities **Text Secondary**,
-**Text Uppercase**, **Max Width Text**, **Weight Medium**,
-**Leading Tight**, **Tracking Wide**; **Button** (the plain outer wrapper of the button components: no fill of
+**Label Text**, **Chip**; **Skip Link**; the utilities (one property
+each, bound to its variable): **Weight Regular**, **Weight Medium**,
+**Weight Bold**; **Leading Tight**, **Leading Snug**, **Leading Normal**;
+**Tracking Tight**, **Tracking Wide**; **Text Secondary**,
+**Text Accent**, **Text Uppercase**, **Text Center**, **Text Balance**;
+**Max Width Text**; **Button** (the plain outer wrapper of the button components: no fill of
 its own, only the focus ring), **Form Field** and **Form Input** (focus
-and keyboard-focus states). Type classes bind the five
+and keyboard-focus states). Form Input is the one class for text inputs,
+selects and textareas: it replaces Webflow's input defaults (height,
+margin, padding, border, background), and its combo **Is Textarea**
+makes it tall. Type classes bind the five
 Typography Styles variables and pick a mode; gaps bind `grid-row-gap` /
 `grid-column-gap`; classes for empty elements (S Bg, S Bg Overlay) carry
 padding 0 and `font-size: inherit`. [Person] sets the padding-top of
 **Is Hero** and **Is Top** to `calc(Nav/Height + Section/Padding V)` in
-the Designer (a `calc()` with variables can't go through the MCP).
+the Designer (a `calc()` with variables can't go through the MCP;
+checked again 2026-10-13: `custom_value` on a Size variable still
+fails). A project that needs the same sums elsewhere (a negative section
+padding for a full-bleed element, the nav height plus the section
+padding) has a [Person] add them once as Layout variables with a custom
+value, `calc(var(--_layout---section--padding-v) * -1)` and
+`calc(var(--_layout---nav--height) + var(--_layout---section--padding-v))`,
+so classes can bind them.
 
 **D. Page shell and components** (§1, §10), all in the component group
 *Global* and named after their root class:
@@ -125,7 +138,7 @@ them and restyles them, it does not rebuild them.
 | **Button Color** (Button) | div › Button Size | pass-through props; variants Primary, Secondary. Hover and pressed are states on the class |
 | **C \| Button** (Button) | Link Block Button › Button Color | Label, Link, Icon, Icon Before, Icon After |
 | **C \| Icon Button** (Button) | `button` Button › Icon Button Box › Icon | Icon, Accessible Name (bound to `aria-label`), Hook (bound to an attribute *name*); variants Primary, Secondary |
-| **C \| Video** (Controls) | `video` Video › `source` | MP4, Poster, and Autoplay, Muted, Loop, Plays Inline (each bound to an attribute *name*, value `true`) |
+| **C \| Video** (Controls) | `video` Video › `source` (WebM, shown only when Has WebM is on) + `source` (MP4) | MP4, WebM and its switch Has WebM, Poster, and Autoplay, Muted, Loop, Plays Inline (each bound to an attribute *name*, value `true`) |
 | **Section Head** (Sections) | div › Chip, h2 D2, paragraph Body L | Chip, Show Chip, Heading, Text |
 
 - The button is four layers so that each variant changes one single-class

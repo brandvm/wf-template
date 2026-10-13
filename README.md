@@ -25,7 +25,7 @@ pnpm dev      # esbuild watch + server on :3000 (in memory, sourcemaps)
 pnpm build    # minified -> dist/ (commit the result)
 pnpm check    # tsc --noEmit
 pnpm test     # build + browser checks
-pnpm update-skills   # agent skills from the latest template release
+pnpm update-skills   # agent skills, build tooling and new scripts from the latest template release
 pnpm phosphor        # Phosphor icon font in the bundle: regular by default, `pnpm phosphor regular bold` adds weights
 ```
 

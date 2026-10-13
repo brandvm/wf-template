@@ -120,6 +120,9 @@
 .sg-swatch-color.is-status-success { background-color: var(--_colors---status--success); }
 .sg-swatch-color.is-status-warning { background-color: var(--_colors---status--warning); }
 .sg-swatch-color.is-status-error { background-color: var(--_colors---status--error); }
+.sg-swatch-color.is-status-success-on-dark { background-color: var(--_colors---status--success-on-dark); }
+.sg-swatch-color.is-status-warning-on-dark { background-color: var(--_colors---status--warning-on-dark); }
+.sg-swatch-color.is-status-error-on-dark { background-color: var(--_colors---status--error-on-dark); }
 .sg-bar.is-none { width: var(--_spacing---none); }
 .sg-bar.is-hairline { width: var(--_spacing---hairline); }
 .sg-bar.is-2 { width: var(--_spacing---2); }

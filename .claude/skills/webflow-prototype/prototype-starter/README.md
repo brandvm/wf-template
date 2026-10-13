@@ -55,6 +55,8 @@ address, so the check scripts can compare staging with it.
 ```bash
 pnpm css                 # snapshot → tokens.css + webflow.css
 pnpm check:snapshot      # the snapshot is consistent: every alias and binding resolves
+pnpm check:drift         # the snapshot matches what staging publishes (variables, classes, values)
+pnpm fig <file.fig>      # read a saved Figma file when there is no connector (skill › figma.md)
 pnpm classes             # new-classes*.css → CLASSES.md
 pnpm style-guide         # snapshot + CSS → design/style-guide/index.html
 pnpm check:style-guide   # every class is applied, and the layout is the fixed one
@@ -68,7 +70,12 @@ Claude writes the two files from the Webflow MCP (variables with all modes
 and aliases; styles with `include_breakpoints`), at the start and after
 every Designer change, then runs `pnpm css` and `pnpm check:snapshot`
 (the snapshot is written by hand, so a wrong alias would otherwise only
-show as a page that looks slightly off). The starter ships with the
+show as a page that looks slightly off). `pnpm check:drift` then compares
+it with the stylesheet the staging site publishes: variables and classes
+that exist on one side only, and every value that differs, at every
+breakpoint, state and mode. Run it after each Designer change is
+published to staging; it is how a change made in the Designer by someone
+else is noticed. The starter ships with the
 snapshot of the starter Webflow site (`webflow-build` › `starter-site.md`), so a new
 prototype starts from the same base system as a duplicated site.
 

@@ -80,6 +80,8 @@ comes back as rework in Webflow, where it costs more.
 - [Claude checks] `pnpm wf:preflight --strict` passes: nothing left to
   fix in the markup; the **plan** lines are noted in `HANDOFF.md`.
 - [Claude checks] `pnpm check:snapshot`, `pnpm check:style-guide` and
-  `pnpm check` pass in the prototype.
+  `pnpm check` pass in the prototype, and `pnpm check:drift` reports no
+  drift against staging (or every difference it lists is a change still
+  waiting in `proposed.css`).
 - [Claude] The kickoff message for the build session is written
   (SKILL.md › Handing over to the build).
