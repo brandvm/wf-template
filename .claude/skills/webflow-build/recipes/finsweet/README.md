@@ -9,6 +9,10 @@ bundle, isn't version-pinned with the release, and loads every page.
 The markup stays exactly as the Finsweet docs describe (`fs-list-element`,
 `fs-combobox-element`…); only the loading changes.
 
+A searchable select built on Combo Box, with the Webflow structure, the
+classes it needs and its pitfalls, is in
+[searchable-select.md](searchable-select.md).
+
 ## Add it to a project
 
 1. Copy the files:
@@ -49,4 +53,5 @@ To update Finsweet later: `pnpm update @finsweet/attributes`, then
   never published. `pnpm finsweet add` writes a pnpm override (`'-'`) for
   each into `pnpm-workspace.yaml`; the code is all in the package's `dist/`.
 - **Combo Box** differs from its docs (needs a clear element, sorts options
-  by value, finds parts by position): see `lessons/js.md`.
+  by value, finds parts by position): see
+  [searchable-select.md](searchable-select.md) and `lessons/js.md`.

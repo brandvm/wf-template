@@ -13,6 +13,16 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.4.2 — 2026-10-13
+
+No manual step for client repos.
+
+- Finsweet recipe: `searchable-select.md`, a searchable select on a
+  Webflow Dropdown with Combo Box. Element by element structure, the same
+  as prototype markup, the Designer values that cancel Webflow's form and
+  dropdown defaults, how it behaves (sorted by value, drives List Sort)
+  and what to check. It is a recipe, not a starter component.
+
 ## 0.4.1 — 2026-10-13
 
 No manual step for client repos.
