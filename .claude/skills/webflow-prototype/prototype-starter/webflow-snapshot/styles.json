@@ -530,7 +530,7 @@
   }
  },
  {
-  "name": "Icon · Small",
+  "name": "Icon · 12px",
   "selector": ".icon:where(.w-variant-d345939b-019f-e2df-81ad-4ea069bff178)",
   "properties": {
    "main": {
@@ -539,7 +539,16 @@
   }
  },
  {
-  "name": "Icon · Large",
+  "name": "Icon · 20px",
+  "selector": ".icon:where(.w-variant-d9b45e0b-d9ad-95e4-d5c6-8074032e905f)",
+  "properties": {
+   "main": {
+    "font-size": "1.25em"
+   }
+  }
+ },
+ {
+  "name": "Icon · 24px",
   "selector": ".icon:where(.w-variant-7bce87e3-ab9e-6f63-a957-78d54b4abbad)",
   "properties": {
    "main": {
@@ -548,7 +557,7 @@
   }
  },
  {
-  "name": "Icon · XL",
+  "name": "Icon · 32px",
   "selector": ".icon:where(.w-variant-5d98fcb5-a6a5-151f-a201-b059ea992cef)",
   "properties": {
    "main": {
@@ -557,11 +566,56 @@
   }
  },
  {
-  "name": "Icon · XXL",
+  "name": "Icon · 48px",
   "selector": ".icon:where(.w-variant-e4d16f47-99b8-e0f3-e283-4d6f504865bc)",
   "properties": {
    "main": {
     "font-size": "3em"
+   }
+  }
+ },
+ {
+  "name": "Icon · 64px",
+  "selector": ".icon:where(.w-variant-9d41bcf1-4466-cbd4-2654-9c4b1423e643)",
+  "properties": {
+   "main": {
+    "font-size": "4em"
+   }
+  }
+ },
+ {
+  "name": "Icon Color",
+  "selector": ".icon-color",
+  "properties": {
+   "main": {
+    "display": "inline-flex"
+   }
+  }
+ },
+ {
+  "name": "Icon Color · Primary",
+  "selector": ".icon-color:where(.w-variant-62928812-eb99-4c09-9f13-32d22d00b3e4)",
+  "properties": {
+   "main": {
+    "color": "var:Colors Semantic/Text/Primary"
+   }
+  }
+ },
+ {
+  "name": "Icon Color · Secondary",
+  "selector": ".icon-color:where(.w-variant-3cf75344-2f7a-18f9-d091-f365874dc11f)",
+  "properties": {
+   "main": {
+    "color": "var:Colors Semantic/Text/Secondary"
+   }
+  }
+ },
+ {
+  "name": "Icon Color · Accent",
+  "selector": ".icon-color:where(.w-variant-95ba9505-d3f3-fbe1-ca24-0e30820d1b57)",
+  "properties": {
+   "main": {
+    "color": "var:Colors Semantic/Text/Accent"
    }
   }
  },

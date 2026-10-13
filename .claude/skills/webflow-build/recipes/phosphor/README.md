@@ -36,7 +36,11 @@ default `ph ph-arrow-right`. Copy a name from phosphoricons.com and type
 `ph ph-<name>`.
 
 - Size and colour are the Designer's: the icon is a font glyph, so it takes
-  `font-size` and `color` from its class (Icon) or from its parent.
+  `font-size` and `color` from its class or from its parent. The Icon
+  component's sizes are named in pixels (12px … 64px) and valued in em
+  (pixels ÷ 16): the name is the size at 16px text, and the icon scales
+  when the text around it does. Icon Color wraps Icon and adds the colour
+  variants.
 - Decorative icons carry `aria-hidden="true"`. An icon that is the only
   content of a link or button needs an accessible name on that control.
 - Check the published class list after wiring a new icon prop: the value

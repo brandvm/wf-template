@@ -13,6 +13,16 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.4.4 — 2026-10-13
+
+No manual step for client repos.
+
+- Icon sizes are named by pixel size at 16px text (12px, 16px, 20px, 24px,
+  32px, 48px, 64px) and valued in em, replacing Small … XXL.
+- New **Icon Color** component: wraps Icon with Inherit, Primary,
+  Secondary and Accent variants bound to the semantic text colours.
+  Starter site, snapshot, specimens and docs updated.
+
 ## 0.4.3 — 2026-10-13
 
 No manual step for client repos.

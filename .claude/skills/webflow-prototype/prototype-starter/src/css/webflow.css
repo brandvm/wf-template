@@ -366,6 +366,10 @@ body {
   font-size: 0.75em;
 }
 
+.icon:where(.w-variant-d9b45e0b-d9ad-95e4-d5c6-8074032e905f) {
+  font-size: 1.25em;
+}
+
 .icon:where(.w-variant-7bce87e3-ab9e-6f63-a957-78d54b4abbad) {
   font-size: 1.5em;
 }
@@ -376,6 +380,26 @@ body {
 
 .icon:where(.w-variant-e4d16f47-99b8-e0f3-e283-4d6f504865bc) {
   font-size: 3em;
+}
+
+.icon:where(.w-variant-9d41bcf1-4466-cbd4-2654-9c4b1423e643) {
+  font-size: 4em;
+}
+
+.icon-color {
+  display: inline-flex;
+}
+
+.icon-color:where(.w-variant-62928812-eb99-4c09-9f13-32d22d00b3e4) {
+  color: var(--_colors-semantic---text--primary);
+}
+
+.icon-color:where(.w-variant-3cf75344-2f7a-18f9-d091-f365874dc11f) {
+  color: var(--_colors-semantic---text--secondary);
+}
+
+.icon-color:where(.w-variant-95ba9505-d3f3-fbe1-ca24-0e30820d1b57) {
+  color: var(--_colors-semantic---text--accent);
 }
 
 .icon-glyph {

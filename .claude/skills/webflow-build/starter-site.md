@@ -118,7 +118,8 @@ them and restyles them, it does not rebuild them.
 
 | Component | Structure | Props and variants |
 | --- | --- | --- |
-| **Icon** (Controls) | div Icon › `i` Icon Glyph whose `class` attribute is bound to a prop | Icon (`ph ph-<name>`); variants Small, Default, Large, XL, XXL. The glyph is a 1em × 1em box, so it follows the font size around it, and it holds a space as its text so the Designer canvas doesn't draw it as an empty element (published as a non-breaking space, which is why the glyph is aligned to flex-start in its box, not centred: `recipes/phosphor/`); the variants only change font size. Colour is the text colour |
+| **Icon** (Controls) | div Icon › `i` Icon Glyph whose `class` attribute is bound to a prop | Icon (`ph ph-<name>`); size variants **12px, 16px (base), 20px, 24px, 32px, 48px, 64px**: named by the size at 16px text, valued in em (0.75em … 4em), so the name tells a designer what they get and the icon still scales with the type. The glyph is a 1em × 1em box, so it follows the font size around it, and it holds a space as its text so the Designer canvas doesn't draw it as an empty element (published as a non-breaking space, which is why the glyph is aligned to flex-start in its box, not centred: `recipes/phosphor/`); the variants only change font size. Colour is the text colour |
+| **Icon Color** (Controls) | div Icon Color › Icon | Icon; variants Inherit, Primary, Secondary, Accent (the semantic text colours, so they follow the theme). Use it where an icon needs its own colour; inside buttons the plain Icon takes the button's text colour |
 | **Button Content** (Button) | div › Button Icon › Icon, the label, Button Icon › Icon | Label, Icon, Icon Before, Icon After (each icon holder's visibility is bound to its switch) |
 | **Button Size** (Button) | div › Button Content | pass-through props; variants Default, Small |
 | **Button Color** (Button) | div › Button Size | pass-through props; variants Primary, Secondary. Hover and pressed are states on the class |
@@ -135,7 +136,8 @@ them and restyles them, it does not rebuild them.
 - [Person] On **C | Button**, expose the inner variants: select the Button
   Color instance inside it, and on its Variant prop choose *Link to new
   prop* (name it Color); the same on Button Color for Button Size's
-  Variant (Size), then link that one up to C | Button too. The API can't
+  Variant (Size), then link that one up to C | Button too. The same on
+  **Icon Color** for the inner Icon's Variant (Size). The API can't
   expose a variant from a nested instance.
 - Forms are classes, not a component: a field's name and placeholder
   can't be bound to props, and form controls can't live outside a Form
