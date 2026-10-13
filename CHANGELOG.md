@@ -13,6 +13,34 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.3.1 — 2026-10-13
+
+No manual step for client repos. Changes that came out of building the
+style guide on the starter Webflow site.
+
+- **Style guide layout:** no monospace font (every label uses the site's
+  font; a system monospace brings its own slashed zero); the theme frame
+  has no maximum height, so a section shows with its full padding; colour
+  dots in tables are a wrapper (**Sg Dot**) around a swatch, not a
+  three-class combo; the Forms section is anchored as `form-elements`
+  (Webflow refuses `forms` as an element id; items still use
+  `section=forms`).
+- **Two h1s are allowed on the style guide** (it is `noindex`): the
+  Typography section shows a real h1 for the All H1 Headings tag style, and
+  specimens keep their h1.
+- **Type scale:** every weight from `Weight/Thin` (100) to
+  `Weight/Black` (900) is a variable, in order. No new classes; roles
+  still use Regular, Medium and Bold.
+- **Starter Webflow site** (done, `starter-site.md` §A, §E, §F): Geist
+  uploaded as a custom font with `ss03` and `ss08` on the Body style;
+  the weights; the style guide page in the fixed layout with all Sg
+  classes and variable combos; a media page shell; and the Layout modes
+  set on Body at each breakpoint (they were missing, so layout values
+  never changed with the breakpoint).
+- Four new lessons in `lessons/mcp.md`: importing with `css` creates
+  classes; `id="forms"` is dropped; reordering variables by swapping
+  slots; a collection's modes do nothing until a style sets them.
+
 ## 0.3.0 — 2026-10-13
 
 The workflow is now one skill per phase, with the style guide first, new

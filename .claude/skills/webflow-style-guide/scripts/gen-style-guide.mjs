@@ -16,7 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SECTIONS, SPECIMEN_SECTIONS } from './sections.mjs';
+import { SECTIONS, SPECIMEN_SECTIONS, anchorOf } from './sections.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
@@ -134,7 +134,7 @@ ${list.map(({ v, combo, label }) => `                  <div class="sg-swatch"><d
                 </div>`));
   }
 }
-const dot = (alias) => (colorCombo.has(alias) ? `<div class="sg-swatch-color is-dot ${colorCombo.get(alias)}"></div>` : '');
+const dot = (alias) => (colorCombo.has(alias) ? `<div class="sg-dot"><div class="sg-swatch-color ${colorCombo.get(alias)}"></div></div>` : '');
 
 // ---- 3 themes: Base, then every class that sets a Colors Semantic mode
 {
@@ -180,12 +180,11 @@ const dot = (alias) => (colorCombo.has(alias) ? `<div class="sg-swatch-color is-
     add('typography', row(s.name, s.selector, `${mode} role${size ? `. Size ${size}.` : ''}`, `<div class="${s.selector.slice(1)}">${sampleFor(mode)}</div>`));
   }
   // Native tags: what a heading, paragraph or link looks like with no class.
-  const TAGS = [['h2', 'All H2 Headings'], ['h3', 'All H3 Headings'], ['h4', 'All H4 Headings'], ['h5', 'All H5 Headings'], ['h6', 'All H6 Headings'], ['p', 'All Paragraphs'], ['a', 'All Links']];
+  const TAGS = [['h1', 'All H1 Headings'], ['h2', 'All H2 Headings'], ['h3', 'All H3 Headings'], ['h4', 'All H4 Headings'], ['h5', 'All H5 Headings'], ['h6', 'All H6 Headings'], ['p', 'All Paragraphs'], ['a', 'All Links']];
   const tagged = TAGS.filter(([t]) => S.some((x) => x.selector === t));
-  if (S.some((x) => x.selector === 'h1')) add('typography', row('All H1 Headings', 'h1', `${S.find((x) => x.selector === 'h1').variableModes?.main?.[STYLES] ?? 'Tag style'} · one per page`, '<div>A page has exactly one h1, so it is not repeated here: see any page title.</div>'));
   for (const [t, label] of tagged) {
     const mode = S.find((x) => x.selector === t).variableModes?.main?.[STYLES];
-    add('typography', row(label, t, mode ? `Tag style · ${mode}` : 'Tag style', t === 'a' ? '<p>A paragraph with <a href="#typography">a link</a> in it.</p>' : `<${t}>The quick brown fox jumps over the lazy dog</${t}>`));
+    add('typography', row(label, t, mode ? `Tag style · ${mode}` : 'Tag style', t === 'a' ? '<p>A paragraph with <a href="#typography">a link</a> in it.</p>' : `<${t}>${t === 'h1' || t === 'h2' ? 'The quick brown fox' : 'The quick brown fox jumps over the lazy dog'}</${t}>`));
   }
   // Font features set on the Body tag style apply to all text: show what they change.
   const features = S.find((x) => x.selector === 'body')?.properties?.main?.['font-feature-settings'];
@@ -266,8 +265,6 @@ const meta = (text, where) => {
 const clean = (html) => expand(html)
   .replace(/<!--[\s\S]*?-->/g, '')
   .replace(/<[a-zA-Z][^>]*>/g, (tag) => tag.replace(/\s(?:data-[\w-]+(?:="[^"]*")?|(?:id|for|aria-labelledby|aria-controls|aria-describedby)="[^"]*")/g, ''))
-  // The page keeps exactly one h1 (its own): an h1 in a specimen becomes a div.
-  .replace(/<h1\b/g, '<div').replace(/<\/h1>/g, '</div>')
   .replace(/<video\b([^>]*)\bposter="([^"]*)"[^>]*>[\s\S]*?<\/video>/g, (_, pre, poster) => `<img${(pre.match(/\sclass="[^"]*"/) ?? [''])[0]} src="${poster}" alt="">`)
   .trim();
 const specimen = (m, html) => {
@@ -345,16 +342,16 @@ ${left.map(([sel, cls]) => `                  <div class="sg-tile"><div class="s
 const present = SECTIONS.filter(([id]) => sections.get(id).length);
 const num = (i) => String(i + 1).padStart(2, '0');
 const body = present.map(([id, title, intro], i) => `
-          <section class="sg-section${i ? '' : ' is-first'}" id="${id}"${id === 'overview' ? '' : ` aria-labelledby="${id}-title"`}>${id === 'overview' ? '' : `
+          <section class="sg-section${i ? '' : ' is-first'}" id="${anchorOf(id)}"${id === 'overview' ? '' : ` aria-labelledby="${anchorOf(id)}-title"`}>${id === 'overview' ? '' : `
             <div class="sg-section-head">
               <div class="sg-eyebrow">${num(i)}</div>
-              <h2 class="sg-section-title" id="${id}-title">${esc(title)}</h2>${intro ? `
+              <h2 class="sg-section-title" id="${anchorOf(id)}-title">${esc(title)}</h2>${intro ? `
               <p class="sg-intro">${esc(intro)}</p>` : ''}
             </div>`}${sections.get(id).join('')}
           </section>`).join('');
 // The number and the label are blocks inside a Link Block (a span would be
 // imported as a text Span and flatten when the link text is edited).
-const sidebar = present.map(([id, title], i) => `<a class="sg-sidebar-link" href="#${id}"><div class="sg-sidebar-number">${num(i)}</div><div>${esc(title)}</div></a>`).join('\n          ');
+const sidebar = present.map(([id, title], i) => `<a class="sg-sidebar-link" href="#${anchorOf(id)}"><div class="sg-sidebar-number">${num(i)}</div><div>${esc(title)}</div></a>`).join('\n          ');
 
 fs.mkdirSync(path.join(root, 'design/style-guide'), { recursive: true });
 fs.writeFileSync(path.join(root, 'design/style-guide/index.html'), `<!doctype html>

@@ -542,3 +542,64 @@ refer to the project the lesson came from; Status is that project's.
   manual steps.
 - Status: workaround confirmed
 - Found by: claude
+
+### 2026-10-13 · WHTML import with `css` creates the classes too
+- Area: mcp
+- Symptom: creating ~50 classes one `create_style` call at a time is slow,
+  and each needs longhand properties written out.
+- Cause: none; the importer has a second input that was not in use.
+- Fix: pass the rules as the WHTML builder's `css`. It creates every class
+  in that CSS (used in the markup or not) with longhand properties, hover
+  states, combos and the three max-width breakpoints. What it can't take:
+  `var()` and `calc()` with variables (use plain values, then bind
+  variables with `update_style`), `rgb(r g b / a)` (write `rgba()`), a
+  font stack (only the first family is kept, with a "missing font"
+  warning), and `.w--current` (not a state; set Current in the Designer).
+  Classes are named by their slug (`sg-row-meta`): rename each one
+  afterwards (`rename_style`), which keeps the selector.
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-13 · `id="forms"` is dropped; an element without an id can't be a link target
+- Area: mcp
+- Symptom: a section imported with `id="forms"` came in with no id (twice),
+  `set_attributes` `id` failed with "An internal error occurred", and
+  `set_link` (type element) to that section failed the same way. Every
+  other section kept its id and linked fine.
+- Cause: Webflow refuses `forms` as an element id (most likely because it
+  shadows `document.forms`); `set_link` needs the target to have an id.
+- Fix: use another id (`form-elements`). When `set_link` to an element
+  fails with an internal error, check the target's id first.
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-13 · No reorder for variables: swap names and values instead
+- Area: mcp
+- Symptom: six weights added to a group appeared after the three older
+  ones (Regular, Medium, Bold, Thin, Extra Light…); the API can only
+  reorder collections.
+- Cause: a variable keeps the position it was created in.
+- Fix: treat the positions as slots. Rename the slots to temporary names,
+  give each slot the value and name it should have in order, and re-point
+  what referenced the old slots (aliases with `existing_variable_id`,
+  classes with `variable_as_value`) at the slot that now holds that value.
+  Updating an alias without `mode_id` also updates the modes that follow
+  the base. Read the published CSS afterwards. In the Designer the same
+  job is a drag.
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-13 · A collection's modes do nothing until a style sets them
+- Area: mcp
+- Symptom: the Layout variables had Tablet and Mobile values, but the
+  published CSS declared each variable once: nothing changed with the
+  breakpoint. The type roles did change.
+- Cause: only Typography Role had its mode set on the Body tag style at
+  each breakpoint; Layout had none (and no breakpoint auto-mode).
+- Fix: `set_style_variable_mode` on `body` with `breakpoint_id` medium,
+  small and tiny, once per responsive collection. Check with
+  `get_style_variable_modes`, then count the variable's declarations in
+  the published CSS (one per mode).
+- Status: fixed in the starter site
+- Found by: human
+

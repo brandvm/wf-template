@@ -5,12 +5,12 @@
 //    styles" can never delete one that only the CMS, a script or an unbuilt
 //    page uses.
 // 2. The layout is the fixed one: only the known sections, in the fixed
-//    order; the sidebar lists exactly those sections; one h1; every section
+//    order; the sidebar lists exactly those sections; a title; every section
 //    is made of rows; no inline styles (the Webflow importer turns each one
 //    into a junk combo class).
 import fs from 'node:fs';
 import path from 'node:path';
-import { SECTIONS } from './sections.mjs';
+import { SECTIONS, anchorOf } from './sections.mjs';
 
 const argv = process.argv.slice(2);
 const rootArg = argv.indexOf('--root');
@@ -38,7 +38,7 @@ const missing = [...classes].filter((c) => !used.has(c)).sort();
 if (missing.length) errors.push(`Not on the style guide (${missing.length} of ${classes.size}); run pnpm style-guide:\n    ${missing.join('\n    ')}`);
 
 // 2 layout
-const known = SECTIONS.map(([id]) => id);
+const known = SECTIONS.map(([id]) => anchorOf(id));
 const ids = [...raw.matchAll(/<section class="sg-section(?: is-first)?" id="([^"]+)"/g)].map((m) => m[1]);
 const unknown = ids.filter((id) => !known.includes(id));
 if (unknown.length) errors.push(`Sections that are not part of the fixed layout: ${unknown.join(', ')}`);
@@ -47,8 +47,10 @@ if (ids.filter((id) => known.includes(id)).join() !== expected.join()) errors.pu
 if (new Set(ids).size !== ids.length) errors.push(`A section appears twice: ${ids.join(', ')}`);
 const links = [...raw.matchAll(/<a class="sg-sidebar-link" href="#([^"]+)"/g)].map((m) => m[1]);
 if (links.join() !== ids.join()) errors.push(`Sidebar (${links.join(', ')}) doesn't match the sections (${ids.join(', ')})`);
+// The page title is the first h1. A second one, as the specimen of the
+// All H1 Headings tag style, is fine on a noindex page.
 const h1 = (raw.match(/<h1\b/g) ?? []).length;
-if (h1 !== 1) errors.push(`The page has ${h1} h1 elements; it needs exactly one`);
+if (h1 < 1) errors.push('The page has no h1');
 const blocks = raw.split(/<section class="sg-section(?: is-first)?" id="/).slice(1);
 for (const b of blocks) {
   const id = b.slice(0, b.indexOf('"'));
@@ -58,4 +60,4 @@ const inline = (raw.match(/\sstyle="/g) ?? []).length;
 if (inline) errors.push(`${inline} inline style attribute(s): move them to a class (the Webflow importer makes a junk combo from each)`);
 
 if (errors.length) { console.log(`Style guide check failed:\n  - ${errors.join('\n  - ')}`); process.exit(1); }
-console.log(`Style guide OK: ${ids.length} sections in the fixed order (${ids.join(', ')}), all ${classes.size} classes applied, sidebar matches, one h1.`);
+console.log(`Style guide OK: ${ids.length} sections in the fixed order (${ids.join(', ')}), all ${classes.size} classes applied, sidebar matches.`);

@@ -61,10 +61,10 @@ one variable.
 | --- | --- | --- |
 | Colors | Base | `Brand/Ink`, `Brand/Paper`, `Brand/Accent`; `Ink Tint/Ink 4…64`, `Paper Tint/Paper 12…64` |
 | Colors Semantic | Base, Dark | `Background/Page`, `Background/Surface`, `Background/Overlay`, `Text/Primary`, `Text/Secondary`, `Text/Accent`, `Border/Subtle`, `Button/Background`, `Button/Text`, `Button/Background Hover`, `Form/Focus`, `Link/Hover`, each an alias of a Colors variable |
-| Typography Scale | Base | `Family/Base`, `Size/12…96`, `Weight/Regular`, `Weight/Medium`, `Weight/Bold`, `Line Height/Tight`, `Snug`, `Normal`, `Letter Spacing/Tight`, `Normal`, `Wide` |
+| Typography Scale | Base | `Family/Base`, `Size/12…96`, `Weight/Thin` (100), `Extra Light`, `Light`, `Regular`, `Medium`, `Semibold`, `Bold`, `Extra Bold`, `Black` (900): every weight is there as a variable, though only Regular, Medium and Bold are used by a role, `Line Height/Tight`, `Snug`, `Normal`, `Letter Spacing/Tight`, `Normal`, `Wide` |
 | Typography Role | Base + Tablet, Mobile Landscape, Mobile (breakpoint auto-modes) | `Family`, `Size`, `Weight`, `Line Height`, `Letter Spacing` for Display, H1–H6, Body, Body Large, Body Small, Label, Button |
 | Typography Styles | Base (= Body) + one per other role | the five properties, each mode aliasing its role |
-| Layout | Base, Tablet, Mobile Landscape, Mobile (set on the Body tag style) | `Section/Padding V`, `Section/Padding H`, `Container/Max Width`, `Content/Gap`, `Nav/Height`, `Nav/Padding H`, `Button/Height` |
+| Layout | Base, Tablet, Mobile Landscape, Mobile (set on the Body tag style at each breakpoint; check the published CSS, the starter once shipped without it and nothing changed with the breakpoint) | `Section/Padding V`, `Section/Padding H`, `Container/Max Width`, `Content/Gap`, `Nav/Height`, `Nav/Padding H`, `Button/Height` |
 | Spacing | Base | `None`, `Hairline`, `2`, `4`, `8`, `12`, `16`, `24`, `32`, `48`, `64`, `96`, `128` |
 | Radius | Base | `None`, `2`, `4`, `8`, `Pill` |
 
@@ -113,15 +113,20 @@ the Designer (a `calc()` with variables can't go through the MCP).
   missing" and the 2a stylesheet 404s; both are expected in the starter.
 
 **E. Style guide page.** The style guide has one layout on every site
-(the `webflow-style-guide` skill). The starter is where its frame belongs:
-the page, the **Sg** layout classes from the skill's `sg.css`, and the
-Current state on **Sg Sidebar Link**, so a project fills rows instead of
-building a layout. Until the starter holds them, a project creates the Sg
-classes itself (the skill's "In Webflow", step 2). Today the page
-`/design/style-guide` holds one section with h1–h6 and a Form (class
-**Form**, its label **Label**, submit **Button**), so the reserved classes,
-which only the Designer can create, survive duplication. Its head code has
-`noindex`. **Never run "Clean up unused styles" on the starter:** most
+(the `webflow-style-guide` skill), and the starter holds it (built
+2026-10-13): `/design/style-guide` with the frame, every **Sg** class, one
+combo per colour (Sg Swatch Color), radius (Sg Radius) and spacing
+variable (Sg Bar), each bound to its variable, and the nine sections for
+the base system. A project fills rows instead of building a layout. The
+Forms row holds the Form (class **Form**, its label **Label**, submit
+**Button**), so the reserved classes, which only the Designer can create,
+survive duplication. Its head code has `noindex`. [Person] sets the
+Current state on **Sg Sidebar Link** once (the API has no Current state).
+
+**F. Media page.** `/design/media` is there as a shell (noindex, one
+section that explains the page): a project with video adds its Background
+Video blocks to it ([media.md](media.md)); a project without video
+deletes the page. **Never run "Clean up unused styles" on the starter:** most
 classes are on no element until a project's style guide applies them.
 
 The starter is never published to a custom domain and holds no client

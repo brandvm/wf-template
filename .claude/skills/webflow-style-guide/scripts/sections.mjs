@@ -15,5 +15,9 @@ export const SECTIONS = [
   ['page-sections', 'Page sections', 'Whole sections at half size. Each is removed from here once its page is built.'],
   ['other-classes', 'Other classes', 'Classes with no specimen above. They are applied here so Webflow’s “Clean up unused styles” can’t delete them.'],
 ];
+// The id a section gets in the page. Webflow refuses "forms" as an element
+// id (it drops it on import and on write), so that section is anchored as
+// "form-elements"; every other section uses its own key.
+export const anchorOf = (id) => (id === 'forms' ? 'form-elements' : id);
 // Sections whose rows are specimens a project supplies (items or page blocks).
 export const SPECIMEN_SECTIONS = ['buttons', 'forms', 'components', 'page-sections'];

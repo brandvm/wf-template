@@ -367,6 +367,30 @@
     }
    },
    {
+    "name": "Weight/Thin",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--thin",
+    "values": {
+     "Base": 100
+    }
+   },
+   {
+    "name": "Weight/Extra Light",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--extra-light",
+    "values": {
+     "Base": 200
+    }
+   },
+   {
+    "name": "Weight/Light",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--light",
+    "values": {
+     "Base": 300
+    }
+   },
+   {
     "name": "Weight/Regular",
     "type": "Number",
     "cssName": "--_typography-scale---weight--regular",
@@ -383,11 +407,35 @@
     }
    },
    {
+    "name": "Weight/Semibold",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--semibold",
+    "values": {
+     "Base": 600
+    }
+   },
+   {
     "name": "Weight/Bold",
     "type": "Number",
     "cssName": "--_typography-scale---weight--bold",
     "values": {
      "Base": 700
+    }
+   },
+   {
+    "name": "Weight/Extra Bold",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--extra-bold",
+    "values": {
+     "Base": 800
+    }
+   },
+   {
+    "name": "Weight/Black",
+    "type": "Number",
+    "cssName": "--_typography-scale---weight--black",
+    "values": {
+     "Base": 900
     }
    },
    {

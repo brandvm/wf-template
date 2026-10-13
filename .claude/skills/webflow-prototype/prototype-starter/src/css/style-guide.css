@@ -8,14 +8,14 @@
 .sg-sidebar-link { display: flex; align-items: baseline; gap: 0.75em; padding: 0.5em 1em; border-left: 1px solid rgb(128 128 128 / 0.3); color: inherit; font-size: 0.9375em; line-height: 1.3; text-decoration: none; opacity: 0.6; transition: opacity 200ms ease, border-color 200ms ease; }
 .sg-sidebar-link:hover { opacity: 1; }
 .sg-sidebar-link.w--current { border-left-color: currentColor; font-weight: 500; opacity: 1; }
-.sg-sidebar-number { flex: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75em; font-weight: 400; opacity: 0.6; }
+.sg-sidebar-number { flex: none; font-size: 0.75em; font-weight: 400; opacity: 0.6; }
 .sg-content { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
 
 /* Sections and their headings */
 .sg-section { display: flex; flex-direction: column; padding: 5em 0; border-top: 1px solid rgb(128 128 128 / 0.3); scroll-margin-top: calc(var(--_layout---nav--height, 5em) + 1em); }
 .sg-section.is-first { padding-top: 0; border-top-width: 0; }
 .sg-section-head { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75em; margin-bottom: 2.5em; }
-.sg-eyebrow { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75em; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; }
+.sg-eyebrow { font-size: 0.75em; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; }
 .sg-title { margin: 0; font-size: 4.5em; line-height: 1; font-weight: 500; letter-spacing: -0.035em; }
 .sg-section-title { margin: 0; font-size: 2.25em; line-height: 1.1; font-weight: 500; letter-spacing: -0.025em; }
 .sg-intro { max-width: 38em; margin: 0; font-size: 1.0625em; line-height: 1.5; opacity: 0.7; }
@@ -24,14 +24,14 @@
 .sg-row { display: flex; align-items: flex-start; gap: 2.5em; padding: 2em 0; border-top: 1px solid rgb(128 128 128 / 0.18); }
 .sg-row-meta { position: sticky; top: calc(var(--_layout---nav--height, 5em) + 1.5em); flex: 0 0 15em; display: flex; flex-direction: column; align-items: flex-start; gap: 0.5em; min-width: 0; }
 .sg-row-name { font-weight: 500; line-height: 1.3; }
-.sg-row-class { max-width: 100%; padding: 0.25em 0.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.375em; background-color: rgb(128 128 128 / 0.1); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75em; line-height: 1.4; overflow-wrap: anywhere; }
+.sg-row-class { max-width: 100%; padding: 0.25em 0.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.375em; background-color: rgb(128 128 128 / 0.1); font-size: 0.75em; line-height: 1.4; overflow-wrap: anywhere; }
 .sg-row-note { font-size: 0.8125em; line-height: 1.5; opacity: 0.65; }
 .sg-row-demo { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1em; }
 
 /* Overview: how to use the page, and the site at a glance */
 .sg-cards { align-self: stretch; display: flex; flex-wrap: wrap; gap: 1em; }
 .sg-card { flex: 1 1 18em; display: flex; flex-direction: column; gap: 0.5em; padding: 1.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; background-color: rgb(128 128 128 / 0.05); }
-.sg-card-step { margin-bottom: 1em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75em; opacity: 0.55; }
+.sg-card-step { margin-bottom: 1em; font-size: 0.75em; opacity: 0.55; }
 .sg-card-title { font-size: 1.125em; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; }
 .sg-card-text { font-size: 0.875em; line-height: 1.5; opacity: 0.7; }
 .sg-stats { align-self: stretch; display: flex; flex-wrap: wrap; gap: 1em; }
@@ -43,15 +43,18 @@
 .sg-swatches { align-self: stretch; display: flex; flex-wrap: wrap; gap: 1em; }
 .sg-swatch { flex: 0 0 9.5em; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
 .sg-swatch-color { height: 5.5em; padding: 0; border-bottom: 1px solid rgb(128 128 128 / 0.2); font-size: inherit; }
-.sg-swatch-color.is-dot { flex: none; width: 1em; height: 1em; border: 1px solid rgb(128 128 128 / 0.3); border-radius: 0.25em; }
+/* A colour dot in a table: a small window onto a swatch. A wrapper, not a
+   combo, so no element carries three classes (the Webflow importer makes a
+   junk entry for every three-class chain). */
+.sg-dot { flex: none; width: 1em; height: 1em; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.3); border-radius: 0.25em; }
 .sg-swatch-name { padding: 0.75em 0.875em 0; font-size: 0.8125em; font-weight: 500; line-height: 1.3; }
-.sg-swatch-value { padding: 0.25em 1em 1em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.6875em; line-height: 1.4; opacity: 0.65; overflow-wrap: anywhere; }
+.sg-swatch-value { padding: 0.25em 1em 1em; font-size: 0.6875em; line-height: 1.4; opacity: 0.65; overflow-wrap: anywhere; }
 .sg-radius { height: 4.5em; margin: 0.75em 0.75em 0; padding: 0; border: 1px solid currentColor; background-color: rgb(128 128 128 / 0.14); font-size: inherit; }
 .sg-bar { flex: none; max-width: 100%; height: 0.5em; padding: 0; border-radius: 0.125em; background-color: currentColor; font-size: inherit; opacity: 0.75; }
 .sg-glyphs { font-size: 2.5em; line-height: 1.2; letter-spacing: 0; }
 .sg-ramp { align-self: stretch; display: flex; flex-wrap: wrap; align-items: baseline; gap: 1em 1.5em; line-height: 1.1; }
 .sg-demo { align-self: stretch; display: flex; flex-wrap: wrap; align-items: center; gap: 1em; padding: 2.5em; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; background-color: rgb(128 128 128 / 0.05); }
-.sg-theme-frame { align-self: stretch; max-height: 22em; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
+.sg-theme-frame { align-self: stretch; overflow: hidden; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }
 
 /* Tables: first column is the name, then one column per mode or value */
 .sg-table { align-self: stretch; display: flex; flex-direction: column; overflow-x: auto; border: 1px solid rgb(128 128 128 / 0.2); border-radius: 0.75em; }

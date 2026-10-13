@@ -40,9 +40,15 @@
   --_typography-scale---size--64: 4em;
   --_typography-scale---size--80: 5em;
   --_typography-scale---size--96: 6em;
+  --_typography-scale---weight--thin: 100;
+  --_typography-scale---weight--extra-light: 200;
+  --_typography-scale---weight--light: 300;
   --_typography-scale---weight--regular: 400;
   --_typography-scale---weight--medium: 500;
+  --_typography-scale---weight--semibold: 600;
   --_typography-scale---weight--bold: 700;
+  --_typography-scale---weight--extra-bold: 800;
+  --_typography-scale---weight--black: 900;
   --_typography-scale---line-height--tight: 1.1;
   --_typography-scale---line-height--snug: 1.25;
   --_typography-scale---line-height--normal: 1.5;

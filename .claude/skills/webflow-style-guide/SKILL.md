@@ -42,7 +42,10 @@ has never seen the site: a client, or a developer on their first day.
   it is for and how to use it (the text is in
   [scripts/sections.mjs](scripts/sections.mjs), the same on every site).
 - Specimens of buttons, forms and components sit on a panel; class names
-  are shown as code; long tables keep their name in view while they scroll.
+  sit in a chip; long tables keep their name in view while they scroll.
+- Every label uses the site's own font. No monospace: a Designer class
+  holds one font family, and a system monospace font brings its own
+  slashed zero.
 - The frame takes its colours from the page (neutral lines and panels at
   low opacity), so it reads the same on a light or a dark site.
 
@@ -58,7 +61,7 @@ nothing in it is left out; nothing is added, renamed or reordered.
 | 5 | Utilities | `utilities` | Size, Weight, Leading, Tracking, Text and Max Width classes |
 | 6 | Spacing, radius and layout | `spacing` | the Spacing (each with a bar of its size), Radius and Layout variables |
 | 7 | Buttons and links | `buttons` | specimens |
-| 8 | Forms | `forms` | specimens |
+| 8 | Forms | `form-elements` | specimens (items use `section=forms`; Webflow refuses `forms` as an element id) |
 | 9 | Components | `components` | specimens |
 | 10 | Page sections | `page-sections` | specimens, shown as a half-size screen |
 | 11 | Other classes | `other-classes` | generated: every class nothing above applies |
@@ -124,9 +127,9 @@ header comment followed by its markup:
 - The generator strips ids, `for`, `data-*` hooks and id references from a
   specimen and marks it `inert`: it is a picture of the component, not a
   working copy, so no script attaches and nothing in it takes focus.
-- An `h1` inside a specimen becomes a `div`, so the page keeps its one h1.
-  Give headings a type class (D1…); a heading styled only by its tag style
-  would look different in the specimen.
+- The page is `noindex`, so a second `h1` on it is fine: the Typography
+  section shows a real one as the specimen of the All H1 Headings tag
+  style, and a specimen may contain one.
 - A `page-sections` specimen is shown at half size in a sealed frame.
   Remove it once its page exists in Webflow: the page then keeps its
   classes. Sections 1 to 9 stay for good.
@@ -159,23 +162,30 @@ any other page. A go-ahead per batch.
    page's head code; excluded from site search and the sitemap; links into
    it do a full page load.
 2. **Sg classes.** A site duplicated from the starter already has them.
-   Otherwise create every class in [sg.css](sg.css) first, named as the
-   Designer shows them (Sg Row, Sg Row Meta, Sg Table Key…), with the
-   Current state on Sg Sidebar Link standing in for `.w--current`. The
-   `contain` rule at the end of sg.css goes to repo CSS (`designer-cant`).
+   Otherwise the quickest way that keeps every value: import the frame
+   with the WHTML builder and pass sg.css as its `css` (variables and
+   `calc()` replaced by plain values, `rgb(r g b / a)` written as
+   `rgba()`, the `.w--current` rules left out). The importer creates each
+   class with longhand properties, states and breakpoints, named by its
+   slug; rename each one afterwards to the name the Designer should show
+   (Sg Row, Sg Row Meta, Sg Table Key…). [Person] sets the **Current**
+   state on Sg Sidebar Link by hand (left border in the text colour,
+   weight 500, opacity 100%; at Tablet a grey background instead): the API
+   has no Current state.
 3. **Variable combos.** For each colour variable, the combo **Sg Swatch
    Color** + **Is …** binding `background-color`; for each radius variable,
    **Sg Radius** + **Is …** binding `border-radius`; for each spacing
    variable, **Sg Bar** + **Is …** binding `width`. The generated
    `src/css/style-guide.css` lists them, one per line.
 4. **Build** section by section from the generated page, with classes only.
-   Create every class before importing markup (the importer drops a whole
-   class list if one class is missing). The sidebar links are links to the
-   sections.
+   Create every class and combo before importing markup (the importer
+   drops a whole class list if one class is missing). Then point each
+   sidebar link at its section (link type: page section), so Webflow marks
+   the current one.
 5. **Rows for components** are component instances, not copies of their
    markup.
 6. **Check on staging:** every class in the site appears on the published
-   page or in the shell; one h1; the sidebar highlights the section in
+   page or in the shell; the sidebar highlights the section in
    view; `noindex` is in the head. Only then is **Clean up unused styles**
    safe.
 
