@@ -118,7 +118,7 @@ them and restyles them, it does not rebuild them.
 
 | Component | Structure | Props and variants |
 | --- | --- | --- |
-| **Icon** (Controls) | div Icon › `i` Icon Glyph whose `class` attribute is bound to a prop | Icon (`ph ph-<name>`); variants Small, Default, Large, XL, XXL. The glyph is a 1em × 1em box, so it follows the font size around it, and it holds a single space as its text so the Designer canvas doesn't draw it as an empty element; the variants only change font size. Colour is the text colour |
+| **Icon** (Controls) | div Icon › `i` Icon Glyph whose `class` attribute is bound to a prop | Icon (`ph ph-<name>`); variants Small, Default, Large, XL, XXL. The glyph is a 1em × 1em box, so it follows the font size around it, and it holds a space as its text so the Designer canvas doesn't draw it as an empty element (published as a non-breaking space, which is why the glyph is aligned to flex-start in its box, not centred: `recipes/phosphor/`); the variants only change font size. Colour is the text colour |
 | **Button Content** (Button) | div › Button Icon › Icon, the label, Button Icon › Icon | Label, Icon, Icon Before, Icon After (each icon holder's visibility is bound to its switch) |
 | **Button Size** (Button) | div › Button Content | pass-through props; variants Default, Small |
 | **Button Color** (Button) | div › Button Size | pass-through props; variants Primary, Secondary. Hover and pressed are states on the class |

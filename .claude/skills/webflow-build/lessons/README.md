@@ -7,7 +7,7 @@ of them every session.
 | File | Covers | Entries |
 | --- | --- | --- |
 | [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 40 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 16 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 17 |
 | [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 10 |
 | [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 12 |
 | [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 10 |
@@ -75,6 +75,7 @@ of them every session.
 - Removing a rule locally does not remove it on the canvas
 - An Embed with a script hides its stylesheet link on the canvas
 - Image Load (lazy/eager) is per instance; preload doesn't fix render delay
+- A space as an element's only text publishes as `&nbsp;` and shifts an icon
 
 **Repo CSS** ([css.md](css.md))
 

@@ -16,12 +16,18 @@ designing.
 An element with two classes: the weight, then the icon.
 
 ```html
-<i class="ph ph-arrow-right" aria-hidden="true"> </i>
+<i class="ph ph-arrow-right" aria-hidden="true">&nbsp;</i>
 ```
 
-The single space inside is deliberate: the glyph is drawn by `::before`,
-so without any content the Designer canvas treats the element as empty
-and shows a dashed placeholder box. A space changes nothing on the page.
+The space inside is deliberate: the glyph is drawn by `::before`, so
+without any content the Designer canvas treats the element as empty and
+shows a dashed placeholder box. Webflow publishes a space set as an
+element's only text as a **non-breaking** space, and that one takes up
+room: inside a flex box it becomes a second item next to the glyph. So
+the glyph element is a 1em × 1em inline-flex box with `justify-content`
+and `align-items` at **flex-start**: the glyph fills the box from its
+corner and the invisible character overflows without moving it. Centring
+the two (the obvious choice) pushes the glyph left and up.
 
 In Webflow the classes come from a prop, not from the Style panel (they are
 repo CSS, the Designer doesn't know them): the starter's **Icon** component

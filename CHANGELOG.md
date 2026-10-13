@@ -13,6 +13,15 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.4.3 — 2026-10-13
+
+No manual step for client repos.
+
+- Icon alignment: Webflow publishes the space inside the icon glyph as a
+  non-breaking space, which shifted the glyph when its box centred its
+  content. Icon Glyph now aligns to flex-start (starter site, snapshot,
+  specimens); the recipe, canvas hygiene and a lesson explain why.
+
 ## 0.4.2 — 2026-10-13
 
 No manual step for client repos.

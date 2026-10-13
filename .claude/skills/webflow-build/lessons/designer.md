@@ -242,3 +242,20 @@ refer to the project the lesson came from; Status is that project's.
   the image), which preload does not change.
 - Status: documented
 - Found by: claude
+
+### 2026-10-13 · A space as an element's only text publishes as `&nbsp;` and shifts an icon
+- Area: designer
+- Symptom: icons drawn by an icon font sat left of and above their box.
+  The element was an inline-flex 1em box with its content centred, holding
+  one space so the canvas wouldn't show it as empty.
+- Cause: Webflow publishes that space as a non-breaking space. A normal
+  space is dropped inside a flex container; a non-breaking one is a flex
+  item with a width. The glyph (`::before`) and the space were centred as
+  a pair, so the glyph moved by half the space's width.
+- Fix: `justify-content` and `align-items` flex-start on the glyph
+  element. The glyph fills the box from its corner and the space overflows
+  unseen. Check icon alignment on the published page with an outline on
+  the element, not by eye.
+- Status: fixed in the starter site
+- Found by: human
+

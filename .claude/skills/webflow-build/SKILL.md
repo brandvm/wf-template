@@ -163,8 +163,10 @@ When a page is complete, run **Page done** in `checklists.md`.
 - Every grid sets at least one row and one column template; centre single
   children with flex, not grid.
 - An element drawn only by a pseudo-element (an icon font glyph) gets a
-  single space as its text (`set_settings`, key `text`): it is then not
-  empty on the canvas, and the page looks the same.
+  space as its text (`set_settings`, key `text`), so it is not empty on
+  the canvas. Webflow publishes it as a non-breaking space, which takes
+  room: size the element (1em × 1em) and align its content to flex-start
+  so the space can't move the glyph.
 - No style values only the MCP can see: if the Designer can't display it,
   it belongs in repo CSS with a tag.
 
