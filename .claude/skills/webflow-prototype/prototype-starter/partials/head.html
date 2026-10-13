@@ -6,6 +6,11 @@
      the variable's value. In Webflow the same file is uploaded in
      Site settings › Fonts. -->
 <link rel="preload" href="/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Phosphor Icons, regular. PROTOTYPE-ONLY stand-in: on the site the icon
+     font is part of the repo's styles.css (`pnpm phosphor`); here the same
+     pinned stylesheet is linked so "ph ph-<name>" classes draw. Add a
+     weight's stylesheet when the repo bundles it. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
 <!-- Styles as render-blocking links, the way Webflow serves webflow.css in
      the head, so the first paint is already styled. Order = cascade order:
      generated Webflow CSS, proposed changes, new classes, then the

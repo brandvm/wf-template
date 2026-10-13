@@ -26,6 +26,7 @@ pnpm build    # minified -> dist/ (commit the result)
 pnpm check    # tsc --noEmit
 pnpm test     # build + browser checks
 pnpm update-skills   # agent skills from the latest template release
+pnpm phosphor        # Phosphor icon font in the bundle: regular by default, `pnpm phosphor regular bold` adds weights
 ```
 
 `.wf-template.json` records the template version a repo was created from

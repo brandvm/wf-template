@@ -82,8 +82,9 @@ each breakpoint.
 **G | Main W**, **G | Footer W**; **D0–D6**, **Body L**, **Body S**,
 **Label Text**, **Chip**; **Skip Link**; the utilities **Text Secondary**,
 **Text Uppercase**, **Max Width Text**, **Weight Medium**,
-**Leading Tight**, **Tracking Wide**; **Button** with **Is Secondary**
-(hover, focus-visible and pressed states). Type classes bind the five
+**Leading Tight**, **Tracking Wide**; **Button** (the plain outer wrapper of the button components: no fill of
+its own, only the focus ring), **Form Field** and **Form Input** (focus
+and keyboard-focus states). Type classes bind the five
 Typography Styles variables and pick a mode; gaps bind `grid-row-gap` /
 `grid-column-gap`; classes for empty elements (S Bg, S Bg Overlay) carry
 padding 0 and `font-size: inherit`. [Person] sets the padding-top of
@@ -111,6 +112,38 @@ the Designer (a `calc()` with variables can't go through the MCP).
   the 404 utility page (the MCP can't reach utility pages). Until a
   project pastes its head code, staging logs "[wfc] Head code config
   missing" and the 2a stylesheet 404s; both are expected in the starter.
+
+**D2. Control components.** Built 2026-10-13; every project starts with
+them and restyles them, it does not rebuild them.
+
+| Component | Structure | Props and variants |
+| --- | --- | --- |
+| **Icon** (Controls) | div Icon › `i` Icon Glyph whose `class` attribute is bound to a prop | Icon (`ph ph-<name>`); variants Small, Default, Large, XL, XXL. The glyph is a 1em × 1em box, so it follows the font size around it; the variants only change font size. Colour is the text colour |
+| **Button Content** (Button) | div › Button Icon › Icon, the label, Button Icon › Icon | Label, Icon, Icon Before, Icon After (each icon holder's visibility is bound to its switch) |
+| **Button Size** (Button) | div › Button Content | pass-through props; variants Default, Small |
+| **Button Color** (Button) | div › Button Size | pass-through props; variants Primary, Secondary. Hover and pressed are states on the class |
+| **C \| Button** (Button) | Link Block Button › Button Color | Label, Link, Icon, Icon Before, Icon After |
+| **C \| Icon Button** (Button) | `button` Button › Icon Button Box › Icon | Icon, Accessible Name (bound to `aria-label`), Hook (bound to an attribute *name*); variants Primary, Secondary |
+| **C \| Video** (Controls) | `video` Video › `source` | MP4, Poster, and Autoplay, Muted, Loop, Plays Inline (each bound to an attribute *name*, value `true`) |
+| **Section Head** (Sections) | div › Chip, h2 D2, paragraph Body L | Chip, Show Chip, Heading, Text |
+
+- The button is four layers so that each variant changes one single-class
+  element (a variant never applies to an element with a combo). A project
+  gets its own button by restyling Button Color's variants and adding one
+  (a glass or outline style), never by adding combos. Decoration the
+  Designer can't draw (crop marks, masks) is repo CSS on `.button`.
+- [Person] On **C | Button**, expose the inner variants: select the Button
+  Color instance inside it, and on its Variant prop choose *Link to new
+  prop* (name it Color); the same on Button Color for Button Size's
+  Variant (Size), then link that one up to C | Button too. The API can't
+  expose a variant from a nested instance.
+- Forms are classes, not a component: a field's name and placeholder
+  can't be bound to props, and form controls can't live outside a Form
+  Block. The submit is a DOM `button type="submit"` with class Button
+  holding a Button Color instance.
+- Icons need the repo stylesheet (`recipes/phosphor/`). The starter has no
+  repo, so its Embed 2a points at the template repo's own staging
+  stylesheet; a project replaces that address with its repo's.
 
 **E. Style guide page.** The style guide has one layout on every site
 (the `webflow-style-guide` skill), and the starter holds it (built

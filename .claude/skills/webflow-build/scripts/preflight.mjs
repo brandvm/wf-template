@@ -104,7 +104,8 @@ for (const { route, file } of files) {
       for (const k of classes) {
         if (have.has(k)) continue;
         if (fresh.has(k)) toCreate.add(k);
-        else if (!other.has(k)) unknown.set(k, (unknown.get(k) ?? new Set()).add(route));
+        // "ph ph-<name>" are the icon font's classes, from the repo bundle.
+        else if (!other.has(k) && !/^ph(-|$)/.test(k)) unknown.set(k, (unknown.get(k) ?? new Set()).add(route));
       }
       walk(c);
     }

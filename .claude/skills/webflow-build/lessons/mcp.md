@@ -634,3 +634,37 @@ refer to the project the lesson came from; Status is that project's.
 - Status: open
 - Found by: claude
 
+### 2026-10-13 · Building nested components through the MCP: what works
+- Area: mcp
+- Symptom: a four-layer button (link › colour › size › content) with an
+  icon component inside had to be built without the Designer.
+- Cause: none; this records the route that worked.
+- Fix: build bottom-up. For each layer: build the wrapper element, insert
+  the inner component as an instance, `transform_element_to_component`,
+  `create_prop` the pass-through props, then bind the inner instance's
+  props with `set_component_instance_prop_values` (`type: "bindable"`,
+  `binding_source_type: "prop"`) inside `scope_component_id`. Inside a
+  new component the root keeps the component's id and its children count
+  up from it. Also confirmed: a custom `class` attribute bound to a text
+  prop (an icon font's classes); an attribute *name* bound to a prop;
+  `visibility` and a Link Block's `link` bound to props; a variant set on
+  an instance by passing the variant id as a string to its Variant prop.
+  Not possible: exposing a nested instance's Variant as a prop of the
+  outer component (a Designer step, "Link to new prop").
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-13 · `set_text` fails on imported blocks; a property can't be removed and set in one update
+- Area: mcp
+- Symptom: `set_text` on a div that the WHTML importer made from
+  `<div>text</div>` answered "This element doesn't support text".
+  Separately, an `update_style` that listed `padding-right` in both
+  `remove_properties` and `properties` left the property unset.
+- Cause: the element is a Block with a text child, not a Text Block; in
+  one update the removal is applied after the write.
+- Fix: write the text with `set_settings`, key `text`
+  (`static_text`), which also accepts a prop binding. Remove a property in
+  one call and set it in the next.
+- Status: workaround confirmed
+- Found by: claude
+

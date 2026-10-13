@@ -1,0 +1,18 @@
+<!-- Specimens for the style guide's "Components" section: the components
+     the starter site ships. Each is what the component publishes. A
+     project adds its own with sg:start blocks on the page that uses them. -->
+
+<!-- sg: section=components | name=Icon | class=.icon · .icon-glyph | note=Phosphor icon. Prop Icon: ph ph-name, from phosphoricons.com. The glyph is a 1em box, so it follows the font size it sits in. Variants: Small, Default, Large, XL, XXL. Colour follows the text colour. -->
+<div class="icon w-variant-d345939b-019f-e2df-81ad-4ea069bff178"><i class="icon-glyph ph ph-plus" aria-hidden="true"></i></div><div class="icon"><i class="icon-glyph ph ph-arrow-right" aria-hidden="true"></i></div><div class="icon w-variant-7bce87e3-ab9e-6f63-a957-78d54b4abbad"><i class="icon-glyph ph ph-magnifying-glass" aria-hidden="true"></i></div><div class="icon w-variant-5d98fcb5-a6a5-151f-a201-b059ea992cef"><i class="icon-glyph ph ph-envelope-simple" aria-hidden="true"></i></div><div class="icon w-variant-e4d16f47-99b8-e0f3-e283-4d6f504865bc"><i class="icon-glyph ph ph-cube" aria-hidden="true"></i></div>
+
+<!-- sg: section=components | name=C | Button | class=.button › .button-color › .button-size › .button-content | note=The link button. Props: Label, Link, Icon, Icon Before, Icon After. Color: Primary, Secondary. Size: Default, Small. -->
+<a class="button" href="#components"><div class="button-color"><div class="button-size"><div class="button-content"><div>Button</div><div class="button-icon"><div class="icon"><i class="icon-glyph ph ph-arrow-right" aria-hidden="true"></i></div></div></div></div></div></a><a class="button" href="#components"><div class="button-color"><div class="button-size"><div class="button-content"><div class="button-icon"><div class="icon"><i class="icon-glyph ph ph-arrow-left" aria-hidden="true"></i></div></div><div>Back</div></div></div></div></a>
+
+<!-- sg: section=components | name=C | Icon Button | class=.button › .icon-button-box | note=Icon-only button element. Props: Icon, Accessible Name (required: what the button does), Hook (the data attribute a script listens for). Variants: Primary, Secondary. -->
+<button class="button" type="button" aria-label="Next"><div class="icon-button-box"><div class="icon w-variant-7bce87e3-ab9e-6f63-a957-78d54b4abbad"><i class="icon-glyph ph ph-arrow-right" aria-hidden="true"></i></div></div></button><button class="button" type="button" aria-label="Close"><div class="icon-button-box w-variant-dfb6235f-76ea-8fb6-7df7-17486e2c7d7c"><div class="icon w-variant-7bce87e3-ab9e-6f63-a957-78d54b4abbad"><i class="icon-glyph ph ph-x" aria-hidden="true"></i></div></div></button>
+
+<!-- sg: section=components | name=C | Video | class=.video | note=Plays a file hosted through the media page. Props: MP4, Poster, and one text prop per attribute (autoplay, muted, loop, playsinline): clear a prop to remove the attribute. -->
+<video class="video" muted="true" loop="true" playsinline="true" preload="metadata"></video>
+
+<!-- sg: section=components | name=Section Head | class=.section-head | note=Chip, heading and text at the top of a section. Props: Chip, Show Chip, Heading, Text. -->
+<div class="section-head"><div class="chip">Chip</div><h2 class="d2">Section heading</h2><p class="body-l">One or two lines that say what this section is about.</p></div>

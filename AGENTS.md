@@ -125,6 +125,7 @@ pnpm wf:pass /   # webflow-build checks: wf:compare, wf:pass, wf:anchors, wf:out
                  # wf:film, wf:transitions, wf:a11y, wf:links, wf:baseline,
                  # wf:html, wf:perf; on the prototype: wf:preflight, wf:styles
 pnpm update-skills   # skills from the latest template release (ask first)
+pnpm phosphor regular bold   # icon font weights in the bundle (default: regular)
 ```
 
 Node 22 and the pinned pnpm in `package.json`. `dist/` is committed: after

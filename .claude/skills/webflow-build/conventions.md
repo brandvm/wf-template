@@ -280,6 +280,15 @@ has been set on it), then bind through the MCP:
 
 ## 10. Components
 
+- **Start from the starter's control components** (`starter-site.md` §D2):
+  Icon, C | Button (Button Color › Button Size › Button Content), C | Icon
+  Button, C | Video, Section Head. Restyle their variants for the design;
+  add a variant before adding a class. Searchable selects, accordions,
+  sliders and lightboxes are not in the starter: they are built when a
+  site needs one, from a recipe where there is one (`recipes/`).
+- **Icons** are the Icon component: type `ph ph-<name>` into its prop
+  (`recipes/phosphor/`). Brand and social logos are uploaded SVGs.
+
 - **Make a component when behaviour should appear only where you place it.**
   The behaviour lives inside it as a `data-*` attribute (a Gallery's
   `data-lightbox`). If the same markup is needed without the behaviour, make a

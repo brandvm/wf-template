@@ -13,6 +13,35 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.4.0 — 2026-10-13
+
+No manual step for client repos (`pnpm update-skills` brings the recipe
+and the lessons). A client repo that wants the icon font copies
+`scripts/phosphor.mjs`, the `phosphor` script, the `loader` and
+`assetNames` lines of `build.mjs` and the `@import` at the top of
+`src/styles.css`, then runs `pnpm phosphor`.
+
+- **Phosphor Icons in the bundle.** `styles.css` ships the regular weight
+  as an icon font (about 75 KB of CSS before compression, plus one 144 KB
+  font that loads only where an icon shows). `pnpm phosphor regular bold`
+  picks the weights per site, `pnpm phosphor none` removes it. Nothing is
+  installed: the script downloads the pinned version's two files per
+  weight. Recipe: `webflow-build/recipes/phosphor/`.
+- **Control components on the starter site** (`starter-site.md` §D2):
+  Icon (a 1em glyph box with size variants), C | Button as four
+  single-class layers (Button › Button Color › Button Size › Button
+  Content) with icon before or after the label, C | Icon Button, C | Video
+  and Section Head. The old Button class is now the plain outer wrapper;
+  its Is Secondary combo is the Secondary variant of Button Color. Forms
+  get Form Field and Form Input classes with focus states.
+- The prototype starter mirrors them: snapshot, generated CSS, style guide
+  specimens (a Components section), and the pinned Phosphor stylesheet as a
+  prototype-only stand-in. `wf:preflight` knows the icon font's classes.
+- Conventions §10: start from the starter's components; searchable
+  selects, accordions, sliders and lightboxes are built when needed.
+- Two lessons: building nested components through the MCP; `set_text` on
+  imported blocks and remove-then-set in one style update.
+
 ## 0.3.2 — 2026-10-13
 
 No manual step for client repos.

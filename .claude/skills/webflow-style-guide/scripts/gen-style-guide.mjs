@@ -140,7 +140,7 @@ const dot = (alias) => (colorCombo.has(alias) ? `<div class="sg-dot"><div class=
 {
   const sem = coll(SEMANTIC);
   const themed = S.filter((s) => s.variableModes?.main?.[SEMANTIC] && s.selector?.startsWith('.'));
-  const sample = `<div class="s-wrapper">${hasClass('d4') ? '<div class="d4">Heading on this theme</div>' : ''}<p>Text / Primary on Background / Page.${hasClass('text-secondary') ? ' <span class="text-secondary">Text / Secondary.</span>' : ''} <a href="#themes">A link</a>.</p>${hasClass('button') ? '<a class="button" href="#themes">Button</a>' : ''}</div>`;
+  const sample = `<div class="s-wrapper">${hasClass('d4') ? '<div class="d4">Heading on this theme</div>' : ''}<p>Text / Primary on Background / Page.${hasClass('text-secondary') ? ' <span class="text-secondary">Text / Secondary.</span>' : ''} <a href="#themes">A link</a>.</p>${hasClass('button-color') ? '<a class="button" href="#themes"><div class="button-color"><div class="button-size"><div class="button-content"><div>Button</div></div></div></div></a>' : hasClass('button') ? '<a class="button" href="#themes">Button</a>' : ''}</div>`;
   if (sem && hasClass('section')) {
     add('themes', row('Base', '.section', `${SEMANTIC} → ${sem.modes?.[0] ?? 'Base'}`, `<div class="sg-theme-frame"><div class="section">${sample}</div></div>`));
     for (const s of themed) {
