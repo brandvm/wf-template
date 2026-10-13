@@ -554,7 +554,7 @@ refer to the project the lesson came from; Status is that project's.
   `var()` and `calc()` with variables (use plain values, then bind
   variables with `update_style`), `rgb(r g b / a)` (write `rgba()`), a
   font stack (only the first family is kept, with a "missing font"
-  warning), and `.w--current` (not a state; set Current in the Designer).
+  warning).
   Classes are named by their slug (`sg-row-meta`): rename each one
   afterwards (`rename_style`), which keeps the selector.
 - Status: workaround confirmed
@@ -602,4 +602,35 @@ refer to the project the lesson came from; Status is that project's.
   the published CSS (one per mode).
 - Status: fixed in the starter site
 - Found by: human
+
+### 2026-10-13 · The Current state can be written, but only on a new class
+- Area: mcp
+- Symptom: the style tool's states stop at hover, focus and the like; there
+  is no Current. A sidebar link had no way to show the section in view.
+- Cause: the style tool doesn't expose the state; the WHTML importer does.
+- Fix: import an element with `css` holding `.the-class.w--current { … }`:
+  it is stored as the Current state (published as `.the-class.w--current`),
+  at breakpoints too. The style tool can't read it back; check the
+  published CSS. For a class that **already exists** the importer does not
+  add to it: it creates `the-class-1`. So import the full class under a
+  new name with the state in it, move the elements over with `set_style`,
+  remove the old class, and rename the new one to the old name (the
+  selector follows the name).
+- Status: workaround confirmed
+- Found by: human + claude
+
+### 2026-10-13 · Sitemap exclusion is plan-gated; site SEO settings have no API
+- Area: mcp
+- Symptom: `update_page_sitemap_status` and `list_pages_sitemap_status`
+  answer 403 "Site plan doesn't support sitemap indexing controls" on a
+  site without a site plan, also after Auto-generate sitemap is turned on.
+  No tool reads or writes Site settings › SEO.
+- Cause: plan gate; the settings page is dashboard-only.
+- Fix: turn Auto-generate sitemap on in the dashboard (a person, or a
+  browser session with their OK). Keep internal pages out of search with
+  `noindex` in their head code until the plan exists, then exclude them
+  from the sitemap. Staging with subdomain indexing off serves
+  `Disallow: /` whatever the sitemap lists.
+- Status: open
+- Found by: claude
 

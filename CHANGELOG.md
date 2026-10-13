@@ -13,6 +13,18 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.3.2 — 2026-10-13
+
+No manual step for client repos.
+
+- The Current state of a class can be written through the WHTML importer
+  (`.class.w--current` in its `css`), on a new class only; the style
+  guide skill and a lesson say how. The starter's Sg Sidebar Link has it.
+- Starter site SEO settings are written down (`starter-site.md` §G):
+  subdomain indexing off, auto-generated sitemap on. Excluding the design
+  pages from the sitemap needs a site plan; `webflow-launch` checks it
+  before launch.
+
 ## 0.3.1 — 2026-10-13
 
 No manual step for client repos. Changes that came out of building the

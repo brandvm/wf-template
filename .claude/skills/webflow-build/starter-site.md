@@ -120,14 +120,23 @@ variable (Sg Bar), each bound to its variable, and the nine sections for
 the base system. A project fills rows instead of building a layout. The
 Forms row holds the Form (class **Form**, its label **Label**, submit
 **Button**), so the reserved classes, which only the Designer can create,
-survive duplication. Its head code has `noindex`. [Person] sets the
-Current state on **Sg Sidebar Link** once (the API has no Current state).
+survive duplication. Its head code has `noindex`, and **Sg Sidebar Link**
+has its Current state.
 
 **F. Media page.** `/design/media` is there as a shell (noindex, one
 section that explains the page): a project with video adds its Background
 Video blocks to it ([media.md](media.md)); a project without video
 deletes the page. **Never run "Clean up unused styles" on the starter:** most
 classes are on no element until a project's style guide applies them.
+
+**G. Site SEO settings** (Site settings › SEO; no API, a person or a
+browser session sets them): Webflow subdomain indexing **off** (staging
+serves `Disallow: /`), **Auto-generate sitemap on**, robots.txt and the
+global canonical URL empty (a project sets the canonical at launch). The
+starter has no site plan, so `/design/style-guide` and `/design/media`
+can't be excluded from its sitemap; both carry `noindex`. On a client
+site, exclude them as soon as the site plan exists
+(`update_page_sitemap_status`, `includeInSitemap: false`).
 
 The starter is never published to a custom domain and holds no client
 content. When `conventions.md` changes, update the starter in the same

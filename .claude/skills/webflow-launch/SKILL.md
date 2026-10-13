@@ -83,6 +83,10 @@ SEO and tracking
   save --live`, every page in `pages`) and commit them.
 - [Claude] Apply the 301 redirects; [Claude checks] the top old URLs
   redirect correctly.
+- [Claude checks] `sitemap.xml` exists (Site settings › SEO ›
+  Auto-generate sitemap) and does **not** list `/design/style-guide` or
+  `/design/media`: exclude both through the sitemap tool once the site
+  plan is on (it answers 403 before that).
 - [Person] Submit sitemap.xml in Search Console.
 - [Person] Submit a form on the live site and see the visit in analytics.
 

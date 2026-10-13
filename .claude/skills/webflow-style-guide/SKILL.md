@@ -159,19 +159,22 @@ any other page. A go-ahead per batch.
 
 1. **Page.** `/design/style-guide` in the `design` folder, on the standard
    shell (`webflow-build` conventions §1). `noindex, nofollow` in the
-   page's head code; excluded from site search and the sitemap; links into
+   page's head code; excluded from site search and the sitemap (the
+   sitemap setting needs a site plan: on a site without one, the
+   `noindex` tag is what keeps it out of search, and the exclusion is
+   set once the plan exists); links into
    it do a full page load.
 2. **Sg classes.** A site duplicated from the starter already has them.
    Otherwise the quickest way that keeps every value: import the frame
    with the WHTML builder and pass sg.css as its `css` (variables and
    `calc()` replaced by plain values, `rgb(r g b / a)` written as
-   `rgba()`, the `.w--current` rules left out). The importer creates each
-   class with longhand properties, states and breakpoints, named by its
-   slug; rename each one afterwards to the name the Designer should show
-   (Sg Row, Sg Row Meta, Sg Table Key…). [Person] sets the **Current**
-   state on Sg Sidebar Link by hand (left border in the text colour,
-   weight 500, opacity 100%; at Tablet a grey background instead): the API
-   has no Current state.
+   `rgba()`). The importer creates each class with longhand properties,
+   states and breakpoints, named by its slug; rename each one afterwards
+   to the name the Designer should show (Sg Row, Sg Row Meta, Sg Table
+   Key…). The `.w--current` rules become the **Current** state of Sg
+   Sidebar Link, which the style tool itself can't write. This only works
+   while the class is new: for a class that already exists the importer
+   makes a numbered duplicate (`webflow-build/lessons/mcp.md`).
 3. **Variable combos.** For each colour variable, the combo **Sg Swatch
    Color** + **Is …** binding `background-color`; for each radius variable,
    **Sg Radius** + **Is …** binding `border-radius`; for each spacing
