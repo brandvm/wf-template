@@ -35,6 +35,11 @@
       file — appending is how a utility silently stops winning.
    ============================================================ */
 
+/* Icons. An @import has to come before every rule, so it sits above 01.
+   repo-css: third-party — Phosphor icon font; `pnpm phosphor` writes the
+   file and chooses the weights. */
+@import "./phosphor.css";
+
 /* ============================================================
    01. TOKENS
    ============================================================ */

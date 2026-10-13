@@ -7,6 +7,10 @@ const config = {
   entryPoints: ['src/index.ts', 'src/styles.css'],
   bundle: true,
   outdir: 'dist',
+  // Icon fonts (src/phosphor/) are copied next to the stylesheet, with a
+  // content hash in the name so a new version is never served from cache.
+  loader: { '.woff2': 'file' },
+  assetNames: 'fonts/[name]-[hash]',
   minify: !dev,
   sourcemap: dev,
   // dist/ is committed and CI fails if it drifts from src/. Dev builds stay

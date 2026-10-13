@@ -11,6 +11,7 @@
     "new-project": "node scripts/new-project.mjs",
     "update-skills": "node scripts/update-skills.mjs",
     "harvest": "node scripts/harvest.mjs",
+    "phosphor": "node scripts/phosphor.mjs",
     "wf:compare": "node .claude/skills/webflow-build/scripts/compare.mjs",
     "wf:pass": "node .claude/skills/webflow-build/scripts/pass.mjs",
     "wf:anchors": "node .claude/skills/webflow-build/scripts/anchors.mjs",
