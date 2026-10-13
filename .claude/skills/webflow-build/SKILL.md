@@ -162,6 +162,9 @@ When a page is complete, run **Page done** in `checklists.md`.
   font-size 0).
 - Every grid sets at least one row and one column template; centre single
   children with flex, not grid.
+- An element drawn only by a pseudo-element (an icon font glyph) gets a
+  single space as its text (`set_settings`, key `text`): it is then not
+  empty on the canvas, and the page looks the same.
 - No style values only the MCP can see: if the Designer can't display it,
   it belongs in repo CSS with a tag.
 

@@ -16,8 +16,12 @@ designing.
 An element with two classes: the weight, then the icon.
 
 ```html
-<i class="ph ph-arrow-right" aria-hidden="true"></i>
+<i class="ph ph-arrow-right" aria-hidden="true"> </i>
 ```
+
+The single space inside is deliberate: the glyph is drawn by `::before`,
+so without any content the Designer canvas treats the element as empty
+and shows a dashed placeholder box. A space changes nothing on the page.
 
 In Webflow the classes come from a prop, not from the Style panel (they are
 repo CSS, the Designer doesn't know them): the starter's **Icon** component

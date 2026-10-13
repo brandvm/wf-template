@@ -13,6 +13,15 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.4.1 — 2026-10-13
+
+No manual step for client repos.
+
+- The Icon glyph holds a single space as its text, as Phosphor's own
+  Webflow component does, so the Designer canvas doesn't show it as an
+  empty element. Canvas hygiene, the Phosphor recipe and the prototype
+  specimens say so.
+
 ## 0.4.0 — 2026-10-13
 
 No manual step for client repos (`pnpm update-skills` brings the recipe
