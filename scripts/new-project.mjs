@@ -70,7 +70,7 @@ const { client, repo, slug, siteId, org, prototypeUrl } = values;
 const today = new Date().toISOString().slice(0, 10);
 
 const edits = {
-  'package.json': (s) => s.replace(/"name": "[^"]*"/, `"name": "${repo}"`).replace(/\n    "harvest": "[^"]*",/, ''),
+  'package.json': (s) => s.replace(/"name": "[^"]*"/, `"name": "${repo}"`).replace(/"license": "[^"]*"/, '"license": "UNLICENSED"').replace(/\n    "harvest": "[^"]*",/, ''),
   'AGENTS.md': (s) => s
     .replace('Fill these in when the repo is created from the template (`pnpm new-project`).', `Filled in by \`pnpm new-project\` on ${today}.`)
     .replaceAll('<CLIENT>', client)
@@ -103,8 +103,10 @@ for (const [file, edit] of Object.entries(edits)) {
   console.log(`${flag('dry-run') ? 'would update' : 'updated'} ${file}`);
   if (!flag('dry-run')) fs.writeFileSync(path.join(root, file), after);
 }
-// Files that only make sense in the template itself.
-const TEMPLATE_ONLY = ['CONTRIBUTING.md', 'CHANGELOG.md', '.github/ISSUE_TEMPLATE', 'scripts/harvest.mjs'];
+// Files that only make sense in the template itself. LICENSE (MIT-0) goes
+// too: the client's own code is not released under it. THIRD-PARTY-NOTICES.md
+// stays.
+const TEMPLATE_ONLY = ['LICENSE', 'CONTRIBUTING.md', 'CHANGELOG.md', '.github/ISSUE_TEMPLATE', 'scripts/harvest.mjs'];
 for (const f of TEMPLATE_ONLY) {
   if (!fs.existsSync(path.join(root, f))) continue;
   console.log(`${flag('dry-run') ? 'would remove' : 'removed'} ${f} (template only)`);

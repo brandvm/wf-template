@@ -305,3 +305,17 @@ Build → paste `dist/index.js` inline into Site footer, CSS inline (a
 `<style>` block) into canvas Embed 2a in place of the link → remove Embed
 2b, the loader and external tags → publish → zip `src/` for the client →
 archive repo.
+
+## Licence
+
+wf-template is free for anyone to use, change, share and sell, for client
+work or anything else, with no attribution required: MIT No Attribution
+(`LICENSE`). It applies to every version of this repo, including those
+released before the licence was added.
+
+It began as a copy of Finsweet's developer-starter (ISC). That notice and
+the licences of the bundled Phosphor icons and Geist font are in
+`THIRD-PARTY-NOTICES.md`; keep that file in repos made from the template.
+`pnpm new-project` removes `LICENSE` from a client repo and marks its
+`package.json` `UNLICENSED`: the client's own code is not released under
+MIT-0.

@@ -41,3 +41,8 @@ up skill changes with `pnpm update-skills`.
 - **Checklist items** keep their [Claude] / [Claude checks] / [Person] tag.
 - **CSS** follows the Designer-first policy in `AGENTS.md`: every repo CSS
   rule carries a `repo-css:` tag.
+- **Licence.** Contributions are released under MIT No Attribution, the
+  template's licence (`LICENSE`), so everyone can keep using the template
+  without asking anyone. Contribute only work you have the right to give.
+  Code taken from elsewhere needs a compatible licence and an entry in
+  `THIRD-PARTY-NOTICES.md`.

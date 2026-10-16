@@ -1,6 +1,7 @@
 {
   "name": "wf-template",
   "private": true,
+  "license": "MIT-0",
   "type": "module",
   "packageManager": "pnpm@11.25.0",
   "scripts": {

@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const FILES = ['package.json', 'AGENTS.md', 'loader.html', 'docs/handoff/HANDOFF.md', 'scripts/new-project.mjs', '.wf-template.json', 'CONTRIBUTING.md', 'CHANGELOG.md'];
+const FILES = ['package.json', 'AGENTS.md', 'loader.html', 'docs/handoff/HANDOFF.md', 'scripts/new-project.mjs', '.wf-template.json', 'CONTRIBUTING.md', 'CHANGELOG.md', 'LICENSE', 'THIRD-PARTY-NOTICES.md'];
 
 function copy() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-new-project-'));
@@ -31,6 +31,7 @@ test('fills in every placeholder and writes the config', { skip }, () => {
   const read = (f) => fs.readFileSync(path.join(dir, f), 'utf8');
   assert.match(read('package.json'), /"name": "wf-acme"/);
   assert.doesNotMatch(read('package.json'), /"harvest"/);
+  assert.match(read('package.json'), /"license": "UNLICENSED"/);
   const agents = read('AGENTS.md');
   assert.doesNotMatch(agents, /<CLIENT>|<REPO>|<SITE_ID>|<SLUG>|<DOMAIN|<RELEASE/);
   assert.match(agents, /# Acme Homes — Webflow custom code/);
@@ -45,6 +46,8 @@ test('fills in every placeholder and writes the config', { skip }, () => {
   assert.equal(cfg.stagingUrl, 'https://acme-homes.webflow.io');
   assert.ok(new RegExp(cfg.bundlePattern).test('https://acme-org.github.io/wf-acme/index.js'));
   assert.ok(!fs.existsSync(path.join(dir, 'CONTRIBUTING.md')) && !fs.existsSync(path.join(dir, 'CHANGELOG.md')), 'template-only files removed');
+  assert.ok(!fs.existsSync(path.join(dir, 'LICENSE')), 'MIT-0 licence not carried into the client repo');
+  assert.ok(fs.existsSync(path.join(dir, 'THIRD-PARTY-NOTICES.md')), 'third-party notices kept');
   const meta = JSON.parse(read('.wf-template.json'));
   assert.match(meta.version, /^\d+\.\d+\.\d+$/);
   assert.match(meta.created, /^\d{4}-\d{2}-\d{2}$/);

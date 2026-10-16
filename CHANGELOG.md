@@ -13,6 +13,22 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.5.1 — 2026-10-16
+
+- **Licensed MIT No Attribution (`LICENSE`).** Anyone may use, change,
+  share and sell the template, for client work or anything else, with no
+  attribution required. The licence covers every earlier version too.
+- **`THIRD-PARTY-NOTICES.md`:** the ISC notice of Finsweet's
+  developer-starter, which the template began from, and where the Phosphor
+  (MIT) and Geist (OFL) licences are. Keep it in every repo made from the
+  template; `pnpm update-skills` adds it to repos that lack it (on the run
+  after the script has updated itself).
+- `pnpm new-project` removes `LICENSE` from a client repo and sets its
+  `package.json` licence to `UNLICENSED`, so the client's own code is not
+  released under MIT-0.
+- `CONTRIBUTING.md` and the pull request template: contributions are
+  accepted under the same licence.
+
 ## 0.5.0 — 2026-10-13
 
 **Manual step for client repos, once:** replace `scripts/update-skills.mjs`

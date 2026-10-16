@@ -10,3 +10,4 @@
 - [ ] Surprises logged in `GOTCHAS.md` (or, in wf-template, in the skill's `lessons/`)
 - [ ] Snippet changes (`loader.html`) noted below: they must be re-pasted in Webflow
 - [ ] wf-template only: version bumped in `.wf-template.json`, `CHANGELOG.md` entry, nothing client-specific
+- [ ] wf-template only: I have the right to contribute this and release it under MIT-0 (`LICENSE`); third-party code is listed in `THIRD-PARTY-NOTICES.md`

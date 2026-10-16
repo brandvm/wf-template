@@ -33,7 +33,7 @@ const dry = argv.includes('--dry-run');
 const skillsOnly = argv.includes('--skills-only');
 const from = opt('from');
 // Files the template owns in every repo made from it.
-const TOOLING = ['build.mjs', 'scripts/update-skills.mjs', 'scripts/phosphor.mjs', 'scripts/check-repo.mjs'];
+const TOOLING = ['build.mjs', 'scripts/update-skills.mjs', 'scripts/phosphor.mjs', 'scripts/check-repo.mjs', 'THIRD-PARTY-NOTICES.md'];
 // package.json scripts that belong to the template repo only.
 const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'new-project'];
 const metaFile = path.join(root, '.wf-template.json');
