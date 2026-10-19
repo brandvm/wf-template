@@ -147,3 +147,34 @@ refer to the project the lesson came from; Status is that project's.
   nothing.
 - Status: fixed in the template's prototype starter
 - Found by: claude
+
+### 2026-10-09 · `<button>` drops the inherited letter-spacing
+- Area: css
+- Symptom: accordion questions wrapped to two lines where the design has
+  one; the heading's −3% tracking was missing on the text inside the
+  button.
+- Cause: the browser's default stylesheet sets `letter-spacing: normal`
+  (and `word-spacing`, `text-transform`) on `<button>`; `font: inherit`
+  does not cover them.
+- Fix: `letter-spacing: inherit` (with `word-spacing` and `text-transform`)
+  on any class used on a `<button>` that should take its parent's type;
+  classes that set their own tracking are fine. A native-button reset in
+  the Designer (designer.md, "Native `<button type="submit">` in Webflow
+  forms") should include them.
+- Status: fixed in that project's prototype
+- Found by: claude
+
+### 2026-10-15 · A script-hidden overlay blocks the Designer canvas
+- Area: css
+- Symptom: below 992px every click on the canvas selected the nav.
+- Cause: the full-screen mobile menu is hidden by a module (`hidden`); the
+  canvas runs no script, so it sat over the page at opacity 0. The canvas
+  also ignored `pointer-events: none`. (The 2a stylesheet link is fetched
+  without a cache-buster in the Designer, so a new repo rule can take up
+  to 10 minutes to reach the canvas.)
+- Fix: hide it on the canvas only:
+  `html.wf-design-mode .mobile-menu:not(.is-open) { display: none; }`
+  (tag `canvas-preview`). To edit the menu, add its open combo for the
+  session. Any overlay that a script hides needs the same rule.
+- Status: fixed in that project's repo
+- Found by: human

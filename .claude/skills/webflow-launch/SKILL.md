@@ -58,10 +58,12 @@ Devices, accessibility, speed
   design trades off.
 
 SEO and tracking
-- [Claude checks] Titles, meta descriptions, one H1 per page, alt text
-  (`asset-audit`), OG images, favicon, schema where planned.
+- [Claude checks] Titles, meta descriptions, OG tags, one H1 per page and
+  JSON-LD that parses with no HTML entities, on every page in the sitemap
+  (`pnpm wf:seo`); noindex only on the pages in `seo.noindexOk`. Alt text
+  (`asset-audit`), favicon, schema where planned.
 - [Claude checks] Canonicals point to the live domain (after the domain is
-  attached).
+  attached: `liveUrl` in the config, then `pnpm wf:seo --live --canonical`).
 - [Person] GA4 and conversions fire (real-time view); nothing tracks
   before cookie consent where consent is required. [Claude checks] the tags
   load only after consent in the page's network requests.
@@ -77,6 +79,11 @@ SEO and tracking
   and set `RELEASE` in the head snippet (README › Release).
 - [Claude checks] SSL works; www and https redirects go to the canonical
   host.
+- [Claude checks] `pnpm wf:install --live`: the published snippets match
+  `loader.html` (with the new `RELEASE`), one viewport meta, no request to
+  localhost.
+- [Claude checks] `pnpm wf:seo --live --canonical`: no noindex left
+  outside `seo.noindexOk`, every canonical on the live domain.
 - [Claude] Remove noindex and the staging password; robots.txt allows
   indexing.
 - [Claude] Save the visual baselines of the live site (`pnpm wf:baseline

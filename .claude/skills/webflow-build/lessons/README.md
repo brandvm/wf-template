@@ -6,11 +6,11 @@ of them every session.
 
 | File | Covers | Entries |
 | --- | --- | --- |
-| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 40 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 17 |
-| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 10 |
-| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 12 |
-| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 10 |
+| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 56 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 22 |
+| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 12 |
+| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 19 |
+| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 12 |
 
 ## Titles
 
@@ -56,6 +56,22 @@ of them every session.
 - Sitemap exclusion is plan-gated; site SEO settings have no API
 - Building nested components through the MCP: what works
 - `set_text` fails on imported blocks; a property can't be removed and set in one update
+- Element builder: a DOM element's attributes can't be set at creation; `query_elements` style and text filters find nothing
+- Variant overrides on a combo element never apply
+- CMS template: list sources, item roles and bound line breaks
+- Restructuring a component copy: List Items and prop ids
+- CMS images over 4 MB are dropped silently; updates need name and slug
+- Month-only CMS dates display a month early
+- Page SEO through the API: what sticks and where
+- Unlinked instances lose conditional classes; link `rel` doesn't publish
+- Three "manual" steps the API can do after all
+- Collection List writes fail inside a slot or a component
+- A section containing a Collection List can't become a component
+- An imported combo can publish as a bare class
+- Keep a CMS template off the site with its toggle, not with draft
+- Bulk rich-text content: the Designer's CSV import, not the API
+- Nested Collection Lists: Show defaults to 5, and the source shape
+- Custom form messages: build inside the component, keep display off the class
 
 **Designer and canvas** ([designer.md](designer.md))
 
@@ -76,6 +92,11 @@ of them every session.
 - An Embed with a script hides its stylesheet link on the canvas
 - Image Load (lazy/eager) is per instance; preload doesn't fix render delay
 - A space as an element's only text publishes as `&nbsp;` and shifts an icon
+- Webflow writes stale size attributes on `<canvas>`
+- A variable mode on a class doesn't recolour inherited text
+- Duplicate ids in CMS lists and component instances
+- Typography classes nest in em
+- A Link Block's `max-width: 100%` caps a negative-margin bleed
 
 **Repo CSS** ([css.md](css.md))
 
@@ -89,9 +110,16 @@ of them every session.
 - Renaming a Webflow variable silently breaks repo CSS
 - Prototype generators lose large breakpoints and `.w--` states
 - Prototype stand-ins override an existing site's tag styles
+- `<button>` drops the inherited letter-spacing
+- A script-hidden overlay blocks the Designer canvas
 
 **JavaScript modules** ([js.md](js.md))
 
+- Barba: forms dead after a page change; stale head and current links
+- Pins created out of page order are measured in the wrong place
+- Barba ignores a root `custom` rule when `to` or `from` is set
+- iOS Low Power Mode refuses autoplay and Safari paints a play glyph
+- Testing local code in the built-in browser pane
 - Moving off IX3: decode the published interactions, then replay them
 - Finsweet recipe: keep it out of index.js
 - Finsweet Combo Box 2.7.1 differs from its docs
@@ -104,10 +132,14 @@ of them every session.
 - One throwing module leaves the page scroll-locked
 - CDN `defer` scripts cannot be ordered against the bundle
 - Webflow's anchor scroll ignores a sticky header
+- `window.lenis` is a version marker, not the instance
+- GSAP `.from()` animates to the current value: items stranded at 0
 
 **Loader, release and CI** ([loader-release-ci.md](loader-release-ci.md))
 
 - Filling in REPO in loader.html breaks the browser tests
+- Staging fetched its stylesheet twice before first paint
+- The Designer's custom-code preview isn't staging
 - Swapping the stylesheet href in 2b causes a full-page layout shift
 - Setting RELEASE in loader.html breaks CI
 - The staging link in Embed 2a costs production a render-blocking request and a second CSS download

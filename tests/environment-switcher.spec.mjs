@@ -193,3 +193,28 @@ test('production without a RELEASE serves staging and logs an error', async ({ p
 test('the scroll lock is released when the bundle cannot load', async ({ page }) => {
   await setup(page, { url: 'https://client.example/', unavailable: url => url.endsWith('index.js') });
 });
+
+test('staging keeps the parsed stylesheet until load, then swaps in a fresh copy', async ({ page }) => {
+  const requests = [];
+  await setup(page, { url: 'https://example.webflow.io/', requests });
+  // One request before first paint: the 2a sheet as parsed, not a second copy.
+  await expect(page.locator('#wfc-css')).toHaveAttribute('href', new RegExp('^' + stage + 'styles\\.css\\?v=\\d{5,}$'));
+  await expect(page.locator('link[rel=stylesheet]')).toHaveCount(1);
+  expect(requests.filter(request => request.startsWith(stage + 'styles.css'))).toHaveLength(2);
+  expect(requests).toContain(stage + 'styles.css?v=1');
+});
+
+test('the Designer custom-code preview counts as staging', async ({ page }) => {
+  const requests = [];
+  await setup(page, { url: 'https://example.canvas.webflow.com/?wfc-dev=1', requests });
+  expect(await page.evaluate(() => window.WFC.staging)).toBe(true);
+  expect(requests).toContain(local + 'index.js');
+});
+
+for (const [url, origin] of [['https://example.webflow.io/', new URL(stage).origin], ['https://client.example/', 'https://cdn.jsdelivr.net']])
+  test(`head code preconnects to the bundle's origin (${new URL(url).hostname})`, async ({ page }) => {
+    await setup(page, { url });
+    await expect(page.locator('link[rel=preconnect]')).toHaveCount(2);
+    for (const href of await page.locator('link[rel=preconnect]').evaluateAll(links => links.map(link => link.href)))
+      expect(new URL(href).origin).toBe(origin);
+  });

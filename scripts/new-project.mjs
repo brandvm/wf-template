@@ -43,7 +43,7 @@ const values = {
   slug: opt('slug'),
   siteId: opt('site-id'),
   org: opt('org') ?? remoteOrg,
-  prototypeUrl: opt('prototype-url') ?? 'http://127.0.0.1:5173',
+  prototypeUrl: opt('prototype-url'),
 };
 const questions = { client: 'Client / site name', org: 'GitHub org or user that owns this repo', slug: 'Webflow staging subdomain (<slug>.webflow.io)', siteId: 'Webflow site ID (Enter to fill in later)' };
 if (process.stdin.isTTY) {
@@ -66,6 +66,10 @@ if (values.siteId && !/^[0-9a-f]{24}$/.test(values.siteId)) {
   console.error('--site-id is the 24-character hex id from Site settings or the MCP');
   process.exit(1);
 }
+// Each project's prototype gets its own port (5200–5999, from the slug), so
+// two clients' prototypes can run at once and the config never points at
+// the wrong one. The prototype's dev script uses --strictPort to match.
+values.prototypeUrl ??= `http://127.0.0.1:${5200 + [...values.slug].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 800, 0)}`;
 const { client, repo, slug, siteId, org, prototypeUrl } = values;
 const today = new Date().toISOString().slice(0, 10);
 
@@ -163,7 +167,11 @@ if (!flag('no-workspace')) {
         catch { fs.cpSync(path.join(root, '.claude/skills', skill), p, { recursive: true }); console.log(`  (copied: no symlink permission; re-copy after pnpm update-skills)`); }
       });
     }
-    make('prototype', (p) => fs.cpSync(path.join(root, '.claude/skills/webflow-prototype/prototype-starter'), p, { recursive: true }));
+    make('prototype', (p) => {
+      fs.cpSync(path.join(root, '.claude/skills/webflow-prototype/prototype-starter'), p, { recursive: true });
+      const pkg = path.join(p, 'package.json');
+      fs.writeFileSync(pkg, fs.readFileSync(pkg, 'utf8').replace('--port 5173', `--port ${new URL(prototypeUrl).port || 5173}`));
+    });
     make('Assets/figma', (p) => fs.mkdirSync(p, { recursive: true }));
   }
 }

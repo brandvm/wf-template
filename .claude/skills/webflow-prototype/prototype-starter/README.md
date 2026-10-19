@@ -24,11 +24,13 @@ repo (copy it by hand for a workspace set up without it). Then:
 
 ```bash
 pnpm install
-pnpm dev            # http://127.0.0.1:5173
+pnpm dev            # http://127.0.0.1:<port> (the project's own, from pnpm new-project)
 ```
 
-Set `prototypeUrl` in the repo's `webflow-build.config.json` to the same
-address, so the check scripts can compare staging with it.
+`pnpm new-project` writes the same port into `prototypeUrl` in the repo's
+`webflow-build.config.json`, so the check scripts compare staging with this
+prototype and not another client's. `--strictPort` makes a busy port an
+error instead of a silent move to the next one. Change both together.
 
 ## Files
 

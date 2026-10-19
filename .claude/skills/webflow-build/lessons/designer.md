@@ -116,6 +116,17 @@ refer to the project the lesson came from; Status is that project's.
   font-family and colour inherit, cursor pointer. The newsletter form sets
   align-items flex-start. The Turnstile state is expected; test submits in a real
   browser, not headless.
+  Update 2026-10-08: a flex-column form inside a flex parent also came out
+  narrower than the prototype and one gap taller. The form's
+  `align-self: stretch` sat on the inner `<form>`, but the Form Block
+  wrapper is the flex item and shrank to its content; and webflow.js
+  appends the Turnstile holder (`div > div > input
+  [name="cf-turnstile-response"]`) as the form's last child at runtime,
+  which adds one more gap. Fix: the Form Block class sets `align-self:
+  stretch`, and repo CSS takes the Turnstile holder out of the flow
+  (`position: absolute`); the invisible widget still runs. After a Barba
+  swap the widget needs re-rendering (js.md, "Barba: forms dead after a
+  page change").
 - Status: fixed (Webflow styles, 2026-10-06)
 - Found by: claude + human
 
@@ -259,3 +270,83 @@ refer to the project the lesson came from; Status is that project's.
 - Status: fixed in the starter site
 - Found by: human
 
+### 2026-09-02 · Webflow writes stale size attributes on `<canvas>`
+- Area: designer, js
+- Symptom: a `<canvas>` drawn by a module rendered at the design-time size,
+  or the module didn't find it by its attribute selector.
+- Cause: Webflow emits design-px `width` / `height` attributes on a canvas
+  element, and sometimes writes a valueless custom attribute as a single
+  space (`data-…=" "`), which an `[data-…=""]` or value selector misses.
+- Fix: the module removes the `width` / `height` attributes and sizes the
+  canvas from `offsetWidth` (times `devicePixelRatio`), then boots on the
+  next animation frame and again on `load`. Select by attribute presence
+  (`[data-…]`), never by an empty value.
+- Status: fixed in that project's repo
+- Found by: human
+
+### 2026-09-04 · A variable mode on a class doesn't recolour inherited text
+- Area: designer
+- Symptom: setting a Colors Semantic mode (e.g. dark) on a class changed
+  its background and borders, but text inside kept the parent's colour,
+  and so did `currentColor` and everything built on it. Two sites hit it.
+- Cause: a mode only redefines the variables on that element. `color` is
+  inherited as a computed value, already resolved on an ancestor with the
+  ancestor's mode.
+- Fix: every class that sets a colour mode **must also declare `color`**
+  (the same Text variable again), so it resolves against the new mode.
+  Check this whenever a mode is added to or changed on a class.
+- Status: documented
+- Found by: claude + human
+
+### 2026-09-08 · Duplicate ids in CMS lists and component instances
+- Area: designer
+- Symptom: labels and ARIA references inside a modal resolved to the first
+  instance of a form component on the page; a CMS filter list published
+  seven radios with `id="radio"`; imported form fields shared
+  `id="field"` with labels at `for=""`.
+- Cause: every instance of a component carries the same authored ids,
+  every item of a Collection List repeats the Designer id, the Designer
+  can't bind an id to a CMS field, and the WHTML importer writes an empty
+  For on Form Labels.
+- Fix: the starter module `unique-form-ids` gives each duplicate radio,
+  checkbox, input, select or textarea a unique id from its label text and
+  moves the matching `for` with it (style by class, never by these ids).
+  For static forms, set a unique id on every field and a custom `for`
+  attribute on each label (the attribute replaces the empty one on
+  publish); an id must not equal a section anchor. A module that clones or
+  reuses a component's ids elsewhere (a modal) prefixes them and rewrites
+  `for` / `aria-*` itself. After any form import, check that every `for`
+  matches an id in the same form and no id repeats.
+- Status: fixed in the template (`src/modules/unique-form-ids.ts`) for
+  radios and checkboxes in lists
+- Found by: claude + human
+
+### 2026-10-07 · Typography classes nest in em
+- Area: designer
+- Symptom: a unit label given a display type class inside a larger display
+  figure rendered at 120px instead of a fraction of the figure, and
+  wrapped the figure onto two lines.
+- Cause: the Typography Role sizes are em values, so a type class inside
+  another type class multiplies (1.5em × 80px). The prototype had the same
+  effect, only smaller.
+- Fix: a small relative class for parts inside a type class (e.g. 0.3em of
+  the figure). Don't nest type classes; put the type class on the inner
+  element, not on a padded wrapper whose em spacing would scale with it.
+- Status: fixed in that project's Webflow styles
+- Found by: claude
+
+### 2026-10-16 · A Link Block's `max-width: 100%` caps a negative-margin bleed
+- Area: designer
+- Symptom: rows in a nav dropdown wrapped their descriptions onto two lines
+  in Webflow and one in the prototype, although every grid, gap, padding
+  and font size measured the same.
+- Cause: Webflow publishes Link Blocks with `w-inline-block`
+  (`max-width: 100%`). The rows used `margin-left: -1em` so their hover box
+  lines up with the label; in the prototype the row grows 1em wider than
+  its column, in Webflow the cap keeps it at 100% and the text loses 1em.
+- Fix: `max-width: none` on the row's class (or combo). Any Link Block that
+  bleeds with a negative margin needs the same. When a Webflow build wraps
+  differently from the prototype, compare the element's computed
+  max-width first.
+- Status: fixed in that project's Webflow styles
+- Found by: claude

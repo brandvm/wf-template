@@ -176,7 +176,8 @@ The scripts are in this skill's `scripts/` folder, with a `pnpm` shortcut
 each. They read `webflow-build.config.json` from the current directory or a
 parent (the example is `webflow-build.config.example.json`). By default
 staging loads this repo's local `dist/`, so code can be checked before a
-push; `--live` checks what visitors get. Screenshots go to
+push; `--live` checks what visitors get (`seo`, `install` and `parity`
+check the custom domain in `liveUrl` with it). Screenshots go to
 `.webflow-build/` next to the config.
 
 ```bash
@@ -191,6 +192,9 @@ pnpm wf:links [/path…] [--max 50] [--external]                   # crawl: brok
 pnpm wf:baseline save|compare [/path…]                           # full-page visual baselines (launch, releases)
 pnpm wf:html [/path…]                                            # published HTML: what Webflow changed on publish
 pnpm wf:perf [/path…] [--runs 5] [--mobile|--desktop]            # Lighthouse, median of several runs
+pnpm wf:seo [/path…] [--live] [--canonical]                      # sitemap crawl: titles, OG, one h1, JSON-LD, noindex
+pnpm wf:install [/path…] [--live]                                # installed snippets vs loader.html, localhost requests
+pnpm wf:parity [/path…] [--live] [--width W] [--control]         # migration: old custom code vs dist/, every element
 ```
 
 Two more read the prototype's files, with no browser and no Webflow
@@ -233,6 +237,20 @@ Reading results:
 - `perf`: read the median, and the range next to it. A change smaller
   than the range is noise, not a result. It always measures the deployed
   bundle.
+- `seo`: pages from `sitemap.xml`, else a crawl from `pages`. Missing
+  title, description or OG tags, not one `<h1>`, and JSON-LD that doesn't
+  parse or holds an HTML entity (`&#39;`) fail; noindex pages are listed,
+  and fail with `--live` unless `seo.noindexOk` allows them. Long titles,
+  short descriptions and pages with no JSON-LD (outside `seo.noSchemaOk`)
+  are notes.
+- `install`: a loader piece (head code, Embed 2a, 2b, footer code) that
+  differs from `loader.html` is an old paste: re-paste it and publish.
+  Also fails on two viewport metas, two Finsweet Attributes tags and any
+  request to localhost from the page.
+- `parity`: every difference is a change the live site would see. Run
+  `--control` first: what differs between two renders of the published
+  page is noise, for `parity.ignore`. Screenshot pairs are in
+  `.webflow-build/parity/`.
 - `preflight`: **FIX** means change the prototype markup now (an empty
   span as a shape, a control outside a form, a valueless boolean, an inline
   style, a class in no CSS file). **PLAN** means the markup is right and
@@ -248,7 +266,8 @@ Run `preflight` on a prototype page before it is approved and again before
 its import; `styles` before the first class batch and whenever
 `new-classes*.css` changes; `compare` per section while building; `pass`,
 `outline`, `anchors`, `a11y`, `links` and `html` when a page is done;
-`perf` at the build handoff and before and after any speed work; `load-film` after touching the hero or the loader;
+`perf` at the build handoff and before and after any speed work;
+`install` after every paste of a loader piece; `seo` before launch; `load-film` after touching the hero or the loader;
 `transitions` after touching pages, links or modules. Check all three
 widths (Webflow's breakpoints are 991/767/479). For interactions, script
 the hover, click or scroll state and compare that, not only the resting
@@ -280,6 +299,28 @@ handoff, review against the frame screenshots in `Assets/figma/`
   variables in em, the desktop frame set to the design before building.
 - Loader snippets aren't versioned: any `loader.html` change must be
   re-pasted in Webflow (a manual step).
+
+## Migrating a live site
+
+Moving a site that is already live onto the template (its old custom
+code hosted elsewhere) happens in two phases, never one:
+
+1. **Parity first.** The port reproduces the live site with no visual,
+   content or behaviour change. Map each old custom-code asset in
+   `parity.oldAssets` (a URL regex → `index.js`, `styles.css`, or `""` for
+   a library the bundle now carries), then `pnpm wf:parity --live` on every
+   template page at every width until it reports zero differences, or
+   each one is explained. Only then paste the loader and remove the old
+   code, and run `pnpm wf:install --live`.
+2. **Improvements second**, in later releases, one at a time, each
+   re-checked with `wf:parity` and shown to the person.
+
+Template defaults that change a live site are improvements, not parity:
+check each before the first release and keep it off until approved. The
+scroll lock (`html.is-loading` in the head code and `src/styles.css`),
+the `theme-color` meta in the head code, the icon font in the bundle
+(`pnpm phosphor`), and the base CSS (`box-sizing`, the §01 type scaling)
+all show up in `wf:parity` if the live site didn't have them.
 
 ## Working rhythm
 

@@ -13,6 +13,81 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.6.0 — 2026-10-19
+
+Harvested from five client builds and the org's other repos.
+
+**Manual step for client repos, once:** run `pnpm update-skills`, then
+re-paste all three loader snippets (head code, Embed 2b, footer code) into
+Webflow and publish. Embed 2a is unchanged. The new starter modules and
+recipes are not copied by `update-skills`: copy `src/modules/aria-roles.ts`,
+`placeholders.ts` and `unique-form-ids.ts` if the site needs them.
+
+- **Loader.** On staging, 2b keeps the stylesheet 2a already fetched and
+  swaps in a cache-busted copy only after `load`. The second,
+  render-blocking request before first paint is gone; CLS on staging
+  went from ~0.18 to 0.005 on the site it came from. The footer loader
+  re-points the sheet only when the bundle comes from another origin.
+  The head code preconnects to the bundle's own origin instead of a fixed
+  jsDelivr pair. It also treats `*.canvas.webflow.com` (the Designer's
+  custom-code preview) as staging. New tests in
+  `environment-switcher.spec.mjs`.
+- **`pnpm wf:seo`:** checks every page in the sitemap (or crawled from
+  `pages`), on staging or `--live`. Fails on:
+  - a missing title, meta description or OG tag;
+  - not exactly one H1;
+  - JSON-LD that doesn't parse or contains an HTML entity (`&#39;`);
+  - with `--canonical`, a missing canonical.
+
+  Indexable pages only; it tells an empty tag (a blank CMS field) from a
+  missing one. Lists noindex pages; with `--live` they fail unless
+  `seo.noindexOk` allows them, and so does a noindex page listed in
+  `sitemap.xml`.
+- **`pnpm wf:install`:** compares the snippets Webflow publishes with
+  `loader.html`, ignoring `RELEASE` and the org and repo. Fails on drift, a
+  jsDelivr URL pinned to a version other than `RELEASE`, a
+  second viewport meta, duplicate Finsweet Attributes tags, or any request
+  to localhost.
+- **`pnpm wf:parity`** and a "Migrating a live site" section in
+  webflow-build: renders each page as published and again with the old
+  custom-code assets (`parity.oldAssets`) served from `dist/`, then
+  compares every element's computed style and box at each width. Reach
+  parity first, improve after. Adds a "Migration parity" gate in
+  `checklists.md`.
+- **Starter modules:**
+  - `aria-roles` (`data-aria-role`);
+  - `placeholders` (`data-placeholder`);
+  - `unique-form-ids` (radios and checkboxes in a CMS list publish the same
+    id; labels' `for` follows).
+
+  The conventions already described them, but the template didn't ship
+  them. Tested in `tests/modules.spec.mjs`.
+- **Video recipe (`recipes/video/`):** autoplay video that loads late,
+  plays only on screen, honours reduced motion and the visitor's pause,
+  and retries on the first tap after a refused autoplay. Also an optional
+  failed state, a WCAG 2.2.2 `data-video-toggle` button, and CSS that
+  hides Safari's Low Power Mode play glyph.
+- **Anchor-scroll recipe (`recipes/anchor-scroll/`):** replaces
+  webflow.js's `click.wf-scroll` so in-page links clear sticky and fixed
+  bars, with an optional Lenis instance.
+- **Prototype port per project:** `pnpm new-project` picks a port from the
+  slug (5200–5999) and writes it to `prototypeUrl` and the prototype's
+  `dev` script, which now uses `--strictPort`. Two clients' prototypes no
+  longer collide on 5173, and a busy port can't move silently.
+- **Lessons:** 33 new entries and 4 corrected ones. Topics include:
+  - Barba forms and head tags after a page change;
+  - pin order;
+  - `window.lenis`;
+  - iOS Low Power Mode video;
+  - CMS list and template limits through the API;
+  - page SEO tokens;
+  - bulk CSV import;
+  - variable modes and inherited text colour;
+  - duplicate ids;
+  - the two loader fixes above.
+
+  `figma.md` covers video fills and clipped layer screenshots.
+
 ## 0.5.1 — 2026-10-16
 
 - **Licensed MIT No Attribution (`LICENSE`).** Anyone may use, change,
