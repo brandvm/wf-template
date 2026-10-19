@@ -193,14 +193,14 @@ const dot = (alias) => (colorCombo.has(alias) ? `<div class="sg-dot"><div class=
   for (const s of typed) {
     const mode = s.variableModes.main[STYLES];
     const size = sizes(mode);
-    add('typography', row(s.name, s.selector, `${mode} role${size ? `. Size ${size}.` : ''}`, `<div class="${s.selector.slice(1)}">${sampleFor(mode)}</div>`));
+    add('typography', row(s.name, s.selector, `${mode} role${size ? `. Size ${size}.` : ''}`, `<div class="${s.selector.slice(1)}" data-sg-type="${esc(s.name)}">${sampleFor(mode)}</div>`));
   }
   // Native tags: what a heading, paragraph or link looks like with no class.
   const TAGS = [['h1', 'All H1 Headings'], ['h2', 'All H2 Headings'], ['h3', 'All H3 Headings'], ['h4', 'All H4 Headings'], ['h5', 'All H5 Headings'], ['h6', 'All H6 Headings'], ['p', 'All Paragraphs'], ['a', 'All Links']];
   const tagged = TAGS.filter(([t]) => S.some((x) => x.selector === t));
   for (const [t, label] of tagged) {
     const mode = S.find((x) => x.selector === t).variableModes?.main?.[STYLES];
-    add('typography', row(label, t, mode ? `Tag style · ${mode}` : 'Tag style', t === 'a' ? '<p>A paragraph with <a href="#typography">a link</a> in it.</p>' : `<${t}>${t === 'h1' || t === 'h2' ? 'The quick brown fox' : 'The quick brown fox jumps over the lazy dog'}</${t}>`));
+    add('typography', row(label, t, mode ? `Tag style · ${mode}` : 'Tag style', t === 'a' ? `<p>A paragraph with <a href="#typography" data-sg-type="${label}">a link</a> in it.</p>` : `<${t} data-sg-type="${label}">${t === 'h1' || t === 'h2' ? 'The quick brown fox' : 'The quick brown fox jumps over the lazy dog'}</${t}>`));
   }
   // Font features set on the Body tag style apply to all text: show what they change.
   const features = S.find((x) => x.selector === 'body')?.properties?.main?.['font-feature-settings'];

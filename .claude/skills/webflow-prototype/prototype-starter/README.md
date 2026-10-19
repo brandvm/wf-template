@@ -48,7 +48,7 @@ error instead of a silent move to the next one. Change both together.
 | `src/css/tokens.css`, `webflow.css` | **Generated** from the snapshot (`pnpm css`), or from the published CSS (`pnpm css:published`). Never edit |
 | `src/css/webflow-base.css` | Only with `pnpm css:published`: what Webflow ships itself (normalize, `w-*`, the site's `@font-face`), linked first in `partials/head.html` |
 | `scripts/published-css.mjs`, `scripts/lib.mjs` | Shared by the scripts: reading Webflow's published CSS; the repo config, the pages, the dev server and Playwright |
-| `.screens/` | Screenshots from `pnpm screens` and `pnpm check:states --shots` (not in git) |
+| `.screens/` | Screenshots from `pnpm screens` and `pnpm check:states --shots`, `type-metrics.json` from `pnpm measure:type --json` (not in git) |
 | `src/css/proposed.css` | Changes to existing variables and class bindings, as P1, P2… old → new |
 | `src/css/new-classes.css` | New classes, grouped by component (more files: `new-classes-*.css`) |
 | `src/css/prototype.css` | Stand-ins for what Webflow ships, and the tag styles; never moved. Element rules are in `:where()`, so a site's real tag styles in `webflow.css` win |
@@ -64,6 +64,7 @@ pnpm check:drift         # the snapshot matches what staging publishes (variable
 pnpm css:published [url] # no connector: CSS + snapshot from the CSS the site publishes (below)
 pnpm screens [/path]     # screenshots at the check widths; overflow and errors from 2560 to 360
 pnpm check:states [/path] # keyboard focus visible, no ring on mouse click, buttons have :active
+pnpm measure:type        # the style guide's type as rendered at 1440 and 390: size, line height, tracking, weight
 pnpm fig <file.fig>      # read a saved Figma file when there is no connector (skill › figma.md)
 pnpm classes             # new-classes*.css → CLASSES.md
 pnpm style-guide         # snapshot + CSS → design/style-guide/index.html

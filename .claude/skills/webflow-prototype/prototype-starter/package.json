@@ -15,6 +15,7 @@
     "css:published": "node scripts/css-from-published.mjs",
     "screens": "node scripts/screens.mjs",
     "check:states": "node scripts/check-states.mjs",
+    "measure:type": "node scripts/measure-type.mjs",
     "fig": "node scripts/fig.mjs"
   },
   "devDependencies": {

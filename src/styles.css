@@ -185,6 +185,16 @@ svg {
   vertical-align: middle;
 }
 
+/* The browser's own sheet gives <button> letter-spacing and word-spacing
+   `normal`, and `font: inherit` doesn't cover them, so text in a button
+   lost its parent's tracking. :where() keeps this at 0-0-0: a Designer
+   tag style for Button (0-0-1) or any class still wins. text-transform
+   is left alone: Webflow's normalize sets it at 0-0-1. */
+:where(button) {
+  letter-spacing: inherit;
+  word-spacing: inherit;
+}
+
 /* ============================================================
    03. WEBFLOW INTERNALS
    ============================================================ */

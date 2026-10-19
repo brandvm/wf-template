@@ -47,7 +47,7 @@ const DOWNLOAD = /\.(pdf|zip|docx?|xlsx?|pptx?|csv|mp4|mov)$/i;
 
 // ---------------------------------------------------------------------------
 // Default transition: fade the old page out, the new one in. Reduced motion
-// swaps at once. The old container is hidden, not removed: Barba removes it.
+// swaps at once. The old container is hidden here; afterEnter removes it.
 
 function leave(current: HTMLElement) {
   if (reducedMotion()) {
@@ -240,6 +240,9 @@ export function initTransition({ initPage, destroyPage, lenis, beforeLeave, afte
 
   barba.hooks.afterEnter((data) => {
     if (!isSwap(data)) return;
+    // Barba removes the old container only after afterEnter: until then a
+    // page module's document.querySelector finds the leaving page first.
+    data.current.container.remove();
     const next = data.next.container;
     const hash = pendingHash;
     pendingHash = '';

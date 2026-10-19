@@ -113,7 +113,10 @@ It builds on [smooth-scroll](../smooth-scroll/README.md) (`gsap.ts`,
   this every submit stays disabled). "Turnstile already has been loaded"
   in the console afterwards is harmless. IX3 has no public re-init: a
   site with page transitions moves its motion off IX3 (conventions.md §16).
-- **Page modules.** `pages.ts` runs them inside one `gsap.context`
+- **Page modules.** The old container is removed first: Barba removes it
+  only after `afterEnter`, and until then a module's
+  `document.querySelector` finds the leaving page's elements. `pages.ts`
+  runs the modules inside one `gsap.context`
   (reverting it kills their tweens, ScrollTriggers and `matchMedia`) and
   records the `window` and `document` listeners they add while starting.
   Then `ScrollTrigger.sort()` and `refresh()`: pins are measured in the

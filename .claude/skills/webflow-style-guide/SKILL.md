@@ -21,6 +21,10 @@ Its layout is fixed. A project supplies content, never layout:
   one element, or the layout has drifted.
 - [scripts/sections.mjs](scripts/sections.mjs) is the section list both
   scripts share.
+- Every typography specimen carries `data-sg-type` (its name), so the
+  prototype's `pnpm measure:type` can print the type as rendered at 1440
+  and 390 (size, line height, tracking, weight) to compare with the
+  design's type sheet before the classes go into Webflow.
 
 The shared rules apply (`webflow-build` › rules.md: Designer first, no
 commit or push without an OK), and in Webflow the build's own: a go-ahead
