@@ -164,7 +164,10 @@ refer to the project the lesson came from; Status is that project's.
   classes that set their own tracking are fine. A native-button reset in
   the Designer (designer.md, "Native `<button type="submit">` in Webflow
   forms") should include them.
-- Status: fixed in that project's prototype
+- Status: fixed in that project's prototype; template 0.7.1 §02 sets
+  `letter-spacing` and `word-spacing` to `inherit` on `:where(button)`
+  (zero specificity, so a Designer tag style or class still wins).
+  `text-transform` stays per class: normalize sets it at 0-0-1.
 - Found by: claude
 
 ### 2026-10-15 · A script-hidden overlay blocks the Designer canvas

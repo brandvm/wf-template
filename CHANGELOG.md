@@ -13,6 +13,33 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.7.1 — 2026-10-19
+
+A check of 0.6.0 and 0.7.0: every harvested source was confirmed committed
+(or, for the unversioned prototype folders, finished and documented), and
+every recipe was run in a browser against the real libraries (gsap 3.15,
+lenis 1.3, @barba/core 2.10), not only type-checked.
+
+**For client repos:** `pnpm update-skills`. Copy the `:where(button)` rule
+from §02 of `src/styles.css`, and `scripts/measure-type.mjs` plus its
+package script into `../prototype`, if wanted.
+
+- **Barba recipe fix:** Barba 2.10 removes the leaving container only
+  after `afterEnter`, so page modules started there bound the old page's
+  elements (and its ScrollTriggers). `afterEnter` now removes it first.
+  Navigation, head sync, current links, focus, `dataLayer`, teardown,
+  Webflow re-init, hash and `prevent` all checked in a browser.
+- **Removed:** the before/after report template added to webflow-audit in
+  0.7.0. Its source was an interim draft not yet committed in the project
+  it came from; the Close step is back to its 0.6.0 text.
+- **Starter CSS §02:** `:where(button)` inherits `letter-spacing` and
+  `word-spacing`. Text in a button no longer loses its parent's tracking.
+  A Designer tag style or class still wins: zero specificity.
+- **`pnpm measure:type`** (prototype): the style guide's type as rendered
+  at 1440 and 390 (size, line height, tracking, weight, case, family).
+  The style-guide generator now writes `data-sg-type` on each typography
+  specimen; the starter's style guide is regenerated with it.
+
 ## 0.7.0 — 2026-10-19
 
 Tier 2 and 3 of the 2026-10-19 harvest from client builds.
@@ -81,7 +108,8 @@ on `html` only): copy that rule if the repo still locks `body`.
   - an SEO plan section in webflow-launch;
   - the `data-manual-todo` marker for manual steps;
   - a looping background video section in `media.md`;
-  - a plain-language before/after report template in webflow-audit.
+  - a plain-language before/after report template in webflow-audit
+    (removed again in 0.7.1: its source was an interim draft).
 - **`wf:perf`:** extra Chrome flags from `WF_PERF_CHROME_FLAGS`.
 - **AGENTS.md:** `rename_variable` works; a create can come back suffixed.
 - **Lessons:** 15 new entries and 7 updated ones from seven more client
