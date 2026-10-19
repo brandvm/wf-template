@@ -33,7 +33,7 @@ const bad = old.find((o) => !['index.js', 'styles.css', ''].includes(o.file));
 if (bad) { console.error(`parity.oldAssets: "${bad.file}" is not "index.js", "styles.css" or "".`); process.exit(1); }
 const widths = values.width ? [cfg.widths.find(([w]) => w === Number(values.width)) ?? [Number(values.width), 900]] : cfg.widths;
 const settle = cfg.parity?.settle ?? 3000;
-const NOISE = new RegExp(`^(::(before|after))?(will-change${cfg.parity?.ignore ? '|' + cfg.parity.ignore : ''})$`);
+const NOISE = new RegExp(`^(::(before|after) )?(will-change${cfg.parity?.ignore ? '|' + cfg.parity.ignore : ''})$`);
 const dist = { 'index.js': fs.readFileSync(path.join(cfg.repoDir, 'dist/index.js')), 'styles.css': fs.readFileSync(path.join(cfg.repoDir, 'dist/styles.css')) };
 const dir = outDir('parity');
 
@@ -56,7 +56,7 @@ const snapshot = () => {
     for (const p of cs) st[p] = cs.getPropertyValue(p);
     for (const pseudo of ['::before', '::after']) {
       const ps = getComputedStyle(e, pseudo);
-      if (ps.content && ps.content !== 'none') for (const p of ps) st[pseudo + p] = ps.getPropertyValue(p);
+      if (ps.content && ps.content !== 'none') for (const p of ps) st[`${pseudo} ${p}`] = ps.getPropertyValue(p);
     }
     const r = e.getBoundingClientRect();
     const cls = typeof e.className === 'string' ? e.className : e.className?.baseVal ?? '';
@@ -89,7 +89,7 @@ async function render(url, size, swap) {
 // Custom properties keep their source text, so a minifier's `.5` for `0.5`
 // is not a rendering change; nor is `0%` for a zero length.
 const same = (k, a, c) => {
-  const n = (v) => { if (!v) return v; if (/(^|::(before|after))--/.test(k)) v = v.replace(/(^|[\s,(])0\.(\d)/g, '$1.$2'); return v === '0%' ? '0px' : v; };
+  const n = (v) => { if (!v) return v; if (/(^|::(before|after) )--/.test(k)) v = v.replace(/(^|[\s,(])0\.(\d)/g, '$1.$2'); return v === '0%' ? '0px' : v; };
   return n(a) === n(c);
 };
 
@@ -109,7 +109,12 @@ for (const route of paths(cfg, pos)) {
       const id = `${x.tag}${x.cls ? '.' + x.cls.split(/\s+/).join('.') : ''}`;
       if (x.tag !== y.tag || x.cls !== y.cls) { diffs.push(`#${i} ${id} → ${y.tag}${y.cls ? '.' + y.cls.split(/\s+/).join('.') : ''} (the element lists diverge here; later rows are shifted)`); break; }
       if (x.box.join() !== y.box.join()) diffs.push(`#${i} ${id} box ${x.box} → ${y.box}`);
+      // A pseudo-element on one side only is one difference, not one per
+      // property (an icon font's glyph is a ::before).
+      const gone = ['::before', '::after'].filter((ps) => (`${ps} content` in x.st) !== (`${ps} content` in y.st));
+      for (const ps of gone) diffs.push(`#${i} ${id} ${ps} ${`${ps} content` in x.st ? `removed (content ${x.st[`${ps} content`]})` : `added (content ${y.st[`${ps} content`]})`}`);
       for (const k of new Set([...Object.keys(x.st), ...Object.keys(y.st)])) {
+        if (gone.some((ps) => k.startsWith(ps + ' '))) continue;
         if (!NOISE.test(k) && !same(k, x.st[k], y.st[k])) diffs.push(`#${i} ${id} ${k}: ${x.st[k] ?? '(none)'} → ${y.st[k] ?? '(none)'}`);
       }
     }
@@ -121,8 +126,12 @@ for (const route of paths(cfg, pos)) {
     problems += diffs.length;
     report.push({ route, width: size[0], elements: a.snap.length, diffs });
     console.log(`\n${route} @${size[0]}: ${diffs.length ? `${diffs.length}${diffs.length >= 200 ? '+' : ''} difference${diffs.length === 1 ? '' : 's'} (${a.snap.length} elements)` : `no differences (${a.snap.length} elements)`}`);
-    for (const d of diffs.slice(0, 10)) console.log(`  ${d}`);
-    if (diffs.length > 10) console.log(`  … ${diffs.length - 10} more in report.json`);
+    // Ten lines, at most three per element, so one changed element doesn't
+    // hide the rest.
+    const per = {};
+    const shown = diffs.filter((d) => { const el = d.match(/^#\d+/)?.[0] ?? d; return (per[el] = (per[el] ?? 0) + 1) <= 3; }).slice(0, 10);
+    for (const d of shown) console.log(`  ${d}`);
+    if (diffs.length > shown.length) console.log(`  … ${diffs.length - shown.length} more in report.json`);
   }
 }
 await b.close();

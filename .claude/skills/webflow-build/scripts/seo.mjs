@@ -7,8 +7,9 @@
 // config. Staging by default; --live checks `liveUrl`, the custom domain.
 // Reported per page (exit 1 on any):
 //   - a page that doesn't answer 200;
-//   - no <title>, meta description, og:title, og:description or og:image;
-//   - not exactly one <h1>;
+//   - no <title>, meta description, og:title, og:description or og:image,
+//     or not exactly one <h1> (indexable pages only);
+//   - with --live, a noindex page listed in sitemap.xml (noted on staging);
 //   - a JSON-LD block that doesn't parse, has no @context or an item with
 //     no @type, or holds an HTML entity (Webflow writes &#39; for an
 //     apostrophe typed into a field bound inside a script);
@@ -36,6 +37,9 @@ const attr = (tag, name) => tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)
 const metaTag = (html, key, value) => [...html.matchAll(/<meta\b[^>]*>/gi)].map((m) => m[0]).find((t) => (attr(t, key) ?? '').toLowerCase() === value);
 const content = (html, key, value) => { const t = metaTag(html, key, value); return t ? attr(t, 'content') : null; };
 const decode = (s) => s.replace(/&#39;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+// "no" when the tag is missing, "empty" when it is there with no content
+// (on a CMS template: the field it is bound to is blank on that item).
+const missing = (html, key, value) => (metaTag(html, key, value) ? `empty ${value}` : `no ${value}`);
 const norm = (p) => p.replace(/\/$/, '') || '/';
 
 // Internal page links in served HTML (files and fragments left out).
@@ -71,22 +75,27 @@ async function discover() {
   return { source: `crawl from ${(cfg.pages ?? ['/']).join(', ')}`, paths: [...pages.keys()], pages };
 }
 
-function check(p, { status, html, error }) {
+function check(p, { status, html, error }, inSitemap) {
   const bad = [];
   const note = [];
   if (status !== 200) return { bad: [error ? `no answer (${error})` : `HTTP ${status}`], note, noindex: false };
+  const noindex = /noindex/i.test(content(html, 'name', 'robots') ?? '');
+  if (noindex && live && !matches(noindexOk, p)) bad.push('noindex (not in seo.noindexOk)');
+  // A noindex page in the sitemap asks search engines to index it and tells
+  // them not to (Search Console reports it as an error).
+  if (noindex && inSitemap) (live ? bad : note).push('noindex, but listed in sitemap.xml (exclude it in the page settings; plan-gated)');
+  // Search tags only matter on pages that can be indexed.
+  if (!noindex) {
   const titles = [...html.matchAll(/<title\b[^>]*>([\s\S]*?)<\/title>/gi)].map((m) => decode(m[1].trim()));
   if (titles.length !== 1 || !titles[0]) bad.push(titles.length > 1 ? `${titles.length} <title> tags` : 'no <title>');
   else if (titles[0].length > 60) note.push(`title is ${titles[0].length} characters`);
   const desc = content(html, 'name', 'description');
-  if (!desc) bad.push('no meta description');
+  if (!desc) bad.push(missing(html, 'name', 'description').replace('description', 'meta description'));
   else if (decode(desc).length < 50 || decode(desc).length > 160) note.push(`description is ${decode(desc).length} characters`);
-  for (const og of ['og:title', 'og:description', 'og:image']) if (!content(html, 'property', og)) bad.push(`no ${og}`);
+  for (const og of ['og:title', 'og:description', 'og:image']) if (!content(html, 'property', og)) bad.push(missing(html, 'property', og));
   const h1 = (html.match(/<h1\b/gi) ?? []).length;
   if (h1 !== 1) bad.push(`${h1} <h1>`);
-
-  const noindex = /noindex/i.test(content(html, 'name', 'robots') ?? '');
-  if (noindex && live && !matches(noindexOk, p)) bad.push('noindex (not in seo.noindexOk)');
+  }
 
   if (canonical) {
     const c = [...html.matchAll(/<link\b[^>]*\brel\s*=\s*"canonical"[^>]*>/gi)].map((m) => attr(m[0], 'href'));
@@ -113,7 +122,7 @@ console.log(`seo: ${found.paths.length} page${found.paths.length === 1 ? '' : 's
 let problems = 0;
 const noindexed = [];
 for (const p of [...found.paths].sort()) {
-  const r = check(p, found.pages.get(p) ?? (await get(base + p)));
+  const r = check(p, found.pages.get(p) ?? (await get(base + p)), found.source === 'sitemap.xml');
   if (r.noindex) noindexed.push(p + (matches(noindexOk, p) ? '' : live ? '' : '  (not in seo.noindexOk)'));
   problems += r.bad.length;
   if (r.bad.length || r.note.length) console.log(`\n${p}\n${[...r.bad.map((m) => `  ${m}`), ...r.note.map((m) => `  (note) ${m}`)].join('\n')}`);

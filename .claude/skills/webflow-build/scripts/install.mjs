@@ -9,6 +9,7 @@
 //     comments or whitespace, with RELEASE, the org/repo names and the
 //     2a ?v= number normalised, so a filled-in repo and a released
 //     install still match;
+//   - a jsDelivr URL pasted with a version other than RELEASE;
 //   - Embed 2a (id="wfc-css") missing, more than once, or in <head>;
 //   - more than one viewport meta (one from Webflow, one pasted);
 //   - more than one Finsweet Attributes script tag (one alone is noted:
@@ -36,6 +37,9 @@ const norm = (s) => s
   .replace(/var OWNER = "[^"]*"/g, 'var OWNER = "ORG"')
   .replace(/var SITE = "[^"]*"/g, 'var SITE = "REPO"')
   .replace(/https:\/\/[\w-]+\.github\.io\/[\w.-]+\//g, 'https://ORG.github.io/REPO/')
+  // A release pinned in a URL (an older 2a points at jsDelivr) is RELEASE
+  // by another name; whether it agrees with RELEASE is checked below.
+  .replace(/cdn\.jsdelivr\.net\/gh\/[\w.-]+\/[\w.-]+@[\w.-]+\//g, 'cdn.jsdelivr.net/gh/ORG/REPO@RELEASE/')
   .replace(/(styles\.css)\?v=\d+/g, '$1?v=N')
   .replace(/\s+/g, ' ')
   .replace(/> </g, '><')
@@ -72,6 +76,10 @@ for (const route of paths(cfg, pos)) {
     const missing = piece.tags.filter((t) => !installed.includes(t));
     if (missing.length) say(`${piece.name} differs from loader.html: ${missing.length} of ${piece.tags.length} tag${piece.tags.length === 1 ? '' : 's'} not found as written (first: ${missing[0].slice(0, 90)}…). Re-paste it from loader.html and publish.`);
   }
+  const release = served.match(/var RELEASE = "([^"]+)"/)?.[1];
+  const pinned = [...new Set([...served.matchAll(/cdn\.jsdelivr\.net\/gh\/[\w.-]+\/[\w.-]+@([\w.-]+)\//g)].map((m) => m[1]))];
+  const stray = pinned.filter((v) => v !== release);
+  if (stray.length) say(`a pasted jsDelivr URL pins ${stray.join(', ')} but RELEASE is ${release ?? 'null'}: the release lives in two places (lessons › "VER lives in two snippets"). Point 2a at staging as loader.html does.`);
   const head = served.split(/<\/head>/i)[0];
   const embeds = (served.match(/<link\b[^>]*\bid="wfc-css"[^>]*>/gi) ?? []).length;
   if (!embeds) say('Embed 2a (<link id="wfc-css">) is not on this page: the component holding Embeds 2a and 2b is missing here.');

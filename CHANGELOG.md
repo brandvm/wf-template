@@ -39,10 +39,13 @@ recipes are not copied by `update-skills`: copy `src/modules/aria-roles.ts`,
   - JSON-LD that doesn't parse or contains an HTML entity (`&#39;`);
   - with `--canonical`, a missing canonical.
 
-  Lists noindex pages; with `--live` they fail unless `seo.noindexOk`
-  allows them.
+  Indexable pages only; it tells an empty tag (a blank CMS field) from a
+  missing one. Lists noindex pages; with `--live` they fail unless
+  `seo.noindexOk` allows them, and so does a noindex page listed in
+  `sitemap.xml`.
 - **`pnpm wf:install`:** compares the snippets Webflow publishes with
   `loader.html`, ignoring `RELEASE` and the org and repo. Fails on drift, a
+  jsDelivr URL pinned to a version other than `RELEASE`, a
   second viewport meta, duplicate Finsweet Attributes tags, or any request
   to localhost.
 - **`pnpm wf:parity`** and a "Migrating a live site" section in
