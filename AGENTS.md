@@ -123,10 +123,10 @@ pnpm test     # build + Playwright checks + the new-project test
 pnpm new-project --client "<Client>" --slug <site> --org <org>   # once, after creating the repo
 pnpm wf:pass /   # webflow-build checks: wf:compare, wf:pass, wf:anchors, wf:outline,
                  # wf:film, wf:transitions, wf:a11y, wf:links, wf:baseline,
-                 # wf:html, wf:perf, wf:seo, wf:install, wf:parity;
+                 # wf:html, wf:perf, wf:seo, wf:install, wf:parity, wf:overflow;
                  # on the prototype: wf:preflight, wf:styles
 pnpm update-skills   # skills, build tooling and new scripts from the latest template release (ask first)
-pnpm phosphor regular bold   # icon font weights in the bundle (default: regular)
+pnpm phosphor regular bold   # icon font weights in the bundle (default: regular; --subset keeps only the icons used)
 ```
 
 Node 22 and the pinned pnpm in `package.json`. `dist/` is committed: after
@@ -146,8 +146,9 @@ Worked around, not fixed — do not rediscover these.
 - `custom_value` is rejected for Color and Size variables (`color-mix()`,
   `oklch()`, `calc()`). Create those through the variables JSON import with
   `valueType: "custom"`.
-- No variable rename or reorder within a collection. Rename in the Designer
-  (preserves ids and aliases; recreating does not).
+- No variable reorder within a collection. `rename_variable` works and
+  keeps ids and aliases (recreating does not); check the `name` in every
+  create result, which can come back suffixed ("-9").
 - The WHTML importer keeps classes that already exist, but drops the whole
   class list if any one is missing (create classes first, then re-check
   `styleNames`). It drops every `<img>` attribute and the asset link, turns

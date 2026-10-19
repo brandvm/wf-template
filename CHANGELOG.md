@@ -13,6 +13,91 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.7.0 — 2026-10-19
+
+Tier 2 and 3 of the 2026-10-19 harvest from client builds.
+
+**For client repos:** run `pnpm update-skills` (it brings `build.mjs`,
+`scripts/phosphor.mjs`, the `subset-font` devDependency and the new `wf:*`
+scripts; run `pnpm install` after). No loader snippet changed. An existing
+`../prototype` is a copy: take the new files from
+`.claude/skills/webflow-prototype/prototype-starter/scripts/` and its
+package.json scripts by hand. §04 of `src/styles.css` changed (scroll lock
+on `html` only): copy that rule if the repo still locks `body`.
+
+- **`pnpm wf:overflow`:** loads each page at 13 widths from 2560 to 360
+  (`overflow.widths`). Reports sideways scroll and every element whose
+  visible right edge passes the viewport, named by class chain. Skips
+  clipped content, off-canvas menus and hidden elements; `--why` lists
+  what was skipped, `overflow.ignore` adds selectors. Clean on two client
+  sites at all widths.
+- **`tests/loader.check.mjs`:** the loader pieces run in `node:vm` with no
+  browser: host detection, blocked storage, missing config, RELEASE null
+  or set, preconnect origin, fallbacks. Part of `pnpm test`.
+- **`pnpm phosphor --subset`:** keeps only the icons used (`src/**`,
+  `phosphor.icons`, `--icons`, or the published pages with
+  `--from <url>`). The font is cut to those glyphs with `subset-font`
+  (hundreds of bytes instead of ~150 KB) and inlined as a data URL. Names
+  that aren't icons are reported. The full font stays the default; a new
+  icon needs a re-run.
+- **`build.mjs`:**
+  - accepts `{ in, out }` entry points (the dev log no longer breaks);
+  - defines `__WFC_VERSION__` from `package.json`;
+  - writes `dist/version.json` (a content `hash`, and the version when
+    `package.json` has one; `--stamp` adds `commit` and `built`).
+- **Prototype:**
+  - `pnpm css:published` builds the CSS and a stand-in snapshot from a
+    site's published CSS when there is no connector (GET only, per-page CSS
+    merged), and lists what it can't recover;
+  - `pnpm screens` takes screenshots at the check widths and reports
+    overflow and errors from 2560 to 360;
+  - `pnpm check:states` checks keyboard focus, the mouse focus ring and the
+    pressed state of every control, with no selectors to list;
+  - `check-drift` shares the published-CSS parser;
+  - `check:style-guide` fails when a combo doesn't sit on one element.
+- **Recipes:**
+  - `barba`: page-transition skeleton. Syncs head and current links,
+    re-inits Turnstile and Webflow, announces the title and moves focus,
+    sends a GTM page view, and tears modules down per page with
+    `ScrollTrigger.sort()`.
+  - `smooth-scroll`: one shared GSAP + Lenis setup. Off under reduced
+    motion, handles nested scrollers, and passes the instance rather than
+    reading `window.lenis`.
+  - `modal`: portal, inert, focus trap, `#hash` openers, scroll lock on
+    `html` only.
+  - `snippets`: count-up, marquee, FAQ, CMS tabs, dropdown close,
+    resize-reload, page-loader backstop, IX3 fallback.
+
+  All are linked from webflow-build SKILL.md.
+- **conventions.md:**
+  - §16 Motion and Webflow interactions: CSS first, then a module; never
+    hide first-screen content waiting for JS; the IX3 fallback; the
+    page-loader failsafe.
+  - §17: an optional split stylesheet.
+- **Starter CSS:** the loading scroll lock is on `html` only. A locked
+  `body` became the scroll container and un-stuck sticky headers.
+- **Handoff and docs:**
+  - new `docs/handoff/REVIEW.md` and `SEO-PLAN.md`;
+  - an SEO plan section in webflow-launch;
+  - the `data-manual-todo` marker for manual steps;
+  - a looping background video section in `media.md`;
+  - a plain-language before/after report template in webflow-audit.
+- **`wf:perf`:** extra Chrome flags from `WF_PERF_CHROME_FLAGS`.
+- **AGENTS.md:** `rename_variable` works; a create can come back suffixed.
+- **Lessons:** 15 new entries and 7 updated ones from seven more client
+  builds. Topics include:
+  - WHTML imports: conditional visibility, section ids, new-tab links;
+  - links and nested link styles in CMS rich text;
+  - template JSON-LD;
+  - component variant classes;
+  - capped bleeds;
+  - Finsweet List counts and filters;
+  - scroll locks on `html` only;
+  - consent managers blocking the bundle;
+  - HubSpot CAPTCHA forms;
+  - WebGL before first paint;
+  - local Lighthouse network flags.
+
 ## 0.6.0 — 2026-10-19
 
 Harvested from five client builds and the org's other repos.

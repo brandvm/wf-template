@@ -13,7 +13,8 @@
 //   "prototypeDir": "../prototype",                 // optional: the prototype folder, for preflight and styles
 //   "liveUrl": "https://www.client.com",            // optional: the custom domain, for --live
 //   "seo": { "noindexOk": [], "noSchemaOk": [] },   // optional: path regexes wf:seo allows
-//   "parity": { "oldAssets": {} }                   // optional: wf:parity, old asset URL regex -> dist file
+//   "parity": { "oldAssets": {} },                  // optional: wf:parity, old asset URL regex -> dist file
+//   "overflow": { "widths": [], "ignore": [] }      // optional: wf:overflow width sweep and selectors to skip
 // }
 //
 // By default staging pages load this repo's local dist/ instead of the

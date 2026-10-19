@@ -356,3 +356,56 @@ refer to the project the lesson came from; Status is that project's.
   inside the panel itself.
 - Status: fixed in that project's repo
 - Found by: claude
+
+### 2026-10-08 · A consent manager blocks the dynamically inserted bundle
+- Area: js, loader
+- Symptom: behaviour from the bundle worked after cookie consent but
+  failed on another page or in a fresh browser before consent: the CSS
+  loaded, `index.js` was never requested.
+- Cause: the consent manager (Iubenda) blocks scripts it doesn't know are
+  essential, including ones created by another script. The site's old
+  script tags carried its exemption attribute (`data-cmp-ab="2"`); the
+  new footer loader didn't, so the whole bundle was treated as a
+  consent-dependent script.
+- Fix: mark the inline footer loader itself with the consent manager's
+  allow attribute (for Iubenda `data-cmp-ab="2"`), so scripts it creates
+  are exempt too, and set the same attribute on each script it appends.
+  When a site has a consent manager, test the bundle in a fresh private
+  window before consenting, on more than one page.
+- Status: fixed in that project's loader
+- Found by: codex
+
+### 2026-10-16 · HubSpot forms with CAPTCHA must use the embed
+- Area: js
+- Symptom: the plan was the designed Webflow form posting to HubSpot's
+  Forms API, but the client's form has CAPTCHA on, which the submit
+  endpoints refuse. The embed then rendered the themed form inside an
+  iframe, out of reach of page CSS, and changes made in `onFormReady`
+  (placeholders, a custom button) vanished.
+- Cause: themed HubSpot forms render in a same-origin, srcless iframe;
+  the form is a React app that re-renders after `onFormReady` and may
+  replace the form element it passed. HubSpot's theme selectors beat
+  plain class rules.
+- Fix: keep the HubSpot embed for any form with CAPTCHA. A module loads
+  it near the viewport, writes the design's CSS into the iframe (every
+  declaration `!important`, sizes relative to the iframe root), and
+  re-applies its DOM changes (placeholders from labels, a designed button
+  that clicks HubSpot's hidden submit, the reCAPTCHA disclosure) from a
+  MutationObserver, always on the live `form.hs-form`. Test with headless
+  Playwright: a hidden browser pane never fires IntersectionObserver.
+- Status: fixed in that project's repo
+- Found by: claude
+
+### 2026-10-12 · A WebGL context created before the first paint delays it
+- Area: js, perf
+- Symptom: Lighthouse mobile showed an observed first paint at 2.1 s with
+  0 ms blocking time; desktop was fine.
+- Cause: a hero shader created its WebGL context and compiled during
+  boot. Where the GPU is emulated (headless Chrome, lab tests) that work
+  holds back the first frame without showing as main-thread time.
+- Fix: a canvas on screen at load starts after `load`, two animation
+  frames and idle time, with a still image as the first paint; canvases
+  further down start near the viewport. Observed first paint went to
+  0.26 s.
+- Status: fixed in that project's repo
+- Found by: claude

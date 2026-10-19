@@ -20,7 +20,17 @@ variable picker. Gradients: Backgrounds → gradient, pick each stop from the
 variables.
 
 Letters run A, B, C… then AA, AB… and are never reused, so a letter
-mentioned in GOTCHAS or a commit stays unambiguous.
+mentioned in GOTCHAS or a commit stays unambiguous. The next free letter is
+also kept in `REVIEW.md` once the review phase starts.
+
+Rows that change something visible on a page also get a marker there, so
+the step is found on the canvas and nobody mistakes the unfinished state
+for the design: a small Caption next to the element (on the style guide,
+next to its specimen) with the attribute `data-manual-todo="<letter>"` and
+the text "Manual step <letter>: <what>". When the row is done, Claude
+removes the marker in the same batch that ticks the row. Before the build
+handoff and before launch, no `data-manual-todo` may be left on any
+published page (search the published HTML for it).
 
 Categories to expect on every build. Go through them at the start and
 again at each gate, so the steps are found early and not at the end:

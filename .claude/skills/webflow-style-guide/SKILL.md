@@ -17,7 +17,8 @@ Its layout is fixed. A project supplies content, never layout:
 - [scripts/gen-style-guide.mjs](scripts/gen-style-guide.mjs) writes the
   page from the Webflow snapshot, the CSS and the project's specimens.
 - [scripts/check-style-guide.mjs](scripts/check-style-guide.mjs) fails when
-  a class is missing from the page or the layout has drifted.
+  a class is missing from the page, a combo's classes never sit together on
+  one element, or the layout has drifted.
 - [scripts/sections.mjs](scripts/sections.mjs) is the section list both
   scripts share.
 
@@ -188,7 +189,8 @@ any other page. A go-ahead per batch.
 5. **Rows for components** are component instances, not copies of their
    markup.
 6. **Check on staging:** every class in the site appears on the published
-   page or in the shell; the sidebar highlights the section in
+   page or in the shell, and every combo on one element (a combo whose
+   classes only appear apart is still deleted by the cleanup); the sidebar highlights the section in
    view; `noindex` is in the head. Only then is **Clean up unused styles**
    safe.
 

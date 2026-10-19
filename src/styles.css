@@ -277,11 +277,10 @@ svg {
 
 /* The head bootstrap in loader.html adds .is-loading before first paint.
    src/index.ts removes it when the bundle boots; the head timeout provides
-   a fallback if the bundle cannot load. */
-html.is-loading,
-html.is-loading body {
+   a fallback if the bundle cannot load. Lock html only: a locked body
+   becomes the scroll container and un-sticks a sticky header. */
+html.is-loading {
   overflow: hidden;
-  height: 100%;
 }
 
 /* ============================================================

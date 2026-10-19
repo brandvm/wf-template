@@ -1,6 +1,10 @@
 export {};
 
 declare global {
+  // package.json's version (0.0.0 while it has none), replaced at build
+  // time by build.mjs. dist/version.json carries it when package.json has one.
+  const __WFC_VERSION__: string;
+
   interface Window {
     WFC?: {
       staging: boolean;

@@ -7,7 +7,9 @@ current during the build. Agents read it after `AGENTS.md` and `GOTCHAS.md`.
 ## Read first
 
 1. `AGENTS.md`, `GOTCHAS.md`, and the skill's `conventions.md`.
-2. This file, then `MANUAL-TODO.md` and `BUILD-NOTES.md` in this folder.
+2. This file, then `MANUAL-TODO.md` and `BUILD-NOTES.md` in this folder;
+   after the build handoff, `REVIEW.md` (feedback rounds until launch) and
+   `SEO-PLAN.md`.
 3. The approved design: <prototype folder and its URL, Figma file, or both>.
 
 ## Status

@@ -49,9 +49,10 @@ Every checklist item says who does it:
 
 1. Read the workspace `CLAUDE.md`, then this repo's `AGENTS.md` and
    `GOTCHAS.md`, then `docs/handoff/` (`HANDOFF.md`, `MANUAL-TODO.md`,
-   `BUILD-NOTES.md`). Skim [lessons/README.md](lessons/README.md) and read
-   the lesson file for today's area (MCP work: `lessons/mcp.md`). Never
-   repeat a mistake already logged.
+   `BUILD-NOTES.md`, and `REVIEW.md` once the review phase has started).
+   Skim [lessons/README.md](lessons/README.md) and read the lesson file
+   for today's area (MCP work: `lessons/mcp.md`). Never repeat a mistake
+   already logged.
 2. Read the project memory: where the last session stopped, open manual
    steps, open questions. Say in one line where things stand and what's
    next; ask which page or section if it isn't clear.
@@ -85,6 +86,14 @@ The shared rules are in [rules.md](rules.md). The build adds:
 - **After every Webflow write batch, say two things:** "reload the
   Designer" (an open Designer tab doesn't show MCP changes, and saving
   from a stale tab can overwrite them), and what is not published yet.
+- **Mark manual steps on the page.** A `MANUAL-TODO.md` row that leaves
+  something visibly unfinished (a value still missing, a binding not
+  made) gets a marker next to the element, or next to its specimen on the
+  style guide: a Caption with `data-manual-todo="<letter>"` and the text
+  "Manual step <letter>: <what>". It shows on the canvas and on staging,
+  so nobody reviews the unfinished state as the design. Remove it in the
+  batch that ticks the row; none may be left at the build handoff or at
+  launch (search the published HTML for `data-manual-todo`).
 
 ## The order of a build
 
@@ -104,7 +113,10 @@ Structure and names follow `conventions.md`. Each step is gated in
 8. components, built from the real page markup (never from style guide
    previews), each adding its style guide row → **Component done**;
 9. pages, section by section → **Page done**;
-10. the style guide final check, then **Build handoff**.
+10. the style guide final check, then **Build handoff**;
+11. the review phase: `docs/handoff/REVIEW.md` lists what is built per
+    page, each feedback round and what is left before launch, until the
+    `webflow-launch` skill takes over.
 
 A site duplicated from the starter already has the base of steps 1 to
 3 and the page shell; the project adds to it. Before each import run
@@ -195,6 +207,7 @@ pnpm wf:perf [/path…] [--runs 5] [--mobile|--desktop]            # Lighthouse,
 pnpm wf:seo [/path…] [--live] [--canonical]                      # sitemap crawl: titles, OG, one h1, JSON-LD, noindex
 pnpm wf:install [/path…] [--live]                                # installed snippets vs loader.html, localhost requests
 pnpm wf:parity [/path…] [--live] [--width W] [--control]         # migration: old custom code vs dist/, every element
+pnpm wf:overflow [/path…] [--live] [--width W[,W…]] [--why]     # what runs off the right edge, 2560 … 360
 ```
 
 Two more read the prototype's files, with no browser and no Webflow
@@ -251,6 +264,17 @@ Reading results:
   `--control` first: what differs between two renders of the published
   page is noise, for `parity.ignore`. Screenshot pairs are in
   `.webflow-build/parity/`.
+- `overflow`: each row is the first element of a chain whose visible
+  right edge passes the viewport, with the widths and the worst
+  overshoot; a page that scrolls sideways is its own finding. The sweep
+  covers the widths the three checks miss (1366, 1280, 1024, 992…), where
+  the fluid scale holds and fixed sizes stop fitting. Clipped content
+  (slider masks, marquees), off-canvas menus and hidden elements are
+  skipped; `--why` lists them, `overflow.ignore` adds selectors. A row
+  marked "moved by a transform" may be an animation's start state: check
+  it after the animation has played. Fixes are Designer fixes:
+  `minmax(0, 1fr)` columns, `min-width: 0` on flex and grid children,
+  wrapping instead of fixed widths.
 - `preflight`: **FIX** means change the prototype markup now (an empty
   span as a shape, a control outside a form, a valueless boolean, an inline
   style, a class in no CSS file). **PLAN** means the markup is right and
@@ -265,7 +289,7 @@ Reading results:
 Run `preflight` on a prototype page before it is approved and again before
 its import; `styles` before the first class batch and whenever
 `new-classes*.css` changes; `compare` per section while building; `pass`,
-`outline`, `anchors`, `a11y`, `links` and `html` when a page is done;
+`outline`, `anchors`, `a11y`, `links`, `html` and `overflow` when a page is done;
 `perf` at the build handoff and before and after any speed work;
 `install` after every paste of a loader piece; `seo` before launch; `load-film` after touching the hero or the loader;
 `transitions` after touching pages, links or modules. Check all three
@@ -293,8 +317,14 @@ handoff, review against the frame screenshots in `Assets/figma/`
   section's `.pin-spacer`; pause scroll snapping during the glide.
 - Never put `backdrop-filter`, `filter` or `transform` on a wrapper that
   holds `position: fixed` children.
-- Libraries are bundled, never Webflow script tags. Finsweet Attributes:
-  [recipes/finsweet/](recipes/finsweet/README.md).
+- Libraries are bundled, never Webflow script tags. Copy-in recipes:
+  [finsweet](recipes/finsweet/README.md) (Finsweet Attributes),
+  [phosphor](recipes/phosphor/README.md), [video](recipes/video/README.md),
+  [anchor-scroll](recipes/anchor-scroll/README.md),
+  [smooth-scroll](recipes/smooth-scroll/README.md) (GSAP + Lenis),
+  [barba](recipes/barba/README.md), [modal](recipes/modal/README.md),
+  [snippets](recipes/snippets/README.md) (count-up, marquee, FAQ, tabs,
+  dropdown close, resize reload, page-loader backstop, IX3 fallback).
 - Sizes follow the fluid scaling in `src/styles.css` §01: Webflow
   variables in em, the desktop frame set to the design before building.
 - Loader snippets aren't versioned: any `loader.html` change must be
@@ -337,6 +367,10 @@ all show up in `wf:parity` if the live site didn't have them.
 - **`docs/handoff/` stays current** during the session, not at the end:
   a decision goes into `HANDOFF.md` when it is made, a manual step into
   `MANUAL-TODO.md` when it is found.
+- **After the build handoff, review.** Fill in `docs/handoff/REVIEW.md`:
+  what is built per page, then one table per feedback round, the next
+  free `MANUAL-TODO.md` letter and the list of what has to happen before
+  launch.
 - **Lessons go back.** At wrap-up, offer every `template-candidate`
   lesson to the template ([rules.md](rules.md) › Contributing).
 

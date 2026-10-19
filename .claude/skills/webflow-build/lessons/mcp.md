@@ -513,6 +513,13 @@ refer to the project the lesson came from; Status is that project's.
   an existing asset in the Designer (Assets panel › Replace), which keeps
   its id and every usage, or bring images in through a CMS image field
   (next entry). Check `get_asset` size and variants after any upload.
+  Update 2026-10-14: on another project an API-uploaded image did render,
+  but with no `-p-500` … variants and no `srcset`, so phones downloaded
+  the full-size file (mobile Lighthouse lost two points). `set_attributes`
+  refuses `srcset` and `sizes` on an Image element ("An internal error
+  occurred") while accepting `loading` and `fetchpriority`. Pick the image
+  in the Designer (the variants are made then), or until then bind a file
+  sized for phones first.
 - Status: open
 - Found by: claude
 
@@ -562,16 +569,28 @@ refer to the project the lesson came from; Status is that project's.
 - Status: workaround confirmed
 - Found by: claude
 
-### 2026-10-13 · `id="forms"` is dropped; an element without an id can't be a link target
+### 2026-10-13 · The importer drops section ids and new-tab targets; an element without an id can't be a link target
 - Area: mcp
 - Symptom: a section imported with `id="forms"` came in with no id (twice),
   `set_attributes` `id` failed with "An internal error occurred", and
   `set_link` (type element) to that section failed the same way. Every
   other section kept its id and linked fine.
+  Update 2026-10-14: on another project a section imported with an
+  ordinary id (`id="location"`) also published without it, and links
+  imported with `target="_blank"` opened in the same tab.
 - Cause: Webflow refuses `forms` as an element id (most likely because it
   shadows `document.forms`); `set_link` needs the target to have an id.
+  The importer also drops some other ids for no visible reason, and turns
+  `target` and `rel` into custom attributes (next to a custom `href`)
+  instead of link settings.
 - Fix: use another id (`form-elements`). When `set_link` to an element
-  fails with an internal error, check the target's id first.
+  fails with an internal error, check the target's id first. After every
+  import, read back each section id and set missing ones with
+  `set_dom_id`; set new-tab links through `set_settings` key `link`
+  (`static_link` with `open_in_new_tab`) and remove the custom `href`,
+  `target` and `rel` attributes the importer left (for `rel`, see
+  "Unlinked instances lose conditional classes; link `rel` doesn't
+  publish").
 - Status: workaround confirmed
 - Found by: claude
 
@@ -796,7 +815,10 @@ refer to the project the lesson came from; Status is that project's.
   and render per item. A `"` typed into a CMS field breaks JSON-LD built
   from it (see designer.md, "CMS text bindings inside JSON-LD can break
   the schema"). In the Designer, page settings › "+ Add field" inserts the
-  same token; type plain text around it.
+  same token; type plain text around it. The page settings' own Schema
+  markup field on a CMS template can only be filled in the Designer (see
+  designer.md, "CMS text bindings inside JSON-LD can break the schema",
+  update 2026-10-16).
 - Status: workaround confirmed
 - Found by: claude
 
@@ -857,6 +879,11 @@ refer to the project the lesson came from; Status is that project's.
   element builder can't bind a CMS field at creation ("not inside a CMS
   context"): create, then bind. If a list refuses a query write once,
   stop and hand it to the Designer; later writes won't take.
+  Update 2026-10-15: on another project one page's list refused sort in
+  the Designer as well; a script that sorted the items from a bound
+  `data-order` was written, and removed again the same day when a person
+  rebuilt the list with a native sort. Report a refused native setting
+  as a Designer step first, before writing workaround code.
 - Status: workaround confirmed
 - Found by: claude
 
@@ -956,4 +983,87 @@ refer to the project the lesson came from; Status is that project's.
   needs the form's width, or it jumps sideways. Check by forcing each
   state, not by sending a form.
 - Status: done
+- Found by: claude
+
+### 2026-10-16 · Imported divs reject conditional visibility; a Collection List can't sit in a Link Block
+- Area: mcp
+- Symptom: on a CMS template, every Designer "Create conditional" on a div
+  that came from the WHTML importer failed with "[Conflict] The operation
+  could not be applied to the component map", on plain and reference
+  fields alike. Paragraphs from the same import, and divs made with
+  `data_element_builder`, took conditions fine. Separately, a nested
+  Collection List (a card's tags) was refused inside a whole-card Link
+  Block ("Collection List Wrapper can not be placed in a Link"), and
+  `set_text ""` on a paragraph after adding child spans wiped the spans.
+- Cause: unknown for the import (some state on imported Block elements;
+  see also "TextBlock builder makes an uneditable Block; WHTML drops fs-*
+  attributes"); the link rule is a Webflow constraint.
+- Fix: for every block that needs a condition, build a DivBlock with the
+  same classes before it (`data_element_builder`), `move_element` the
+  children in (bindings are kept), remove the imported div, then set the
+  condition in the Designer. Conditions on a reference's subfields work on
+  builder divs. A card that needs a nested list is a div card with an
+  absolute overlay Link Block (its `aria-label` bound to the item name).
+  Clear a paragraph's text before adding spans, never after. When
+  selecting in the Designer by script, check the breadcrumb before
+  applying a condition: the Navigator scrolls and a stale row selects the
+  wrong element.
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-09 · A variable create can come back suffixed; `rename_variable` works
+- Area: mcp
+- Symptom: in a batch of ~200 variable writes (all reported success, no
+  429 at 20 per call), `create_color_variable` "Group/Name 4" came back
+  named "Group/Name 4-9" (CSS `--…name-4-9`). No other live variable had
+  that name.
+- Cause: unconfirmed; most likely a deleted variable of the starter still
+  holds the name. Webflow suffixes silently and reports success.
+- Fix: check the `name` in every create result, and rename any suffixed
+  one: `rename_variable` now works through the MCP (ids and aliases kept;
+  the CSS name follows), so AGENTS.md › Webflow MCP limits "No variable
+  rename" is out of date. Also seen: a variable created in a collection
+  with modes takes its base value in every mode (no gaps on read-back), so
+  only the modes that differ need a write; an update without `mode_id`
+  writes Base only, so a value that must hold at every breakpoint is one
+  write per mode.
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-15 · Links in CMS copy: RichText companion fields; nested link styles are Designer-only
+- Area: mcp
+- Symptom: final copy added ~180 links inside running text, but most of it
+  sat in PlainText fields, which can't hold a link. Once the links were in,
+  they were invisible (global links are plain: inherited colour, no
+  underline), and the style API couldn't write a `.copy-class a` rule.
+- Cause: a field's type can't be changed, and a Paragraph can't bind to a
+  RichText field. Nested ("When nested inside of") styles aren't in the
+  API, and a bound RichText in the Designer has no child link to select.
+- Fix:
+  - add a RichText companion field per PlainText field ("Intro Rich"),
+    fill it (the linked version where the text has links, the plain text
+    wrapped in `<p>` otherwise), then in the template build a `RichText`
+    element next to the paragraph with the same classes
+    (`data_element_builder`), bind `richText` to the new field
+    (`set_settings`) and remove the paragraph. Keep the PlainText fields
+    filled: "is set" visibility conditions still read them. A RichText
+    built through the API starts with Webflow's sample content; the
+    binding replaces it on publish;
+  - static text with a link: rebuild the paragraph with the WHTML builder
+    (`<p>… <a href>…</a> …</p>`), then remove the custom `href` attribute
+    the importer adds to the link;
+  - link style: build a temporary **unbound** RichText with the same
+    classes through the API (its sample content has links), select a link
+    in it in the Designer, selector › All Links › "Nest selector inside
+    of", set the styles, then remove the temporary block: the nested
+    style stays. Point the sample link away from the current page, or the
+    selector picks up a Current state. Bind colours with the variable dot:
+    a colour typed into the Custom value editor published as
+    `color: @var_variable-…` (invalid CSS). After publishing, grep the
+    CSS for `@var_`. Plain Link elements in a paragraph can take a class
+    instead, which the API can write (`text-decoration-thickness`,
+    `text-underline-offset`, `text-decoration-color`);
+  - transitions: Effects › Transitions in the Designer; `transition` can't
+    be entered under Custom properties.
+- Status: workaround confirmed
 - Found by: claude
