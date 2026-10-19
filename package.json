@@ -25,7 +25,10 @@
     "wf:preflight": "node .claude/skills/webflow-build/scripts/preflight.mjs",
     "wf:styles": "node .claude/skills/webflow-build/scripts/styles.mjs",
     "wf:html": "node .claude/skills/webflow-build/scripts/html.mjs",
-    "wf:perf": "node .claude/skills/webflow-build/scripts/perf.mjs"
+    "wf:perf": "node .claude/skills/webflow-build/scripts/perf.mjs",
+    "wf:seo": "node .claude/skills/webflow-build/scripts/seo.mjs",
+    "wf:install": "node .claude/skills/webflow-build/scripts/install.mjs",
+    "wf:parity": "node .claude/skills/webflow-build/scripts/parity.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

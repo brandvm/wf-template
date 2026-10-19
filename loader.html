@@ -45,11 +45,6 @@ published.
 ------------------------------------------------------------ -->
 <meta name="theme-color" content="#000000" />
 
-<!-- Two lines on purpose: a stylesheet fetch and its font fetches are
-     CORS-different and open separate connections. -->
-<link rel="preconnect" href="https://cdn.jsdelivr.net" />
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-
 <script>
   (function () {
     var RELEASE = null; // the release tag, e.g. "1.0.0" — the only version string
@@ -57,7 +52,9 @@ published.
     var SITE = "REPO"; // this repo's name
     var STAG = "https://" + OWNER + ".github.io/" + SITE + "/";
     var DEV = "http://localhost:3000/";
-    var staging = /\.webflow\.io$/.test(location.hostname);
+    // *.canvas.webflow.com is the Designer's custom-code preview: a separate
+    // origin, with its own URL flag and localStorage.
+    var staging = /\.webflow\.io$|\.canvas\.webflow\.com$/.test(location.hostname);
     var q = new URLSearchParams(location.search);
     var flag = staging && q.get("wfc-dev") === "1";
     try {
@@ -69,6 +66,19 @@ published.
       : STAG;
     if (!staging && !RELEASE)
       console.error("[wfc] RELEASE is not set in head code; serving the staging bundle. Tag a release and set RELEASE before launch.");
+    // Warm the connection to wherever the bundle comes from (GitHub Pages
+    // on staging, jsDelivr with a RELEASE, localhost in dev mode). A fixed
+    // jsDelivr preconnect went unused on staging and before the first
+    // release. Two links on purpose: the stylesheet and its font fetches
+    // are CORS-different and open separate connections.
+    var origin = new URL(flag ? DEV : staging ? STAG : prod).origin;
+    [false, true].forEach(function (cors) {
+      var warm = document.createElement("link");
+      warm.rel = "preconnect";
+      warm.href = origin;
+      if (cors) warm.crossOrigin = "";
+      document.head.appendChild(warm);
+    });
     // Shared config — the Embed, the footer loader and the bundle read this.
     window.WFC = {
       staging: staging, dev: flag, devBase: DEV, stag: STAG,
@@ -107,10 +117,10 @@ published.
    code the canvas would show blank boxes where every icon should be.
 
    The canvas shows the STAGING stylesheet: push, wait ~1 min, reload
-   the Designer tab. Everywhere else the 2b script swaps in the right
-   sheet (pinned tag on prod, cache-busted staging on webflow.io) without
-   an unstyled gap, and adds the localhost sheet only when the dev flag
-   is on.
+   the Designer tab. On published pages the 2b script swaps in the
+   pinned tag on prod without an unstyled gap; on webflow.io it keeps the
+   sheet the parser already fetched and swaps in a cache-busted copy only
+   after `load`. It adds the localhost sheet only when the dev flag is on.
 
    There is deliberately no static localhost <link> here. It used to
    let the canvas show unsaved local CSS, but every public visitor's
@@ -179,7 +189,16 @@ published.
       };
       cur.parentNode.insertBefore(next, cur.nextSibling);
     };
-    C.setCSS(C.staging ? C.stag + "styles.css?v=" + Date.now() : C.prod + "styles.css");
+    if (!C.staging && C.prod !== C.stag) C.setCSS(C.prod + "styles.css");
+    else
+      // Staging (webflow.io, or a domain before the first release): keep the
+      // sheet from 2a. Swapping before first paint fetched it a second time,
+      // render-blocking, and shifted the layout when it arrived. GitHub
+      // Pages caches ~10 min, so a cache-busted copy follows after `load`,
+      // unless dev mode or a fallback has taken the bundle elsewhere.
+      window.addEventListener("load", function () {
+        if (C.source === C.stag) C.setCSS(C.stag + "styles.css?v=" + Date.now());
+      });
     if (C.dev && !document.getElementById("wfc-css-dev")) {
       var dev = document.createElement("link");
       dev.id = "wfc-css-dev";
@@ -217,9 +236,12 @@ Rollback = set RELEASE in piece 1 back to the previous tag and publish.
         if (devCSS) devCSS.remove();
         var baseCSS = document.getElementById("wfc-css");
         var cssURL = C.source + "styles.css" + new URL(src).search;
-        // setCSS (piece 2b) swaps without an unstyled gap and skips an
-        // unchanged URL; fall back to a plain href if 2b is an older copy.
-        if (C.setCSS) C.setCSS(cssURL);
+        // Re-point the sheet only when it comes from somewhere else (a
+        // fallback), so CSS and JS match: staging keeps the sheet 2b left.
+        // setCSS (piece 2b) swaps without an unstyled gap; fall back to a
+        // plain href if 2b is an older copy.
+        if (baseCSS && baseCSS.href.indexOf(C.source) === 0) { /* already there */ }
+        else if (C.setCSS) C.setCSS(cssURL);
         else if (baseCSS) baseCSS.href = cssURL;
       }
       var s = document.createElement("script");

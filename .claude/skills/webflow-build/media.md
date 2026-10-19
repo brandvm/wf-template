@@ -53,7 +53,10 @@ need it either.
    than the MP4.
 6. **Check** on staging, at desktop and phone width: each video plays, the
    poster shows first, nothing is requested from the media page itself, and
-   reduced motion is respected (the module pauses it or the poster stays).
+   reduced motion is respected (the poster stays). The playback behaviour
+   (late loading, on-screen only, reduced motion, the pause button,
+   refused autoplay) comes from the video recipe:
+   [recipes/video/](recipes/video/README.md).
 
 ## Rules
 

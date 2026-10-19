@@ -94,6 +94,9 @@ test('sets up the workspace around the repo', { skip }, () => {
   assert.equal(fs.readFileSync(path.join(ws, '.mcp.json'), 'utf8'), '{"keep":true}', 'existing files are kept');
   assert.ok(fs.existsSync(path.join(ws, '.claude/skills/webflow-build/SKILL.md')), 'skills reachable from the workspace');
   assert.ok(fs.existsSync(path.join(ws, 'prototype/package.json')), 'prototype copied');
+  const port = new URL(JSON.parse(fs.readFileSync(path.join(dir, 'webflow-build.config.json'), 'utf8')).prototypeUrl).port;
+  assert.match(port, /^5[2-9]\d\d$/, 'a per-project prototype port');
+  assert.match(fs.readFileSync(path.join(ws, 'prototype/package.json'), 'utf8'), new RegExp(`--port ${port} --strictPort`), 'prototype dev script uses the same port');
   assert.ok(fs.statSync(path.join(ws, 'Assets/figma')).isDirectory());
 });
 

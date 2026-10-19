@@ -1,7 +1,10 @@
 // Entry point. Keep this file a manifest: one run() call per module.
 // Feature code lives in src/modules/<name>.ts and exports an init
 // function that no-ops when its selector is absent from the page.
+import { initAriaRoles } from './modules/aria-roles';
 import { initEnvironmentSwitcher } from './modules/environment-switcher';
+import { initPlaceholders } from './modules/placeholders';
+import { initUniqueFormIds } from './modules/unique-form-ids';
 
 // Each module runs in isolation: one that throws is logged and skipped,
 // and every module after it still initializes.
@@ -21,6 +24,10 @@ function boot() {
   document.documentElement.classList.remove('is-loading');
 
   run('environment-switcher', initEnvironmentSwitcher);
+  // Starter fixes for markup Webflow publishes (conventions.md §9–11).
+  run('aria-roles', initAriaRoles);
+  run('placeholders', initPlaceholders);
+  run('unique-form-ids', initUniqueFormIds);
   // Add project feature initializers here: run('<name>', init<Name>);
 }
 
