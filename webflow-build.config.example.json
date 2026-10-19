@@ -11,6 +11,11 @@
     "noSchemaOk": ["^/(privacy-policy|terms|404)$"],
     "maxPages": 500
   },
+  "overflow": {
+    "widths": [2560, 1920, 1440, 1366, 1280, 1024, 992, 820, 768, 600, 480, 390, 360],
+    "ignore": [".marquee", "[data-overflow-ok]"],
+    "tolerance": 1
+  },
   "parity": {
     "oldAssets": {
       "<old-host>/.+\\.css(\\?|$)": "styles.css",

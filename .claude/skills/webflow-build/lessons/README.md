@@ -6,11 +6,11 @@ of them every session.
 
 | File | Covers | Entries |
 | --- | --- | --- |
-| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 56 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 22 |
-| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 12 |
-| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 19 |
-| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 12 |
+| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 59 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 27 |
+| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 14 |
+| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 22 |
+| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 13 |
 
 ## Titles
 
@@ -49,7 +49,7 @@ of them every session.
 - CMS image fields re-host an image from a public URL
 - A box-shadow with a variable can't be set through the API
 - WHTML import with `css` creates the classes too
-- `id="forms"` is dropped; an element without an id can't be a link target
+- The importer drops section ids and new-tab targets; an element without an id can't be a link target
 - No reorder for variables: swap names and values instead
 - A collection's modes do nothing until a style sets them
 - The Current state can be written, but only on a new class
@@ -72,6 +72,9 @@ of them every session.
 - Bulk rich-text content: the Designer's CSV import, not the API
 - Nested Collection Lists: Show defaults to 5, and the source shape
 - Custom form messages: build inside the component, keep display off the class
+- Imported divs reject conditional visibility; a Collection List can't sit in a Link Block
+- A variable create can come back suffixed; `rename_variable` works
+- Links in CMS copy: RichText companion fields; nested link styles are Designer-only
 
 **Designer and canvas** ([designer.md](designer.md))
 
@@ -97,6 +100,11 @@ of them every session.
 - Duplicate ids in CMS lists and component instances
 - Typography classes nest in em
 - A Link Block's `max-width: 100%` caps a negative-margin bleed
+- A variant's class is compound per element; a border with no colour fades from currentColor
+- Empty slots take cut and paste; date formats and "exclude current item" in the Designer
+- A capped bleed sticks to the left on wide screens; Finsweet's filtered count is `results-count`
+- An IX3 entrance's hidden start state has no fallback
+- A page loader with no exit except a Webflow interaction
 
 **Repo CSS** ([css.md](css.md))
 
@@ -112,6 +120,8 @@ of them every session.
 - Prototype stand-ins override an existing site's tag styles
 - `<button>` drops the inherited letter-spacing
 - A script-hidden overlay blocks the Designer canvas
+- A scroll lock belongs on `html` only: locking `body` un-sticks the header
+- Finsweet filters: style `.is-list-active`, and the operator is `contain`
 
 **JavaScript modules** ([js.md](js.md))
 
@@ -134,10 +144,14 @@ of them every session.
 - Webflow's anchor scroll ignores a sticky header
 - `window.lenis` is a version marker, not the instance
 - GSAP `.from()` animates to the current value: items stranded at 0
+- A consent manager blocks the dynamically inserted bundle
+- HubSpot forms with CAPTCHA must use the embed
+- A WebGL context created before the first paint delays it
 
 **Loader, release and CI** ([loader-release-ci.md](loader-release-ci.md))
 
 - Filling in REPO in loader.html breaks the browser tests
+- Local Lighthouse adds a second to some hosts on some networks
 - Staging fetched its stylesheet twice before first paint
 - The Designer's custom-code preview isn't staging
 - Swapping the stylesheet href in 2b causes a full-page layout shift

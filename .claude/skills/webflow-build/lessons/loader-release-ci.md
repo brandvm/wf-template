@@ -24,6 +24,23 @@ refer to the project the lesson came from; Status is that project's.
 
 <!-- Add new entries here, newest first. -->
 
+### 2026-10-13 · Local Lighthouse adds a second to some hosts on some networks
+- Area: ci, perf
+- Symptom: every local Lighthouse run showed the staging stylesheet and
+  Webflow's jQuery taking ~1.1 s each, which put mobile at 82 for a page
+  that scored 96 elsewhere. `curl` and Playwright fetched the same files
+  in 70 ms.
+- Cause: the newer DNS and connection path in the Chrome that Lighthouse
+  launches, on that network; not the site.
+- Fix: run local Lighthouse with
+  `--chrome-flags="--headless=new --disable-features=HappyEyeballsV3,AsyncDns"`
+  (`wf:perf` passes them from `WF_PERF_CHROME_FLAGS`), and check
+  the request list for a host that is slow only there before believing a
+  score. The keyless PageSpeed API quota is usually spent; the PageSpeed
+  website is the reference.
+- Status: workaround confirmed
+- Found by: claude
+
 ### 2026-10-16 · Staging fetched its stylesheet twice before first paint
 - Area: loader, perf
 - Symptom: on `*.webflow.io`, `styles.css` was requested twice before

@@ -57,12 +57,28 @@ for (const f of cssFiles) {
       sel = sel.trim().replace(/^[a-z]+(?=\.)/, '');
       const m = sel.match(/^((?:\.[a-z][\w-]*)+)/);
       if (m && !chains.has(m[1])) chains.set(m[1], m[1].slice(1).split('.'));
+      // A combo later in the selector (`.list .card.is-small`) is a style too.
+      for (const compound of sel.replace(/:(?:not|where|is|has)\([^)]*\)/g, '').split(/\s*[>+~]\s*|\s+/).slice(1)) {
+        const cs = [...new Set([...compound.matchAll(/\.([a-z][\w-]*)/g)].map((x) => x[1]).filter((c) => !/^w--|^w-variant-/.test(c)))];
+        if (cs.length > 1 && !chains.has(`.${cs.join('.')}`)) chains.set(`.${cs.join('.')}`, cs);
+      }
     }
   }
 }
 const hasClass = (c) => chains.has(`.${c}`);
 const used = new Set();
-const useMarkup = (html) => { for (const [, list] of html.matchAll(/\bclass="([^"]*)"/g)) for (const c of list.split(/\s+/)) if (c) used.add(c); return html; };
+// Class lists as they sit on elements: a combo counts as shown only when
+// all its classes are on one element (check-style-guide checks the same).
+const usedSets = [];
+const useMarkup = (html) => {
+  for (const [, list] of html.matchAll(/\bclass="([^"]*)"/g)) {
+    const set = new Set(list.split(/\s+/).filter(Boolean));
+    usedSets.push(set);
+    for (const c of set) used.add(c);
+  }
+  return html;
+};
+const shown = (cls) => (cls.length === 1 ? used.has(cls[0]) : usedSets.some((set) => cls.every((c) => set.has(c))));
 // Names as the Designer shows them: the snapshot's name, else words.
 const words = (c) => c.split('-').filter(Boolean).map((w) => (w.length === 1 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1))).join(' ');
 const nameOf = (sel) => {
@@ -329,7 +345,7 @@ ${stats.map(([n, l]) => `                  <div class="sg-stat"><div class="sg-s
 useMarkup(expand('<!-- @include partials/nav.html --><!-- @include partials/footer.html -->'));
 for (const html of sections.values()) html.forEach(useMarkup);
 ['g-page-w', 'g-main-w'].forEach((c) => used.add(c));
-const left = [...chains].filter(([, cls]) => !cls.every((c) => used.has(c)) && !cls[0].startsWith('sg-'));
+const left = [...chains].filter(([, cls]) => !shown(cls) && !cls[0].startsWith('sg-'));
 if (left.length) {
   add('other-classes', row('Kept for cleanup', '', `${left.length} class${left.length === 1 ? '' : 'es'} or combo${left.length === 1 ? '' : 's'} not shown above. Each is applied here so Webflow's “Clean up unused styles” can't delete it.`, `
                 <div class="sg-tiles">

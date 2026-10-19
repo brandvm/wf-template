@@ -199,8 +199,8 @@ src/
 build.mjs             esbuild config and dev server
 loader.html           the three Webflow snippets, documented
 scripts/              new-project setup and the repo checks
-tests/                Playwright checks and the new-project test
-docs/handoff/         HANDOFF, MANUAL-TODO and BUILD-NOTES for this project
+tests/                Playwright checks, the loader (node:vm) and new-project tests
+docs/handoff/         HANDOFF, MANUAL-TODO, BUILD-NOTES, REVIEW and SEO-PLAN for this project
 .claude/skills/       webflow-prototype (project setup, inputs, the
                       localhost prototype and its starter, Figma),
                       webflow-build (the Webflow build: checklists,

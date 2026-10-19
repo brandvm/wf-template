@@ -8,7 +8,7 @@
     "dev": "node build.mjs --dev",
     "build": "node build.mjs",
     "check": "tsc --noEmit && node scripts/check-repo.mjs",
-    "test": "pnpm build && playwright test && node --test tests/new-project.check.mjs tests/update-skills.check.mjs",
+    "test": "pnpm build && playwright test && node --test tests/new-project.check.mjs tests/update-skills.check.mjs tests/loader.check.mjs",
     "new-project": "node scripts/new-project.mjs",
     "update-skills": "node scripts/update-skills.mjs",
     "harvest": "node scripts/harvest.mjs",
@@ -28,12 +28,14 @@
     "wf:perf": "node .claude/skills/webflow-build/scripts/perf.mjs",
     "wf:seo": "node .claude/skills/webflow-build/scripts/seo.mjs",
     "wf:install": "node .claude/skills/webflow-build/scripts/install.mjs",
-    "wf:parity": "node .claude/skills/webflow-build/scripts/parity.mjs"
+    "wf:parity": "node .claude/skills/webflow-build/scripts/parity.mjs",
+    "wf:overflow": "node .claude/skills/webflow-build/scripts/overflow.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "axe-core": "4.10.3",
     "esbuild": "^0.28.2",
+    "subset-font": "2.9.0",
     "typescript": "^7.0.2"
   }
 }

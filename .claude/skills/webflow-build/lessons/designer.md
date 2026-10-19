@@ -16,6 +16,25 @@ refer to the project the lesson came from; Status is that project's.
   (valid JSON, wrong text).
 - Fix: bind only single-line fields (name, slug, dates, image) in JSON-LD;
   validate every CMS page after a schema change, not a sample.
+  Update 2026-10-16: on a template, schema with field tokens can only be
+  set in the Designer. `bulk_update_pages_schema_markup` (and
+  `jsonLdSchema`) accept only valid JSON and re-serialise it; Webflow's
+  token
+  `{{wf {&quot;path&quot;:&quot;name&quot;,&quot;type&quot;:&quot;PlainText&quot;\} }}`
+  isn't valid JSON, every escaped form the API takes comes out wrong, and
+  each bound value publishes empty (`"name": ""`). The API is fine for
+  static pages. On a template: page settings › Schema markup, type the
+  whole block as raw text with the tokens in that form (types
+  `PlainText`, `ImageRef`, `Date` → ISO, `Link`; reference subfields as
+  `ref-field:name`); the editor turns each token into a chip. Start with
+  `<script type="application/ld+json">` (without it the JSON publishes as
+  bare text in the head) and don't type `</script>`: the editor adds it,
+  and a typed one doubles it. Escape closes the panel and loses unsaved
+  text. The result reads back through the API as `rawJsonLdSchema`. Use ’
+  rather than `'` in fields that feed it. A template's Open Graph image
+  (a collection image field) is a Designer setting too. Head code with
+  `set_page_freeform_code` also works (mcp.md, "Page SEO through the API:
+  what sticks and where").
 - Status: open (Webflow behaviour)
 - Found by: claude
 
@@ -350,3 +369,98 @@ refer to the project the lesson came from; Status is that project's.
   max-width first.
 - Status: fixed in that project's Webflow styles
 - Found by: claude
+
+### 2026-10-15 · A variant's class is compound per element; a border with no colour fades from currentColor
+- Area: designer
+- Symptom: adding a component variant's class to the nav wrapper on
+  scroll (to switch it to its light variant) turned the bar light but left
+  its links white. Then the variant's new bottom border flashed dark
+  before fading to light grey.
+- Cause: Webflow puts the variant's `w-variant-<id>` class on every
+  element the variant styles and publishes compound selectors
+  (`.nav-link.w-variant-…`), not descendant ones, so the class on the
+  wrapper reaches only the wrapper (see also mcp.md, "Variant overrides
+  on a combo element never apply"). A border with no colour set is
+  `currentColor`, so `transition: border-color` animates from the text
+  colour.
+- Fix: the module adds the class to the wrapper and, when the wrapper
+  opts in with an attribute, to every element inside it; the class name
+  comes from a `data-*` attribute set in Webflow, not from the code. The
+  base style sets `border-bottom: 1px solid transparent`, so the variant's
+  border fades in from transparent. Give any border that a state or
+  variant adds a transparent colour in the base.
+- Status: fixed in that project
+- Found by: human
+
+### 2026-10-14 · Empty slots take cut and paste; date formats and "exclude current item" in the Designer
+- Area: designer
+- Symptom / cause / fix:
+  - the API can't insert into an empty component slot (see mcp.md,
+    "Slots: the MCP can work beside a plain element, never start one"),
+    and dragging an element onto the slot's Navigator row is refused
+    ("can't be dragged into component instances outside of slots").
+    Select the element, Cmd+X, select the slot's row in the Navigator,
+    Cmd+V: it lands in the slot. Build template content in a wrapper at
+    body level, then cut and paste it in;
+  - the date format menu of a CMS text binding is a custom list whose
+    options often miss a click (also from automation): open it and use
+    ArrowDown + Enter, then read the text back;
+  - "exclude current item" is a list filter: field = the collection's
+    own item reference, condition "is not", value Current item. It
+    defaults to "is"; re-open the filter and check before closing;
+  - template SEO title and description: page settings › "+ Add field"
+    inserts a field token; type plain text around it.
+- Status: workaround confirmed
+- Found by: claude
+
+### 2026-10-15 · A capped bleed sticks to the left on wide screens; Finsweet's filtered count is `results-count`
+- Area: designer
+- Symptom: (1) on 2000px+ screens a hero panel with a max-width and
+  negative side margins (a bleed past the rails) sat against the left
+  edge with a wide gap on the right. A device check at fixed widths that
+  looked only for overflow didn't catch it. (2) A "Showing N items" count
+  stayed at the total with a filter on.
+- Cause: (1) once the parent is wider than the cap, nothing centres the
+  panel: the negative left margin still applies and the right side takes
+  the slack. (2) In Finsweet List v2 `fs-list-element="items-count"` is
+  the total; the filtered number is `results-count`.
+- Fix: (1) margin-left and margin-right
+  `max(-1.875em, calc((100% - 105em) / 2))` (bleed and cap as values):
+  the bleed below the cap, centred above it. The API accepts the value
+  and the Designer keeps it. Any capped element with negative margins
+  needs the same (and a Link Block also needs `max-width: none`, see "A
+  Link Block's `max-width: 100%` caps a negative-margin bleed"). Check
+  wide screens by comparing an element's left and right gaps, not only
+  overflow. (2) `results-count` on the count element (`recipes/finsweet/`);
+  style the count for every state of its chip, not only the active one.
+- Status: fixed in that project's Webflow styles
+- Found by: human
+
+### 2026-09-15 · An IX3 entrance's hidden start state has no fallback
+- Area: designer, css
+- Symptom: CTA groups and hero text authored hidden for an IX3 entrance
+  can stay invisible for good if IX3 never starts (a script error, a
+  blocked chunk).
+- Cause: the hidden start state lives in Webflow; nothing reveals it when
+  `html` gets `w-mod-js` but never `w-mod-ix3`.
+- Fix: a visibility-only fallback in repo CSS on
+  `html.w-mod-js:not(.w-mod-ix3)` for the elements IX3 hides, which stops
+  matching once IX3 runs. It sets `visibility` only, never display,
+  opacity or transforms, so it can't fight the interaction. A module that
+  hides content for its own entrance needs the same kind of exit (see
+  js.md, "gsap.from() start state reverts on load: hero flickers").
+- Status: fixed in that project's repo
+- Found by: codex
+
+### 2026-08-21 · A page loader with no exit except a Webflow interaction
+- Area: designer, css
+- Symptom: risk of a permanent full-screen overlay.
+- Cause: the page loader was fixed at the top z-index, and only the
+  page-load interaction set it to `display: none`; if the interaction
+  doesn't run, the page stays covered.
+- Fix: a CSS backstop in repo CSS: the loader fades out after 4 s on its
+  own (a `@keyframes` fade), off on the canvas (`html.wf-design-mode`)
+  and skipped under reduced motion. Any overlay that a script or interaction
+  removes needs an exit that works without it.
+- Status: fixed in that project's repo
+- Found by: human
