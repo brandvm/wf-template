@@ -51,6 +51,8 @@ function load({ host = 'example.webflow.io', search = '', stored = null, denySto
     documentElement: { classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c), contains: (c) => classes.has(c) } },
     head: { appendChild: (node) => attach(document.head, node) },
     createElement: el,
+    // Piece 1 writes the release <link> into <head> on a release domain.
+    write: (html) => { const node = el('link'); node.rel = 'stylesheet'; node.href = html.match(/href="([^"]+)"/)?.[1]; node.written = true; attach(document.head, node); },
     getElementById: (id) => nodes.find((n) => n.parentNode && n.id === id) ?? null,
   };
   const page = vm.createContext({
@@ -79,6 +81,7 @@ function load({ host = 'example.webflow.io', search = '', stored = null, denySto
     page, logs, timers, classes, stored: () => stored,
     WFC: page.WFC,
     preconnects: () => nodes.filter((n) => n.rel === 'preconnect'),
+    written: () => nodes.filter((n) => n.written),
     scripts: () => nodes.filter((n) => n.tagName === 'SCRIPT'),
     css: () => document.getElementById('wfc-css'),
     devCSS: () => document.getElementById('wfc-css-dev'),
@@ -229,4 +232,11 @@ test('the scroll lock is set at once and released by the 3 s safety timeout', ()
   assert.ok(lock, 'a 3000 ms timeout');
   lock.fn();
   assert.ok(!h.classes.has('is-loading'));
+});
+
+test('RELEASE set: production writes the pinned stylesheet into <head>; staging does not', () => {
+  const prod = load({ host: 'client.example', RELEASE: '1.0.0' });
+  assert.deepEqual(prod.written().map((n) => n.href), [release('1.0.0') + 'styles.css']);
+  assert.equal(load({ RELEASE: '1.0.0' }).written().length, 0, 'staging keeps the 2a sheet');
+  assert.equal(load({ host: 'client.example' }).written().length, 0, 'no release, nothing written');
 });
