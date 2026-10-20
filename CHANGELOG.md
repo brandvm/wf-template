@@ -33,7 +33,8 @@ publish; pieces 2a, 2b and 3 are unchanged. Copy the Finsweet recipe's
   that only re-points 2a, which painted before the CSS (CLS 0.17–0.31).
 - **Finsweet recipe:** each attribute starts when one of its elements is
   within two screens of the viewport, or on first input, instead of at
-  load (a list nest fetched seven item pages at load).
+  load (a list nest fetched seven item pages at load). `resetFinsweet()`
+  cancels any still waiting, so a page transition never starts one late.
 - **`wf:baseline compare`:** compares the new screenshot's PNG height
   with the saved one, not the pre-scroll `scrollHeight` (every page that
   grows as it loads was reported as changed).

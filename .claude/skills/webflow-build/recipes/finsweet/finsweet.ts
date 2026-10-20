@@ -113,15 +113,24 @@ function usedOnPage(): Map<string, Element[]> {
 const NEAR = '200% 0px';
 const INPUTS = ['scroll', 'pointerdown', 'keydown', 'touchstart'] as const;
 
+// Attributes still waiting to start; resetFinsweet() cancels them so a page
+// transition doesn't start one on the next page or keep old nodes observed.
+const waiting = new Set<() => void>();
+
 function startWhenNear(name: string, elements: Element[]) {
   let started = false;
-  const start = () => {
-    if (started) return;
+  const cancel = () => {
     started = true;
+    waiting.delete(cancel);
     observer.disconnect();
     INPUTS.forEach((type) => window.removeEventListener(type, start));
+  };
+  const start = () => {
+    if (started) return;
+    cancel();
     void loadAttribute(name);
   };
+  waiting.add(cancel);
   const observer = new IntersectionObserver((entries) => {
     if (entries.some((entry) => entry.isIntersecting)) start();
   }, { rootMargin: NEAR });
@@ -136,9 +145,10 @@ export function initFinsweet() {
   void Promise.resolve().then(() => usedOnPage().forEach((elements, name) => startWhenNear(name, elements)));
 }
 
-// For page transitions: destroy every started attribute so the next page's
-// markup gets fresh instances.
+// For page transitions: cancel attributes still waiting to start and destroy
+// every started one, so the next page's markup gets fresh instances.
 export function resetFinsweet() {
+  waiting.forEach((cancel) => cancel());
   const w = window as FinsweetWindow;
   if (w.FinsweetAttributes && !Array.isArray(w.FinsweetAttributes)) {
     w.FinsweetAttributes.destroy();
