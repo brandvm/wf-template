@@ -43,8 +43,12 @@ To update Finsweet later: `pnpm update @finsweet/attributes`, then
 - `finsweet.ts` does what the CDN loader does: creates
   `window.FinsweetAttributes` (`scripts`, `modules`, `process`, `load`,
   `push`, `destroy`), finds which chosen attributes the page uses (any
-  `fs-<name>…` attribute), and starts only those. `loadAttribute('list')`
-  resolves with the List instances for modules that need them.
+  `fs-<name>…` attribute), and starts only those, each once one of its
+  elements comes within two screens of the viewport or on the first
+  scroll, pointer or key input (0.8.0: a list's nest fetches every item's
+  page, which competed with the hero at load). `loadAttribute('list')`
+  starts one at once and resolves with the List instances for modules
+  that need them.
 
 ## Known issues
 
