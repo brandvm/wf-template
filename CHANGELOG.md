@@ -13,6 +13,21 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.7.2 — 2026-10-26
+
+**For client repos:** rename the server key in the repo's and the
+workspace's `.mcp.json` from `webflow` to `webflow-<slug>`, add
+`- Webflow MCP server: \`webflow-<slug>\` (\`.mcp.json\`)` to `AGENTS.md` ›
+Project facts, copy the **Webflow MCP connection** section into
+`AGENTS.md`, and sign in once with `/mcp` (tick only that client's site).
+
+- **One Webflow sign-in per client repo:** `pnpm new-project` names the MCP
+  server `webflow-<slug>`. Claude Code keeps sign-ins per server name, so
+  every client repo had shared one: signing in for one client replaced the
+  other's. The token stays on the machine, never in the repo.
+- **AGENTS.md:** use only the project's server, and check the site ID it
+  reaches before the first write.
+
 ## 0.7.1 — 2026-10-19
 
 A check of 0.6.0 and 0.7.0: every harvested source was confirmed committed

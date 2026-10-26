@@ -287,11 +287,22 @@ Without a token (or a signed-in `gh`) only public repos are read.
 ## Webflow MCP
 
 `.mcp.json` carries the Webflow MCP server definition; `pnpm new-project`
-copies it to the workspace, since Claude Code only reads `.mcp.json` from
-the folder it starts in. Approve the project server on first launch, then
-run `/mcp` to authorise Webflow — OAuth is per-machine, so this is
-repeated on each new machine. The Figma connector (for designs sent as a
+names it `webflow-<slug>` and copies it to the workspace, since Claude Code
+only reads `.mcp.json` from the folder it starts in. Approve the project
+server on first launch, then run `/mcp` to sign in to Webflow and tick
+**only this client's site** (not the workspace box).
+
+Claude Code keeps one sign-in per server name, on the machine — so every
+client repo keeps its own, and opening a repo loads the sign-in for its
+site. The token is never in the repo (these repos are public); the sign-in
+is repeated on each new machine. The cloud (claude.ai/code) can't run it:
+do Webflow MCP work locally. The Figma connector (for designs sent as a
 Figma link) is connected once per account.
+
+Repos created before 0.7.2 share the name `webflow`, so signing in for one
+client replaced the other. Rename the key in the repo's and the
+workspace's `.mcp.json` to `webflow-<slug>`, add the server line to
+`AGENTS.md` › Project facts, and sign in once with `/mcp`.
 
 ## Auditing before launch
 

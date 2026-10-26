@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const FILES = ['package.json', 'AGENTS.md', 'loader.html', 'docs/handoff/HANDOFF.md', 'scripts/new-project.mjs', '.wf-template.json', 'CONTRIBUTING.md', 'CHANGELOG.md', 'LICENSE', 'THIRD-PARTY-NOTICES.md'];
+const FILES = ['package.json', 'AGENTS.md', 'loader.html', 'docs/handoff/HANDOFF.md', 'scripts/new-project.mjs', '.wf-template.json', 'CONTRIBUTING.md', 'CHANGELOG.md', 'LICENSE', 'THIRD-PARTY-NOTICES.md', '.mcp.json'];
 
 function copy() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-new-project-'));
@@ -42,6 +42,8 @@ test('fills in every placeholder and writes the config', { skip }, () => {
   assert.match(loader, /var OWNER = "acme-org";/);
   assert.doesNotMatch(loader.replace(/<!--[\s\S]*?-->/g, ''), /REPO/);
   assert.doesNotMatch(read('docs/handoff/HANDOFF.md'), /<CLIENT>/);
+  assert.deepEqual(Object.keys(JSON.parse(read('.mcp.json')).mcpServers), ['webflow-acme-homes'], 'one MCP server name (and sign-in) per project');
+  assert.match(agents, /Webflow MCP server: `webflow-acme-homes`/);
   const cfg = JSON.parse(read('webflow-build.config.json'));
   assert.equal(cfg.stagingUrl, 'https://acme-homes.webflow.io');
   assert.ok(new RegExp(cfg.bundlePattern).test('https://acme-org.github.io/wf-acme/index.js'));
@@ -69,7 +71,7 @@ test('rejects a full URL as the slug', { skip }, () => {
 function copyIntoWorkspace() {
   const ws = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'wf-workspace-')), 'Acme');
   const dir = path.join(ws, 'wf-acme');
-  for (const f of [...FILES, '.mcp.json']) {
+  for (const f of FILES) {
     fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true });
     fs.copyFileSync(path.join(root, f), path.join(dir, f));
   }
