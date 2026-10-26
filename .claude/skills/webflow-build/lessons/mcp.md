@@ -6,6 +6,20 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-26 · All client repos shared one Webflow MCP sign-in
+- Area: mcp
+- Symptom: signing in to the Webflow MCP for one client's repo replaced
+  the sign-in of another; the MCP then reached the wrong client's site.
+- Cause: every repo's `.mcp.json` named the server `webflow`, and Claude
+  Code keeps one OAuth sign-in per server name on the machine.
+- Fix: `pnpm new-project` names it `webflow-<slug>` (template 0.7.2), so
+  each repo keeps its own sign-in, scoped to its site at the consent
+  screen; AGENTS.md › Webflow MCP connection says to check the site ID
+  before the first write. The token stays on the machine, never in the
+  repo.
+- Status: fixed in wf-template 0.7.2
+- Found by: human
+
 ### 2026-10-09 · Upload a local file as an asset without a public URL
 - Area: mcp
 - Symptom: `asset_tool › upload_image_by_url` only takes a public URL, so a

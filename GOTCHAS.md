@@ -26,15 +26,3 @@ collected from client repos into those files.
 ## This project
 
 <!-- Add new entries here, newest first. -->
-
-### 2026-10-26 · All client repos shared one Webflow MCP sign-in
-- Area: mcp
-- Scope: template-candidate
-- Symptom: signing in to the Webflow MCP for one client's repo replaced
-  the sign-in of another; the MCP then reached the wrong client's site.
-- Cause: every repo's `.mcp.json` named the server `webflow`, and Claude
-  Code keeps one OAuth sign-in per server name on the machine.
-- Fix: `pnpm new-project` names it `webflow-<slug>`; AGENTS.md says to
-  check the site ID before writing. Tokens stay out of the repo.
-- Status: open
-- Found by: human
