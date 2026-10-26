@@ -245,3 +245,12 @@ test('on a release domain, first paint waits for the pinned stylesheet and only 
   // The browser's look-ahead scanner may still request the 2a sheet from
   // GitHub Pages; the paint above shows it no longer holds the page.
 });
+
+test('on a release domain, a failed release stylesheet leaves Embed 2a on staging', async ({ page }) => {
+  // jsDelivr down or blocked: the page must keep the repo CSS from GitHub
+  // Pages, as before piece 1 wrote the release sheet (it scales the type).
+  await setup(page, { url: 'https://client.example/', unavailable: url => url.startsWith(release) });
+  await expect(page.locator('#wfc-css')).toHaveAttribute('href', stage + 'styles.css?v=1');
+  // A cross-origin sheet's rules can't be read; a link that failed has none.
+  await expect.poll(() => page.evaluate(() => Boolean(document.getElementById('wfc-css').sheet))).toBe(true);
+});

@@ -31,10 +31,16 @@ publish; pieces 2a, 2b and 3 are unchanged. Copy the Finsweet recipe's
   first paint waits for the release sheet (delayed 1 s) and not for
   GitHub Pages (delayed 3 s); it fails on 0.7.1's loader and on a version
   that only re-points 2a, which painted before the CSS (CLS 0.17–0.31).
+  If the release sheet fails (jsDelivr down or blocked), 2a goes back to
+  its staging sheet, so the page stays styled as it did on 0.7.1 (new
+  test). The head code uses `document.write` on purpose; Lighthouse lists
+  it under Best Practices.
 - **Finsweet recipe:** each attribute starts when one of its elements is
   within two screens of the viewport, or on first input, instead of at
   load (a list nest fetched seven item pages at load). `resetFinsweet()`
   cancels any still waiting, so a page transition never starts one late.
+  An attribute used only inside a hidden element starts on first input
+  (Known issues in the recipe).
 - **`wf:baseline compare`:** compares the new screenshot's PNG height
   with the saved one, not the pre-scroll `scrollHeight` (every page that
   grows as it loads was reported as changed).

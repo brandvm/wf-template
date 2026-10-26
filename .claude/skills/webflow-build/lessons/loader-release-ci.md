@@ -146,7 +146,9 @@ refer to the project the lesson came from; Status is that project's.
   way, so test with paint timing: `tests/environment-switcher.spec.mjs`
   delays the release sheet 1 s and requires first paint after it. The
   look-ahead scanner may still request the 2a staging sheet; it no longer
-  holds the page.
+  holds the page. Re-pointing 2a removed the old jsDelivr fallback (a
+  failed swap kept the staging sheet), so the written link's `onerror`
+  puts 2a back on staging; a second test blocks jsDelivr.
 - Found by: claude
 
 ### 2026-10-09 · A parity check on settled pages misses layout shifts

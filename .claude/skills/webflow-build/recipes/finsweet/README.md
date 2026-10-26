@@ -59,3 +59,9 @@ To update Finsweet later: `pnpm update @finsweet/attributes`, then
 - **Combo Box** differs from its docs (needs a clear element, sorts options
   by value, finds parts by position): see
   [searchable-select.md](searchable-select.md) and `lessons/js.md`.
+- **Hidden elements start on first input** (0.8.0): an element with
+  `display: none` (a closed modal, an inactive tab) never comes near the
+  viewport, so an attribute used only there starts on the first scroll,
+  pointer or key input. If that input is the click that opens it, the
+  attribute sets up a moment after it appears; call
+  `loadAttribute('<name>')` from a module to start it at load instead.
