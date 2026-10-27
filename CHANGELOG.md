@@ -13,6 +13,15 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.8.1 — 2026-10-27
+
+**For client repos:** `pnpm update-skills`. No loader snippet changed.
+
+- **`wf:a11y`** leaves out the Dev / Staging switcher (`#wfc-environment`).
+  It renders on `*.webflow.io` only, never for visitors, and its faded idle
+  state (65% opacity) failed `color-contrast` on every staging page, so
+  every site reported one serious failure that wasn't its own.
+
 ## 0.8.0 — 2026-10-27
 
 Harvested from a live-site optimization (a site taken from mobile 60 to 93
