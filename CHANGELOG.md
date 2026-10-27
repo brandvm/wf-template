@@ -13,11 +13,12 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
-## 0.8.0 — 2026-10-20
+## 0.8.0 — 2026-10-27
 
 Harvested from a live-site optimization (a site taken from mobile 60 to 93
 and desktop 86 to 96 on its home page). One loader fix, one recipe change,
-one script fix and eleven lessons.
+one script fix and eleven lessons. Released after 0.7.2 and includes it:
+coming from 0.7.1, do 0.7.2's client-repo steps too.
 
 **For client repos:** `pnpm update-skills`. To take the loader fix,
 re-paste piece 1 (head code) from `loader.html` with your `RELEASE`, and
@@ -53,6 +54,20 @@ publish; pieces 2a, 2b and 3 are unchanged. Copy the Finsweet recipe's
   font through the API (another host; don't preload it); proving a CMS
   field unused; `set_attributes` on Images (`loading` works, `sizes` and
   `crossorigin` fail); the Embed 2a lesson closed with the shipped fix.
+## 0.7.2 — 2026-10-26
+
+**For client repos:** rename the server key in the repo's and the
+workspace's `.mcp.json` from `webflow` to `webflow-<slug>`, add
+`- Webflow MCP server: \`webflow-<slug>\` (\`.mcp.json\`)` to `AGENTS.md` ›
+Project facts, copy the **Webflow MCP connection** section into
+`AGENTS.md`, and sign in once with `/mcp` (tick only that client's site).
+
+- **One Webflow sign-in per client repo:** `pnpm new-project` names the MCP
+  server `webflow-<slug>`. Claude Code keeps sign-ins per server name, so
+  every client repo had shared one: signing in for one client replaced the
+  other's. The token stays on the machine, never in the repo.
+- **AGENTS.md:** use only the project's server, and check the site ID it
+  reaches before the first write.
 
 ## 0.7.1 — 2026-10-19
 

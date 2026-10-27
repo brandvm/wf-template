@@ -3,7 +3,8 @@
 //                    [--org <github-org>] [--site-id <24-hex>] [--prototype-url URL]
 // Missing values are asked for when run in a terminal. Writes:
 //   package.json name · AGENTS.md project facts · loader.html REPO ·
-//   docs/handoff/HANDOFF.md title · webflow-build.config.json · .wf-template.json
+//   docs/handoff/HANDOFF.md title · .mcp.json server name (webflow-<slug>) ·
+//   webflow-build.config.json · .wf-template.json
 // and removes the files that only belong in the template (CONTRIBUTING…).
 // Then sets up the workspace around the repo (the folder that holds it):
 //   CLAUDE.md · .mcp.json · .claude/skills links · prototype/ · Assets/
@@ -81,7 +82,7 @@ const edits = {
     .replaceAll('<ORG>/<REPO>', `${org}/${repo}`)
     .replaceAll('<ORG>.github.io/<REPO>', `${org}.github.io/${repo}`)
     .replace('<SITE_ID>', siteId ?? '<SITE_ID>')
-    .replace('<SLUG>', slug)
+    .replaceAll('<SLUG>', slug)
     .replace('<DOMAIN or "not attached yet">', 'not attached yet')
     .replace('<RELEASE in the head snippet, or "none yet">', 'none yet'),
   'loader.html': (s) => s
@@ -90,6 +91,11 @@ const edits = {
     .replace('var SITE = "REPO";', `var SITE = "${repo}";`)
     .replaceAll('https://ORG.github.io/REPO/', `https://${org}.github.io/${repo}/`),
   'docs/handoff/HANDOFF.md': (s) => s.replace('<CLIENT>', client),
+  // Claude Code keeps one Webflow sign-in per MCP server name, on the
+  // machine (never in the repo). A name per project gives each client repo
+  // its own sign-in, scoped to its own site; with a shared "webflow" name,
+  // signing in for one client replaced the other's.
+  '.mcp.json': (s) => s.replace('"webflow": {', `"webflow-${slug}": {`),
 };
 const config = {
   prototypeUrl,
@@ -214,4 +220,4 @@ Next, in this order (README › New project checklist):
      the starter has them with ORG/REPO placeholders: replace those), and
      footer code. Publish to staging; the canvas picks up styles.css.
   4. Staging: password and noindex until launch.${siteId ? '' : '\n  - Add the Webflow site ID to AGENTS.md › Project facts.'}
-  Then open Claude in ${ws} (approve the Webflow MCP server, /mcp to sign in)${workspaceReady ? ', and run pnpm install in ../prototype' : ''}.`);
+  Then open Claude in ${ws} (approve the webflow-${slug} MCP server, then /mcp to sign in and tick only this client's site)${workspaceReady ? ', and run pnpm install in ../prototype' : ''}.`);
