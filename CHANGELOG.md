@@ -13,6 +13,47 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.8.0 — 2026-10-27
+
+Harvested from a live-site optimization (a site taken from mobile 60 to 93
+and desktop 86 to 96 on its home page). One loader fix, one recipe change,
+one script fix and eleven lessons. Released after 0.7.2 and includes it:
+coming from 0.7.1, do 0.7.2's client-repo steps too.
+
+**For client repos:** `pnpm update-skills`. To take the loader fix,
+re-paste piece 1 (head code) from `loader.html` with your `RELEASE`, and
+publish; pieces 2a, 2b and 3 are unchanged. Copy the Finsweet recipe's
+`finsweet.ts` into `src/modules/` if the project uses it.
+
+- **Loader (piece 1):** on a release domain the head code writes the
+  pinned stylesheet into `<head>` and re-points Embed 2a at it as the
+  parser inserts it. Production no longer waits for the staging sheet on
+  GitHub Pages and then swaps (closes the 2026-10-09 lesson). New test:
+  first paint waits for the release sheet (delayed 1 s) and not for
+  GitHub Pages (delayed 3 s); it fails on 0.7.1's loader and on a version
+  that only re-points 2a, which painted before the CSS (CLS 0.17–0.31).
+  If the release sheet fails (jsDelivr down or blocked), 2a goes back to
+  its staging sheet, so the page stays styled as it did on 0.7.1 (new
+  test). The head code uses `document.write` on purpose; Lighthouse lists
+  it under Best Practices.
+- **Finsweet recipe:** each attribute starts when one of its elements is
+  within two screens of the viewport, or on first input, instead of at
+  load (a list nest fetched seven item pages at load). `resetFinsweet()`
+  cancels any still waiting, so a page transition never starts one late.
+  An attribute used only inside a hidden element starts on first input
+  (Known issues in the recipe).
+- **`wf:baseline compare`:** compares the new screenshot's PNG height
+  with the saved one, not the pre-scroll `scrollHeight` (every page that
+  grows as it loads was reported as changed).
+- **Lessons:** IX3 replay corrected (no `position` = 0, not append; empty
+  actions skipped; default 0.5 s; hidden actions left out of the
+  published chunk); bundled GSAP plugins registering on Webflow's
+  `window.gsap`; lazy ScrollTrigger builds with hidden and re-rendered
+  triggers; reserving space for an async form; Finsweet list nesting;
+  deferring GTM (and its cost); the `0fr` grid row padding; replacing a
+  font through the API (another host; don't preload it); proving a CMS
+  field unused; `set_attributes` on Images (`loading` works, `sizes` and
+  `crossorigin` fail); the Embed 2a lesson closed with the shipped fix.
 ## 0.7.2 — 2026-10-26
 
 **For client repos:** rename the server key in the repo's and the

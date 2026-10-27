@@ -19,6 +19,41 @@ refer to the project the lesson came from; Status is that project's.
   repo.
 - Status: fixed in wf-template 0.7.2
 - Found by: human
+### 2026-10-20 · Replacing a font through the API moves it to another host
+- Area: mcp, perf
+- Symptom: after `replace_font_file` (subset fonts, 345 → 89 KB), the
+  published CSS loaded the fonts from
+  `webflow-files-prod.global.ssl.fastly.net` instead of
+  `cdn.prod.website-files.com`: one more connection before first paint.
+  Preloading the font from there made Lighthouse mobile worse (93 → 82):
+  a preloaded font always starts before the paint, so it always counts.
+- Cause: that is where the font API stores files; Designer uploads go to
+  the asset CDN the page already uses.
+- Fix: upload font files in the Designer (Site settings → Fonts) and point
+  the typography variables at them; if the API is the only way, add a
+  `preconnect` (crossorigin) to the font host, not a font preload. Keep
+  the original files for rollback. A Latin subset (`pyftsubset`, both
+  variable axes kept, default features + `tnum`, `case`) rendered the same
+  on 5 pages × 2 widths.
+- Status: documented
+- Found by: claude
+
+### 2026-10-20 · The MCP can't prove a CMS field is unused
+- Area: mcp
+- Symptom: a field-usage audit from Designer settings alone listed FAQ
+  reference fields, multi-reference list sources and template fields as
+  unused, though the live pages use them.
+- Cause: `get_settings` returns conditional visibility as just
+  `"conditional"`, an "equals current item" filter as an empty filter, and
+  a multi-reference list source as the target collection only; bindings
+  inside component definitions aren't returned, and children of a
+  component's slots have no element id. Parallel scanners also hit 429s.
+- Fix: count a field unused only if no binding, list filter/sort,
+  component prop, page setting or custom-code token reads it **and** its
+  values are absent from the item's own live page; check reference fields
+  in reverse (are the referenced items the ones shown?).
+- Status: documented
+- Found by: claude
 
 ### 2026-10-09 · Upload a local file as an asset without a public URL
 - Area: mcp
@@ -45,11 +80,17 @@ refer to the project the lesson came from; Status is that project's.
 - Status: worked around
 - Found by: claude
 
-### 2026-10-09 · `set_attributes` works on DOM elements, fails on Image elements
+### 2026-10-09 · `set_attributes` on Image elements: `loading` works, `crossorigin` and `sizes` fail
 - Area: mcp
 - Symptom: `crossorigin` on an Image element failed with an internal error
   (twice, Designer connected); Image settings expose no attributes key.
-- Cause: unknown; Image elements don't take custom attributes over the API.
+  On another site (2026-10-20), `sizes` failed the same way, but
+  `loading=lazy` / `eager` worked on Image elements on a page, inside a
+  component definition (`scope_component_id`) and inside a CMS list: the
+  published `<img>` carries one `loading`, the attribute replacing
+  Webflow's own. The MCP's settings have no Load option, so this is the
+  way to set it.
+- Cause: unknown; some attribute names are reserved on Image elements.
 - Fix: the same call works on DOM elements (`video` `poster`, `source`
   `src`/`type`/`media`), on Links (`aria-label`, also inside component
   definitions with `scope_component_id`), on form labels (`for` — Webflow
