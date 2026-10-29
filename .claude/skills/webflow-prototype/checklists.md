@@ -21,7 +21,9 @@ before code. Missing → ask; Claude never fills them in with guesses.
 - [Person] The desktop design frame and the width range it scales over,
   for the fluid scaling in `src/styles.css` §01 (default 1680, scaling
   1440–1680). [Claude] sets `--size-container-ideal`, `-min` and `-max`
-  from it, and the Webflow variables stay in em.
+  from it, in §01 and in the prototype's stand-in
+  (`prototype/src/css/prototype.css`), and the Webflow variables stay in
+  em.
 - [Person] CMS structure: collections, fields (with types), references,
   sort order, and which pages list or template them.
 - [Person] SEO per page: title, meta description, H1, slug.

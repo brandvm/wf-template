@@ -13,6 +13,59 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.9.0 — 2026-10-29
+
+Harvested from four client builds (2026-10-26 to 10-29). Three prototype
+fixes and 43 lessons, mostly on the Webflow MCP: Collection List query
+writes, imported images, forms and attributes, image `srcset`, fonts,
+component variants and slots.
+
+**For client repos:** `pnpm update-skills`. No loader snippet changed. A
+project with a prototype already copied from the starter can take the
+fixes by hand: the §01 stand-in at the top of
+`prototype/src/css/prototype.css` (with the project's ideal/min/max),
+`check-drift.mjs` and `check-states.mjs`.
+
+- **Prototype starter:** `prototype.css` has a stand-in of the repo's
+  fluid scaling (`src/styles.css` §01), so prototype and staging render at
+  the same scale at desktop widths (at 1440: 16px against 13.7px before).
+  The prototype checklist says to set ideal/min/max in both.
+  `proposed.css` says breakpoint proposals go on `:root, body`: the
+  starter's Body tag modes redeclare the variables on `body`.
+- **`check:drift`:** splits Webflow's unspaced shorthands
+  (`var(--_a)var(--_b)`, `var(--_a).625em`); an untouched starter site
+  reported 12 false differences.
+- **`check:states`:** clears `localStorage` and `sessionStorage` before
+  every load, so a control that removes itself (a dismissible bar) no
+  longer shifts later controls onto other elements and reports missing
+  pressed states.
+- **Lessons (mcp):** intermittent Collection List query conflicts and the
+  one-key-at-a-time rebuild; date filter value shapes; removing an Empty
+  State deletes its list; images without `srcset` (late variants, stale
+  props, plain Images); imported Images and blocks refusing attributes;
+  forms as DOM elements; section ids after import; lists in a rich-text
+  prop; `calc()` and gradients with variables; fonts through the API (the
+  upload, the second host, licences); bound date formats; a plain element
+  in an empty slot without a person; prop bindings; batch timeouts and
+  Rich Text sample content; mode values reading back as Base; the
+  `variable-` id prefix; the importer's dropped spaces, image assets and
+  stray classes; variant styles through the variants tool; the style
+  guide page's hidden starter content; rich-text child styles; scroll
+  interactions off per breakpoint; the element builder dropping links and
+  `li` text; custom properties failing a style update; CMS images copied
+  from site assets.
+- **Lessons (designer):** `display: contents` drops the box; Collection
+  List gaps; lazy images without dimensions; empty CMS fields in component
+  props; grid placement ID rules; variant styles losing to base
+  breakpoints; per-instance mobile variants; a theme at one breakpoint;
+  interactive content in a `pointer-events: none` layer; the canvas grid
+  and nested type entries extended.
+- **Lessons (css):** the body size variable as the text components' 1em,
+  and the three prototype fixes above.
+- **Lessons (js):** never start the LCP element from opacity 0; Finsweet
+  List 2.7 markup; Webflow Dropdown accordions closing each other;
+  scroll-snap rows with reordered and tall cards.
+
 ## 0.8.1 — 2026-10-27
 
 **For client repos:** `pnpm update-skills`. No loader snippet changed.
