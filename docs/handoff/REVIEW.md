@@ -31,7 +31,7 @@ pages (`SEO-PLAN.md`)>.
 
 - Feedback comes in rounds. Each round: Claude lists every item in the
   reviewer's own words, fixes them (Designer first; repo CSS only with a
-  `repo-css:` tag), publishes to staging, checks at the three widths and
+  `repo-css:` tag), publishes to staging, checks at the four widths and
   asks before every commit.
 - Anything the API can't do goes in `MANUAL-TODO.md`. Next letter: **<A>**.
   Update it here each time one is used.
@@ -73,4 +73,4 @@ skill's Pre-launch QA. Each item has an owner.
 - [ ] Custom domain attached; a release tagged from a commit whose CI
       passed and set as `RELEASE` before the domain goes live.
 - [ ] Final pass on the release build: `wf:pass`, `wf:anchors`,
-      `wf:outline`, `wf:transitions`, `wf:film` at the three widths.
+      `wf:outline`, `wf:transitions`, `wf:film` at the four widths.

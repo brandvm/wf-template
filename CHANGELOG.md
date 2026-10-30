@@ -13,6 +13,15 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.12.0 — 2026-10-30
+
+The check widths cover all four of Webflow's default breakpoints: **667 × 375** (Mobile landscape, 767 px and down) joins 1440 × 900 (Desktop), 820 × 1180 (Tablet) and 390 × 844 (Mobile). The new width is 667 because a phone on its side is often wider: 844 px falls in Webflow's Tablet range, so it would check the Tablet layout again.
+
+**For client repos:** `pnpm update-skills` brings the wording. To check mobile landscape too, add `[667, 375]` to `widths` in `webflow-build.config.json`, between the 820 and 390 entries. The config belongs to the site, so the update doesn't change it. Every `wf:*` check that runs at each width then also runs at 667, and the ones that take a `--width` accept 667.
+
+- `new-project`, `webflow-build.config.example.json` and both `lib.mjs` defaults (the build checks and the prototype's) list the four widths.
+- The skills, checklists and `docs/handoff/REVIEW.md` say "four widths" and name 667 next to 1440, 820 and 390.
+
 ## 0.11.0 — 2026-10-30
 
 Launch and SEO checks moved in from an earlier site-checking app, so

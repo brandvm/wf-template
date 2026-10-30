@@ -105,7 +105,7 @@ const config = {
   stagingUrl: `https://${slug}.webflow.io`,
   repoDir: '.',
   bundlePattern: `${org.replace(/\./g, '\\.')}\\.github\\.io/${repo}/(index\\.js|styles\\.css)`,
-  widths: [[1440, 900], [820, 1180], [390, 844]],
+  widths: [[1440, 900], [820, 1180], [667, 375], [390, 844]],
   pages: ['/'],
 };
 
