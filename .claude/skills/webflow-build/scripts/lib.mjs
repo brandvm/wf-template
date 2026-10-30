@@ -14,7 +14,8 @@
 //   "liveUrl": "https://www.client.com",            // optional: the custom domain, for --live
 //   "seo": { "noindexOk": [], "noSchemaOk": [] },   // optional: path regexes wf:seo allows
 //   "parity": { "oldAssets": {} },                  // optional: wf:parity, old asset URL regex -> dist file
-//   "overflow": { "widths": [], "ignore": [] }      // optional: wf:overflow width sweep and selectors to skip
+//   "overflow": { "widths": [], "ignore": [] },     // optional: wf:overflow width sweep and selectors to skip
+//   "redirects": { "oldUrl": "", "file": "docs/seo/redirects.csv" } // optional: wf:redirects old site and map file
 // }
 //
 // By default staging pages load this repo's local dist/ instead of the
@@ -48,8 +49,9 @@ export function loadConfig() {
 }
 
 // Flags that take a value: --width 390, --offset 72, --max 50, --dir baselines,
-// --root ../prototype, --runs 5, --out file.
-const VALUED = new Set(['--width', '--offset', '--max', '--dir', '--threshold', '--root', '--runs', '--out']);
+// --root ../prototype, --runs 5, --out file, --from <url>, --existing file,
+// --file urls.txt, --today 2026-01-31.
+const VALUED = new Set(['--width', '--offset', '--max', '--dir', '--threshold', '--root', '--runs', '--out', '--from', '--existing', '--file', '--today']);
 
 export function args() {
   const argv = process.argv.slice(2);

@@ -188,8 +188,9 @@ The scripts are in this skill's `scripts/` folder, with a `pnpm` shortcut
 each. They read `webflow-build.config.json` from the current directory or a
 parent (the example is `webflow-build.config.example.json`). By default
 staging loads this repo's local `dist/`, so code can be checked before a
-push; `--live` checks what visitors get (`seo`, `install` and `parity`
-check the custom domain in `liveUrl` with it). Screenshots go to
+push; `--live` checks what visitors get (`seo`, `install`, `parity`,
+`tracking` and `redirects` check the custom domain in `liveUrl` with it;
+`domain` always does). Screenshots go to
 `.webflow-build/` next to the config.
 
 ```bash
@@ -208,6 +209,10 @@ pnpm wf:seo [/path…] [--live] [--canonical]                      # sitemap cra
 pnpm wf:install [/path…] [--live]                                # installed snippets vs loader.html, localhost requests
 pnpm wf:parity [/path…] [--live] [--width W] [--control]         # migration: old custom code vs dist/, every element
 pnpm wf:overflow [/path…] [--live] [--width W[,W…]] [--why]     # what runs off the right edge, 2560 … 360
+pnpm wf:tracking [/path…] [--live]                               # tags, double page views, cookie consent, gclid/UTM (hits blocked)
+pnpm wf:redirects map [--from URL] [--existing export.csv]       # old site → new pages, Webflow 301 import file
+pnpm wf:redirects test [--live] [--file urls.txt]                # every redirect lands in one permanent hop
+pnpm wf:domain                                                   # liveUrl: certificate, domain renewal, DNS host, http/www redirects
 ```
 
 Two more read the prototype's files, with no browser and no Webflow

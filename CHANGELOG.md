@@ -13,6 +13,43 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.11.0 — 2026-10-30
+
+Launch and SEO checks moved in from an earlier site-checking app, so
+Claude, CI and Bench's Tasks run one implementation: three new scripts, a
+heading plan for the SEO plan, and site-wide checks in `wf:seo`. (Numbered
+after 0.10.0, the template packs release.)
+
+**For client repos:** `pnpm update-skills` (it adds the three `wf:*`
+shortcuts). No loader snippet changed. `wf:seo` can now fail a site that
+passed before: on duplicate titles or descriptions, or a missing page that
+answers 200.
+
+- **`wf:tracking`:** which analytics and ad tags load on which pages, page
+  views counted twice, what tracks before the cookie choice and after
+  Reject, Google consent mode, gclid and UTM through the http, www and
+  trailing-slash redirects, and the third-party services the pages load
+  (for the handoff). Every request that sends tag data is blocked.
+- **`wf:redirects`:** `map` matches the old site's pages to the new ones
+  (path, slug, then slug and title words) and writes
+  `docs/seo/redirects.csv` in Webflow's 301 import format, merged with the
+  site's own export (`--existing`) because an import replaces them all;
+  hand edits survive a re-run. `test` follows every row (or a Search
+  Console list with `--file`) and names loops, chains, temporary and
+  wrong redirects, dead ends and URLs sent to the home page.
+- **`wf:domain`:** the `liveUrl` certificate (trusted, not near its end),
+  the domain's renewal date and registrar (RDAP), the DNS host, and http
+  and www redirects to the canonical host.
+- **`wf:seo`:** duplicate titles and descriptions across pages, a made-up
+  path answering 200, `X-Robots-Tag: noindex` headers, and with `--live`
+  a robots.txt that blocks every page.
+- **webflow-launch:** `headings.md` (the H1–H6 rules); SEO plan steps for
+  the heading plan and the redirect map; pre-launch, launch day, handoff
+  and 30-day items use the new checks.
+- **webflow-audit:** the read-only audit runs `wf:tracking`, `wf:domain`
+  and `wf:redirects test` on Search Console's not-found URLs.
+- Config: optional `redirects.oldUrl` and `redirects.file`.
+
 ## 0.10.0 — 2026-10-30
 
 The template can be used from Bench, a desktop workspace for Webflow builds. Bench carries signed **template packs**, so its users never need this repo. It can also use a customized copy of this template, or a template a user brings, as long as that meets the template contract. `docs/bench.md` describes the pack format, the project record and the contract.

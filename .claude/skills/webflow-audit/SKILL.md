@@ -56,17 +56,28 @@ because they describe the site *before* any change.
   of 5 runs with its range, for every key page (not only Home).
 - [Claude] **Accessibility:** `pnpm wf:a11y --live --all-widths`.
 - [Claude] **Links and redirects:** `pnpm wf:links --live --external`; the
-  redirect list from Site settings; the sitemap.
+  redirect list from Site settings (export it to a CSV); the sitemap. With
+  the URLs Search Console reports as not found, `pnpm wf:redirects test
+  --live --file <export>`: which old URLs 404, loop, chain or land on the
+  home page.
 - [Claude] **Published HTML:** `pnpm wf:html --live` (default field names,
   links standing in for buttons, classes no stylesheet defines).
-- [Claude] **SEO and schema:** per page, the title, description, canonical,
-  Open Graph image, indexing state and any JSON-LD (does it parse; does a
-  quote in a CMS field break it).
+- [Claude] **SEO and schema:** `pnpm wf:seo --live --canonical`: per page,
+  the title, description, canonical, Open Graph image, indexing state and
+  any JSON-LD (does it parse; does a quote in a CMS field break it); and
+  site-wide, duplicate titles and descriptions, the 404 page, robots.txt.
+  The heading outlines against `webflow-launch` › headings.md.
+- [Claude] **Tracking:** `pnpm wf:tracking --live`: which tags load where,
+  page views counted twice, what runs before the cookie choice and after
+  Reject, gclid and UTM through redirects. Data requests are blocked, so
+  the audit sends nothing to the client's accounts.
+- [Claude] **Domain:** `pnpm wf:domain`: certificate, domain renewal date,
+  registrar and DNS host, the http and www redirects.
 - [Claude] **Inventory**, read through the connector: pages and folders;
   CMS collections with field types and item counts; components; fonts and
   how they load; every piece of custom code (site head and footer, each
   page's, every Embed) and every third-party script, with what each is
-  for; interactions, and which pages depend on them; forms and where they
+  for (`wf:tracking` lists the services the pages load); interactions, and which pages depend on them; forms and where they
   submit.
 - [Claude] **Report** in `AUDIT.md`: the findings as short points with
   numbers, each marked *measured* or *read from the code*, sorted by what
