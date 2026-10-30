@@ -16,3 +16,7 @@ playwright-report/
 
 # Harvest drafts from client repos (contain client details)
 .harvest/
+
+# Template packs for Bench (pnpm pack-template); signing keys never go here
+packs/
+pack-key.pem
