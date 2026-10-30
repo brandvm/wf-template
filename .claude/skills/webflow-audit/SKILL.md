@@ -45,7 +45,7 @@ first two are the ones that get skipped and can't be made up later,
 because they describe the site *before* any change.
 
 - [Claude] **Visual baselines, with the noise floor.**
-  `pnpm wf:baseline save --live` on every key page at three widths, then
+  `pnpm wf:baseline save --live` on every key page at four widths, then
   `compare` straight away with no change made. What differs between two
   untouched runs (video frames, sliders, lazy images) is the noise floor;
   write it down per page. Keep baseline images out of git (they are large):
@@ -123,7 +123,7 @@ change goes out first, on its own, with **nothing a visitor can see**.
 
 - [Claude] Port the existing behaviour as it is. No rewrites or
   improvements in this step: those are later batches, each measured.
-- [Claude checks] Parity on every key page at three widths: computed
+- [Claude checks] Parity on every key page at four widths: computed
   styles and geometry against the baselines (`pnpm wf:baseline compare`,
   differences inside the noise floor only).
 - [Claude checks] Load-time parity too (`pnpm wf:film`): a settled page can
@@ -142,7 +142,7 @@ describe in a sentence. For each:
    Designer", and what is not published.
 3. **Publish to staging only.**
 4. **Verify on staging:** the batch's own check, plus `baseline compare`,
-   `html` and the console on the pages it touches, at three widths.
+   `html` and the console on the pages it touches, at four widths.
 5. **Ask what else would go live.** [Person] checks the site for other
    pending changes (their own or a colleague's). Claude can't see who
    changed what; say so and wait.

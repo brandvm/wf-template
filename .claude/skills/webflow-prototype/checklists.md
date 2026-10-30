@@ -50,7 +50,7 @@ comes back as rework in Webflow, where it costs more.
 - [Claude] The style guide was approved before the first content page, and
   every class or component this page added has its row
   (`pnpm style-guide`, `pnpm check:style-guide`).
-- [Claude checks] Tablet and phone, not only desktop: looked at 1440, 820
+- [Claude checks] Tablet and phone, not only desktop: looked at 1440, 820, 667
   and 390, no sideways scroll, nothing overlapping or cut off. `pnpm
   screens` passes: no overflow and no errors at any width from 2560 to
   360 (the screenshots are in `.screens/`).
@@ -71,11 +71,11 @@ comes back as rework in Webflow, where it costs more.
 - [Claude] The page's modules depend on `data-*` hooks, not class names;
   new classes are in `new-classes*.css` and variable changes in
   `proposed.css` as old → new.
-- [Person] Approves the page at the three widths.
+- [Person] Approves the page at the four widths.
 
 ## Prototype handoff (once, before the Webflow build starts)
 
-- [Person] Every prototype page approved at the three widths, and the
+- [Person] Every prototype page approved at the four widths, and the
   style guide with it.
 - [Claude] `docs/handoff/HANDOFF.md` is filled in: pages, variables and
   classes, CMS, components to make (from the component plan), modules with

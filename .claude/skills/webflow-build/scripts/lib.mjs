@@ -8,7 +8,9 @@
 //   "stagingUrl":   "https://<site>.webflow.io",    // published Webflow staging
 //   "repoDir":      ".",                           // this repo (has dist/ and @playwright/test), relative to the config
 //   "bundlePattern": "<org>\\.github\\.io/<repo>/(index\\.js|styles\\.css)",
-//   "widths": [[1440, 900], [820, 1180], [390, 844]],
+//   "widths": [[1440, 900], [820, 1180], [667, 375], [390, 844]],
+//                   // one per Webflow breakpoint: Desktop (992+), Tablet (≤991), Mobile
+//                   // landscape (≤767: 667, as 844, a phone on its side, is Tablet), Mobile (≤478)
 //   "pages": ["/", "/about"],                       // optional: default paths for a11y, links, baseline, html, perf
 //   "prototypeDir": "../prototype",                 // optional: the prototype folder, for preflight and styles
 //   "liveUrl": "https://www.client.com",            // optional: the custom domain, for --live
@@ -42,7 +44,7 @@ export function loadConfig() {
   const cfg = JSON.parse(fs.readFileSync(file, 'utf8'));
   cfg.file = file;
   cfg.repoDir = path.resolve(path.dirname(file), cfg.repoDir ?? '.');
-  cfg.widths ??= [[1440, 900], [820, 1180], [390, 844]];
+  cfg.widths ??= [[1440, 900], [820, 1180], [667, 375], [390, 844]];
   cfg.prototypeUrl = cfg.prototypeUrl?.replace(/\/$/, '');
   cfg.stagingUrl = cfg.stagingUrl?.replace(/\/$/, '');
   return cfg;
