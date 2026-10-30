@@ -16,6 +16,10 @@
     "ignore": [".marquee", "[data-overflow-ok]"],
     "tolerance": 1
   },
+  "redirects": {
+    "oldUrl": "https://www.<domain>",
+    "file": "docs/seo/redirects.csv"
+  },
   "parity": {
     "oldAssets": {
       "<old-host>/.+\\.css(\\?|$)": "styles.css",

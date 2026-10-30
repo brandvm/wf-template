@@ -124,7 +124,8 @@ pnpm test     # build + Playwright checks + the new-project test
 pnpm new-project --client "<Client>" --slug <site> --org <org>   # once, after creating the repo
 pnpm wf:pass /   # webflow-build checks: wf:compare, wf:pass, wf:anchors, wf:outline,
                  # wf:film, wf:transitions, wf:a11y, wf:links, wf:baseline,
-                 # wf:html, wf:perf, wf:seo, wf:install, wf:parity, wf:overflow;
+                 # wf:html, wf:perf, wf:seo, wf:install, wf:parity, wf:overflow,
+                 # wf:tracking, wf:redirects, wf:domain;
                  # on the prototype: wf:preflight, wf:styles
 pnpm update-skills   # skills, build tooling and new scripts from the latest template release (ask first)
 pnpm phosphor regular bold   # icon font weights in the bundle (default: regular; --subset keeps only the icons used)
