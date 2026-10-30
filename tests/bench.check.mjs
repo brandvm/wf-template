@@ -112,7 +112,8 @@ test('update-skills --from --bench records the new version and keeps the repo', 
   const m = meta(dir);
   assert.deepEqual(m.bench, RECORD);
   assert.equal(m.template, 'example/wf-template', 'a local copy does not replace the GitHub repo');
-  assert.match(m.skills.version, /^local@0\.10\.0$/);
+  const current = JSON.parse(fs.readFileSync(path.join(root, '.wf-template.json'), 'utf8')).version;
+  assert.equal(m.skills.version, `local@${current}`, 'records the version it updated to');
   assert.ok(!JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')).scripts['pack-template'], 'template-only');
 });
 
