@@ -13,6 +13,18 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.10.0 — 2026-10-30
+
+The template can be used from Bench, a desktop workspace for Webflow builds. Bench carries signed **template packs**, so its users never need this repo. It can also use a customized copy of this template, or a template a user brings, as long as that meets the template contract. `docs/bench.md` describes the pack format, the project record and the contract.
+
+**For client repos:** nothing to do. `pnpm update-skills` works as before for projects outside Bench.
+
+- **Template packs:** `pnpm pack-template` turns a version into a pack for Bench. A pack is a `tar.gz`, a manifest with its checksum and changelog notes, and an Ed25519 signature of the manifest. `--keygen` makes the signing key pair once. Packs and keys are git-ignored.
+- **Template contract 1:** `.wf-template.json` now says which contract the template meets (`"contract": 1`). `node scripts/check-template.mjs <folder>` checks a template against it, and Bench runs it on templates users bring.
+- **`--bench '<json>'`** on `new-project` and `update-skills` records which Bench template a project uses and at which version. A project with that record updates from Bench: `update-skills` without `--from` (or `--repo`) stops instead of pulling a version Bench doesn't know about.
+- **`update-skills --from`** no longer replaces `template` (the GitHub repo) with `local`.
+- **Template only:** `scripts/pack.mjs`, `scripts/check-template.mjs`, `docs/bench.md` and the `pack-template` script are removed by `new-project` and never added by `update-skills`.
+
 ## 0.9.0 — 2026-10-29
 
 Harvested from four client builds (2026-10-26 to 10-29). Three prototype
