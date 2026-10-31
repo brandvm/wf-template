@@ -54,6 +54,8 @@ test('brings skills, tooling, package entries and the icon font', () => {
   assert.ok(css.startsWith('/* Site styles. */'));
   assert.ok(css.indexOf('@import "./phosphor.css";') < css.indexOf(':root'), 'the import is above every rule');
   assert.ok(fs.readdirSync(path.join(dir, 'src/phosphor')).some((f) => f.endsWith('.woff2')));
+  assert.equal(read(dir, 'docs/handoff/progress.json'), read(root, 'docs/handoff/progress.json'), 'task progress is seeded');
+  assert.ok(fs.existsSync(path.join(dir, 'scripts/progress.mjs')) && pkg.scripts.progress);
 });
 
 test('a second run changes nothing, and a site without icons keeps it that way', () => {

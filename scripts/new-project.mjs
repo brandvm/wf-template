@@ -143,6 +143,17 @@ if (!meta.template && remoteOrg && remoteRepo) {
 if (!meta.template && !bench) console.log('Template repo unknown: pass --template <owner/repo> (used by pnpm update-skills).');
 if (!flag('dry-run')) fs.writeFileSync(metaFile, JSON.stringify(meta, null, 2) + '\n');
 
+// Task progress starts empty (docs/bench.md › Task progress); a template
+// without the file still gets one.
+const progressFile = path.join(root, 'docs/handoff/progress.json');
+if (!fs.existsSync(progressFile)) {
+  console.log(`${flag('dry-run') ? 'would write' : 'wrote'} docs/handoff/progress.json`);
+  if (!flag('dry-run')) {
+    fs.mkdirSync(path.dirname(progressFile), { recursive: true });
+    fs.writeFileSync(progressFile, '{\n  "format": 1,\n  "stage": null,\n  "ticks": {},\n  "todos": [],\n  "components": []\n}\n');
+  }
+}
+
 const configFile = path.join(root, 'webflow-build.config.json');
 console.log(`${flag('dry-run') ? 'would write' : 'wrote'} webflow-build.config.json`);
 // One line per width, like the example file.

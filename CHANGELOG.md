@@ -13,6 +13,16 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.13.0 — 2026-10-31
+
+Task progress lives in the repo: `docs/handoff/progress.json` records which checklist items are done, who did them (you, Claude or a check), the stage, and the person's own to-dos. Bench's Tasks panel, Claude and CI share it, and Sync carries it between Macs. Format and ids: `docs/bench.md` › Task progress (an optional part of contract 1, so the contract number stays 1).
+
+**For client repos:** `pnpm update-skills` brings `scripts/progress.mjs`, the `progress` script and an empty `docs/handoff/progress.json`. Commit the file. Ticks from Bench's earlier per-Mac store move into it the next time Bench opens the project.
+
+- `pnpm progress tick "<checklist>" "<start of the item>"` (`--page`, `--component`, `--by check`), `untick`, `todo`, `todo-done`, `stage`, and `show` for the stage, open checklists and to-dos. It parses the checklists with the same rules as Bench, so both compute the same item ids, and writes one tick per line so two Macs merge cleanly.
+- `webflow-build`: session start runs `pnpm progress show`; checklists.md › How to record progress says when and how to tick, and never to tick a [Person] item. `webflow-launch` records items the same way instead of copying the lists into `LAUNCH.md`.
+- `new-project` writes an empty file when the template has none; `update-skills` seeds it. New test: `tests/progress.check.mjs`.
+
 ## 0.12.0 — 2026-10-30
 
 The check widths cover all four of Webflow's default breakpoints: **667 × 375** (Mobile landscape, 767 px and down) joins 1440 × 900 (Desktop), 820 × 1180 (Tablet) and 390 × 844 (Mobile). The new width is 667 because a phone on its side is often wider: 844 px falls in Webflow's Tablet range, so it would check the Tablet layout again.
