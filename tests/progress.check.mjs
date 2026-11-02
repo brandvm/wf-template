@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { itemId, parseChecklists, serialize, empty } from '../scripts/progress.mjs';
+import { itemId, parseChecklists, serialize, empty, migrate } from '../scripts/progress.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -51,7 +51,9 @@ test('the parser keeps tagged items only, with Markdown made plain', () => {
 test('tick finds the item by the start of its text and records who', () => {
   const dir = repo();
   run(dir, 'tick', 'before building', 'final designs', '--by', 'you');
-  const t = read(dir).ticks['build/Before building'];
+  // The first build tick starts the build plan; ticks are keyed by plan and checklist.
+  assert.deepEqual(read(dir).plans.map((x) => [x.id, x.kind, x.status]), [['build', 'new-build', 'active']]);
+  const t = read(dir).ticks['build/build/Before building'];
   const [id] = Object.keys(t);
   assert.equal(id, 'aee8a1a351c7');
   assert.equal(t[id].by, 'you');
@@ -66,7 +68,7 @@ test('per-page checklists need --page, and vague names say what they match', () 
   assert.match(fails(dir, 'tick', 'nope', 'x'), /No checklist/);
   const page = parseChecklists(fs.readFileSync(path.join(root, '.claude/skills/webflow-build/checklists.md'), 'utf8')).find((g) => g.title === 'Page done');
   run(dir, 'tick', 'page done', page.items[0].text.slice(0, 30), '--page', '/about', '--by', 'check');
-  assert.ok(read(dir).ticks['build/page//about']);
+  assert.ok(read(dir).ticks['build/build/page//about']);
 });
 
 test('one tick per line, sorted, so two Macs merge cleanly', () => {
@@ -79,15 +81,40 @@ test('one tick per line, sorted, so two Macs merge cleanly', () => {
   assert.deepEqual(JSON.parse(serialize(p)), p);
 });
 
-test('the stage is derived until it is set, and to-dos are listed', () => {
+test('a plan’s stage is derived until it is set, and requests are listed', () => {
   const dir = repo();
-  assert.match(run(dir, 'show'), /Stage: Before building/);
+  assert.match(run(dir, 'show'), /No plan running/);
+  run(dir, 'plan', 'add', 'new-build');
+  assert.match(run(dir, 'show'), /build \(new-build\) · stage: Before building/);
   run(dir, 'stage', 'pre-launch');
-  assert.equal(read(dir).stage, 'Pre-launch QA');
+  assert.equal(read(dir).plans[0].stage, 'Pre-launch QA');
   run(dir, 'stage', 'auto');
-  assert.equal(read(dir).stage, null);
+  assert.equal(read(dir).plans[0].stage, undefined);
   run(dir, 'todo', 'Send the client the staging link');
-  assert.match(run(dir, 'show'), /to-dos:\n {2}☐ Send the client the staging link/);
+  assert.match(run(dir, 'show'), /Requests:\n {2}☐ Send the client the staging link/);
   run(dir, 'todo-done', 'send the client');
   assert.equal(read(dir).todos[0].done, true);
+});
+
+test('plans: add, list and end; a second of a kind is refused; recurring ones get a cycle', () => {
+  const dir = repo();
+  run(dir, 'plan', 'add', 'seo');
+  assert.match(fails(dir, 'plan', 'add', 'seo'), /running already/);
+  assert.match(fails(dir, 'plan', 'add', 'nope'), /Plan kinds/);
+  run(dir, 'plan', 'add', 'new-build');
+  const p = read(dir);
+  assert.deepEqual(p.plans.map((x) => x.id), ['seo', 'build']);
+  assert.ok(p.plans[0].cycle.day >= 1);
+  run(dir, 'plan', 'end', 'build');
+  assert.equal(read(dir).plans[1].status, 'done');
+  assert.deepEqual(read(dir).history.map((h) => h.text), ['Started seo', 'Started new-build', 'Finished new-build']);
+  assert.match(fails(dir, 'tick', 'before building', 'final designs'), /No active plan has the build checklists/);
+});
+
+test('format 1 reads as one New build plan, ticks moved under build/, ids kept', () => {
+  const p = migrate({ format: 1, stage: 'Pages', ticks: { 'build/Before building': { aee8a1a351c7: { text: 'x', by: 'you', at: 't' } } }, todos: [], components: ['Nav'] });
+  assert.equal(p.format, 2);
+  assert.deepEqual(p.plans.map((x) => [x.id, x.stage]), [['build', 'Pages']]);
+  assert.ok(p.ticks['build/build/Before building'].aee8a1a351c7);
+  assert.deepEqual(p.components, ['Nav']);
 });

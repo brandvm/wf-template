@@ -103,35 +103,43 @@ Template-only files (`scripts/pack.mjs`, `scripts/check-template.mjs`, `scripts/
 
 An optional part of contract 1: a template without it still works, and Bench falls back to keeping ticks on one Mac.
 
-`docs/handoff/progress.json` holds which checklist items are done, who did them, and the person's own to-dos. It lives in the repo, so Claude Code outside Bench, CI and the other Mac (through Sync) all see the same progress. Bench's Tasks panel reads and writes it, and Claude records ticks with `pnpm progress` (`scripts/progress.mjs`).
+`docs/handoff/progress.json` holds the client's plans, which checklist items are done in each, who did them, and the requests. It lives in the repo, so Claude Code outside Bench, CI and the other Mac (through Sync) all see the same progress. Bench's Tasks panel reads and writes it, and Claude records ticks with `pnpm progress` (`scripts/progress.mjs`). A client with only a Webflow site (no repo) keeps the same file as `<Client>/progress.json`.
 
 ```json
 {
-  "format": 1,
-  "stage": null,
+  "format": 2,
+  "plans": [
+    {"id":"build","kind":"new-build","status":"active","started":"2026-10-01"},
+    {"id":"seo","kind":"seo","status":"active","started":"2026-11-02","cycle":{"day":2}}
+  ],
   "ticks": {
-    "build/Before building": {
+    "build/build/Before building": {
       "aee8a1a351c7": {"text":"Final designs approved in writing, …","by":"you","at":"2026-10-31T12:00:00.000Z"}
     },
-    "build/page//about": {
+    "build/build/page//about": {
       "…": {"text":"…","by":"check","at":"…"}
     }
   },
-  "todos": [{"id":"t-1a2b3c4d","text":"Send the client the staging link","done":false}],
-  "components": ["Nav", "Footer"]
+  "todos": [{"id":"t-1a2b3c4d","text":"Swap the hero photo","done":false,"from":"the client"}],
+  "components": ["Nav", "Footer"],
+  "history": [{"at":"2026-11-02T10:00:00.000Z","text":"Started seo"}]
 }
 ```
 
 | Field | Meaning |
 |---|---|
-| `ticks` | By group, then by item. A group is `build/<checklist>` (from `webflow-build/checklists.md`), `launch/<checklist>` (from `webflow-launch/SKILL.md`), `build/page/<path>` or `build/component/<name>`. A checklist with sub-headings uses `<heading> · <sub-heading>`, e.g. `launch/Pre-launch QA · Content`. |
-| item id | The first 12 hex characters of `sha1("<group id>\n<item text>")`, where the text is the item with Markdown emphasis and links removed and spaces collapsed. Rewording an item changes its id, so an old tick shows as "changed", not done. |
+| `plans` | The work on this client: `new-build`, `migration`, `optimization`, `seo` or `maintenance`. Several can run at once; a finished plan keeps `status: "done"` and its ticks. `stage` is set only when someone picked it by hand; otherwise it's derived (below). Recurring plans (SEO, Maintenance) have a `cycle` day; Optimization can have `targets` (e.g. `{"lcp": 2.5}`). |
+| `ticks` | By `<plan>/<group>`, then by item. A group is `build/<checklist>` (from `webflow-build/checklists.md`), `launch/<checklist>` (from `webflow-launch/SKILL.md`), `build/page/<path>` or `build/component/<name>`; SEO, Maintenance and Optimization use their skills' checklists (`webflow-<kind>/checklists.md`) when the template has them. A checklist with sub-headings uses `<heading> · <sub-heading>`, e.g. `launch/Pre-launch QA · Content`. A New build has the build and launch checklists; a Migration has the build ones. |
+| item id | The first 12 hex characters of `sha1("<group>\n<item text>")` for the `build` plan, and of `sha1("<plan>/<group>\n<item text>")` for any other, where the text is the item with Markdown emphasis and links removed and spaces collapsed. Rewording an item changes its id, so an old tick shows as "changed", not done. |
 | `by` | `you` (ticked in Bench), `claude` (Claude did the work) or `check` (a `pnpm wf:*` script passed). |
-| `stage` | `null` while Bench derives it: the first stage with an unticked item, in the order Before building, Foundation, Components, Pages, Build handoff, SEO plan, Pre-launch QA, Launch day, Client handoff, After launch. A stage name when someone picked it by hand. |
-| `todos` | The person's own to-dos. Claude reads them; it adds one only when asked. |
+| stage | Derived per build plan: the first stage with an unticked item, in the order Before building, Foundation, Components, Pages, Build handoff, SEO plan, Pre-launch QA, Launch day, Client handoff, After launch. |
+| `todos` | Requests: the person's (or the client's) to-dos, across plans. Claude reads them; it adds one only when asked. |
 | `components` | The components that get a Component done group. |
+| `history` | Plans started and finished. |
 
-**Writing it:** one tick per line, groups and ticks sorted by key, two-space indent, as `pnpm progress` writes it. Two Macs ticking different items then change different lines, and git merges them without a conflict. Collapsed groups and other view settings stay in Bench, per Mac.
+A fresh project's file has no plan; Bench and the first build tick both treat it as a New build. A format 1 file (no `plans`, from a pre-release of 0.13.0) reads as one `build` plan with its ticks moved under `build/`; the ids don't change.
+
+**Writing it:** one plan and one tick per line, groups and ticks sorted by key, two-space indent, as `pnpm progress` writes it. Two Macs ticking different items then change different lines, and git merges them without a conflict. Collapsed groups and other view settings stay in Bench, per Mac.
 
 **Manual Designer steps:** ticking a row of `docs/handoff/MANUAL-TODO.md` in Bench writes `☑` into that row's Done cell, as a person would; that file stays the record for those steps.
 

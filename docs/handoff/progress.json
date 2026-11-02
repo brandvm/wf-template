@@ -1,7 +1,8 @@
 {
-  "format": 1,
-  "stage": null,
+  "format": 2,
+  "plans": [],
   "ticks": {},
   "todos": [],
-  "components": []
+  "components": [],
+  "history": []
 }
