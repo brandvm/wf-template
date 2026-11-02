@@ -97,11 +97,16 @@ function skill(rel) {
   return '';
 }
 
-/** Every checklist, with its group id prefix: build/… from webflow-build, launch/… from webflow-launch. */
+/**
+ * Every checklist, with its group id prefix: build/… from webflow-build,
+ * launch/… from webflow-launch, and seo/…, maintenance/…, optimization/…
+ * from those plans' skills.
+ */
 export function checklists() {
   return [
     ...parseChecklists(skill('webflow-build/checklists.md')).map((g) => ({ ...g, set: 'build' })),
     ...parseChecklists(skill('webflow-launch/SKILL.md')).map((g) => ({ ...g, set: 'launch' })),
+    ...['seo', 'maintenance', 'optimization'].flatMap((kind) => parseChecklists(skill(`webflow-${kind}/checklists.md`)).map((g) => ({ ...g, set: kind }))),
   ];
 }
 
@@ -142,6 +147,12 @@ export function planFor(p, set, wanted) {
   if (wanted) {
     const plan = active.find((x) => x.id === wanted);
     if (!plan) throw new Error(`No active plan "${wanted}". pnpm progress plan list shows them.`);
+    return plan;
+  }
+  // SEO, Maintenance and Optimization checklists belong to their own plan.
+  if (KINDS.includes(set)) {
+    const plan = active.find((x) => x.kind === set);
+    if (!plan) throw new Error(`No ${set} plan is running. Start one: pnpm progress plan add ${set}`);
     return plan;
   }
   const plan = active.find((x) => x.kind === 'new-build' || (set === 'build' && x.kind === 'migration'));
@@ -268,7 +279,14 @@ function main(argv) {
 
   if (cmd === 'tick' || cmd === 'untick') {
     if (!a || !b) throw new Error(`Usage: pnpm progress ${cmd} "<checklist>" "<item>" [--page /path] [--component Name]`);
-    const group = findGroup(lists, a, { page: opt('page'), component: opt('component') });
+    // Only the checklists of the plans that are running (or of --plan): SEO and
+    // Optimization both have a Baseline, for one.
+    const sets = (kind) => (kind === 'new-build' ? ['build', 'launch'] : kind === 'migration' ? ['build'] : [kind]);
+    const wanted = opt('plan') && p.plans.find((x) => x.id === opt('plan'));
+    const running = wanted ? [wanted] : p.plans.filter((x) => x.status === 'active');
+    const mine = new Set(running.length ? running.flatMap((x) => sets(x.kind)) : ['build', 'launch']);
+    const pool = lists.filter((g) => mine.has(g.set));
+    const group = findGroup(pool.length ? pool : lists, a, { page: opt('page'), component: opt('component') });
     const item = findItem(group, b);
     const plan = planFor(p, group.set, opt('plan'));
     const key = `${plan.id}/${group.id}`;
@@ -349,10 +367,14 @@ function main(argv) {
     const builds = plan.kind === 'new-build' || plan.kind === 'migration';
     console.log(`${plan.id} (${plan.kind})${builds ? ` · stage: ${plan.stage ?? deriveStage(p, lists, pages, plan)}${plan.stage ? ' (set by hand)' : ''}` : ''}`);
     if (!builds) {
-      console.log('  Its checklists come with the template\'s webflow-' + plan.kind + ' skill.');
+      for (const g of lists.filter((x) => x.set === plan.kind)) {
+        const id = `${g.set}/${g.title}`;
+        const done = g.items.filter((i) => p.ticks[`${plan.id}/${id}`]?.[planItemId(plan, id, i.text)]).length;
+        console.log(`  ${done === g.items.length ? '☑' : '☐'} ${id}  ${done}/${g.items.length}`);
+      }
       continue;
     }
-    for (const g of lists.filter((x) => plan.kind === 'new-build' || x.set === 'build')) {
+    for (const g of lists.filter((x) => x.set === 'build' || (plan.kind === 'new-build' && x.set === 'launch'))) {
       const ids = g.title === 'Page done' ? pages.map((pg) => `build/page/${pg}`)
         : g.title === 'Component done' ? (p.components ?? []).map((c) => `build/component/${c}`) : [`${g.set}/${g.title}`];
       for (const id of ids) {

@@ -13,6 +13,17 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.14.0 — 2026-11-02
+
+Plans get their own checklists: SEO, Maintenance and Optimization each have a skill (`webflow-seo`, `webflow-maintenance`, `webflow-optimization`) with a SKILL.md for the cycle and a `checklists.md` that Bench's Tasks panel and `pnpm progress` read, in the same tagged format as the build lists.
+
+**For client repos:** `pnpm update-skills` brings the three skills. Nothing else changes; a client without those plans doesn't see their lists.
+
+- SEO: Baseline (once), Every cycle, Content and links, Monthly report.
+- Maintenance: Monthly health check, Updates, Monthly note. Requests stay in the progress file's `todos`.
+- Optimization: Baseline, Fixes, Before and after; the plan ends when its `targets` are met.
+- `pnpm progress tick` picks from the checklists of the plans that are running (`--plan` to say which, as SEO and Optimization both have a Baseline), and `show` lists each plan's checklists. New test in `tests/progress.check.mjs`.
+
 ## 0.13.0 — 2026-11-02
 
 Task progress lives in the repo, by plan: `docs/handoff/progress.json` (format 2) records the client's plans (New build, Migration, Optimization, SEO, Maintenance), which checklist items are done and who did them (you, Claude or a check), each plan's stage, and the requests. Bench's Tasks panel, Claude and CI share it, and Sync carries it between Macs. Format and ids: `docs/bench.md` › Task progress (an optional part of contract 1, so the contract number stays 1).

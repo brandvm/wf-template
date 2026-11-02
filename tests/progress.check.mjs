@@ -108,7 +108,7 @@ test('plans: add, list and end; a second of a kind is refused; recurring ones ge
   run(dir, 'plan', 'end', 'build');
   assert.equal(read(dir).plans[1].status, 'done');
   assert.deepEqual(read(dir).history.map((h) => h.text), ['Started seo', 'Started new-build', 'Finished new-build']);
-  assert.match(fails(dir, 'tick', 'before building', 'final designs'), /No active plan has the build checklists/);
+  assert.match(fails(dir, 'tick', 'before building', 'final designs'), /No checklist called "before building"/);
 });
 
 test('format 1 reads as one New build plan, ticks moved under build/, ids kept', () => {
@@ -117,4 +117,17 @@ test('format 1 reads as one New build plan, ticks moved under build/, ids kept',
   assert.deepEqual(p.plans.map((x) => [x.id, x.stage]), [['build', 'Pages']]);
   assert.ok(p.ticks['build/build/Before building'].aee8a1a351c7);
   assert.deepEqual(p.components, ['Nav']);
+});
+
+test('SEO, Maintenance and Optimization checklists tick into their own plan', () => {
+  const dir = repo();
+  run(dir, 'plan', 'add', 'optimization');
+  assert.match(fails(dir, 'tick', 'baseline', 'search console has'), /No item in "Baseline"/);
+  run(dir, 'plan', 'add', 'seo');
+  assert.match(fails(dir, 'tick', 'baseline', 'search console has'), /matches/);
+  run(dir, 'tick', 'baseline', 'search console has', '--by', 'check', '--plan', 'seo');
+  const ticks = read(dir).ticks;
+  const key = Object.keys(ticks).find((k) => k.startsWith('seo/'));
+  assert.equal(key, 'seo/seo/Baseline');
+  assert.match(run(dir, 'show'), /seo \(seo\)\n {2}☐ seo\/Baseline {2}1\/5/);
 });
