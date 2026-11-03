@@ -51,6 +51,7 @@ error instead of a silent move to the next one. Change both together.
 | `.screens/` | Screenshots from `pnpm screens` and `pnpm check:states --shots`, `type-metrics.json` from `pnpm measure:type --json` (not in git) |
 | `src/css/proposed.css` | Changes to existing variables and class bindings, as P1, P2… old → new |
 | `src/css/new-classes.css` | New classes, grouped by component (more files: `new-classes-*.css`) |
+| `src/css/repo.css` | A library's own CSS (Lenis, Swiper…): moved to the repo's `src/styles.css` as is, with its `repo-css: third-party` tag; never Webflow classes |
 | `src/css/prototype.css` | Stand-ins for what Webflow ships, and the tag styles; never moved. Element rules are in `:where()`, so a site's real tag styles in `webflow.css` win |
 | `src/main.ts`, `src/modules/` | The module manifest and one file per module |
 | `CLASSES.md` | **Generated** (`pnpm classes`): every new class with its Designer name |
@@ -204,7 +205,7 @@ write both files, delete `source.json`, run `pnpm css` and
    modules and their `data-*` hooks.
 5. Build in Webflow with the webflow-build skill.
 
-Rules in the new-classes files that the Designer can't express go to the
-repo's `src/styles.css` with their `repo-css:` tag. `check:style-guide`
+Rules in the new-classes files that the Designer can't express, and
+`repo.css`, go to the repo's `src/styles.css` with their `repo-css:` tag. `check:style-guide`
 lists JS state classes too; they need a specimen on the style guide only if
 the Designer styles them.

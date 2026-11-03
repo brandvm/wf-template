@@ -6,6 +6,59 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-10-29 · Style guide specimens can't show hover or focus
+- Area: designer
+- Symptom: the Figma design system shows every button and field in
+  Default, Hover, Focus and Disabled; the generated style guide could only
+  show Default, since specimens are `inert` and nobody can hover them.
+- Cause: the generator marks specimens inert and strips `data-*` from
+  them, so a module can't find them by a data attribute.
+- Fix: a prototype module copies the declarations of the real `:hover` /
+  `:focus` / `:focus-visible` rules onto specimens carrying a style guide
+  class (`sg-state-hover`, `sg-state-focus`, `sg-state-focus-visible`).
+  The hook is a class because `data-*` is stripped; keeping a
+  `data-sg-state` in the generator would be cleaner.
+- Status: open in the template
+- Found by: claude
+
+### 2026-10-29 · A style guide row that wraps a whole section squeezes the component
+- Area: designer
+- Symptom: a before/after row on the style guide showed the section's copy
+  and no photos.
+- Cause: the `sg:start` block wrapped the whole Section, so the specimen
+  was a two-column split inside the narrow specimen frame; the copy took
+  all the width and the flexible media column shrank to nothing.
+- Fix: a `components` block wraps the component only; a block that needs
+  its Section (for its combos) is a `page-sections` row, shown at half
+  size.
+- Status: fixed in that project's prototype
+- Found by: claude
+
+### 2026-10-29 · Style guide rows empty or floating for fixed, absolute and desktop-hidden classes
+- Area: designer
+- Symptom: the nav wrapper's specimens floated at the top of the window or
+  showed nothing; mega panel, back button and media tag rows were empty;
+  mega menus spilled out of their frames; and the site footer sat on top
+  of the specimens.
+- Cause: the nav wrapper had been made `position: fixed`; component frames
+  don't contain fixed elements, and theme frames (`contain: paint`) do but
+  collapse around an out-of-flow child. A class that sets a colour mode
+  gets a theme row with the class itself as the frame, so a hidden
+  absolute panel shows nothing; type rows show the class as is, so a class
+  hidden at desktop or absolute is empty. A footer-reveal module assumed
+  the element before the footer is the page's main wrapper; the generated
+  page's `<main>` has no class.
+- Fix: the nav wrapper stays absolute (conventions §1) and the nav module
+  adds a fixed combo; colour modes sit on the outer wrapper, not on a
+  hidden panel; wide menus are `page-sections` rows; footer-reveal only
+  runs when the element before the footer is positioned and opaque;
+  specimen-only rules in `prototype.css` put out-of-flow classes in the
+  flow inside the style guide's frames (the Webflow style guide page needs
+  the same). The generator could render out-of-flow and breakpoint-hidden
+  classes in the flow itself.
+- Status: open in the template
+- Found by: human
+
 ### 2026-10-29 · `display: contents` drops the box's own styling
 - Area: designer
 - Symptom: after a mobile reorder of a hero, a card lost its frosted
