@@ -6,16 +6,21 @@ of them every session.
 
 | File | Covers | Entries |
 | --- | --- | --- |
-| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 87 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 36 |
-| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 20 |
-| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 31 |
-| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 13 |
+| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 92 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 39 |
+| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 24 |
+| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 38 |
+| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 18 |
 
 ## Titles
 
 **Webflow MCP and API** ([mcp.md](mcp.md))
 
+- IX2 is invisible to the MCP; `data-w-id` is not an attribute
+- Breakpoint auto-modes: link them in the Designer, never through the API
+- The style API rejects `-webkit-box-orient` and drops `-webkit-line-clamp`
+- The Body element takes no class through the API; imported images publish lazy
+- Rich-text images publish eager; `loading="lazy"` written through the CMS API is kept
 - Collection List query writes: intermittent conflicts, one key at a time
 - Collection List date filters: the value shape, and a filter and a sort refuse each other
 - Removing a Collection List's Empty State deletes the whole list
@@ -106,6 +111,9 @@ of them every session.
 
 **Designer and canvas** ([designer.md](designer.md))
 
+- Style guide specimens can't show hover or focus
+- A style guide row that wraps a whole section squeezes the component
+- Style guide rows empty or floating for fixed, absolute and desktop-hidden classes
 - `display: contents` drops the box's own styling
 - A Collection List inside a flex or grid wrapper loses the wrapper's gap
 - A lazy image with no width/height takes no space until it loads
@@ -145,6 +153,10 @@ of them every session.
 
 **Repo CSS** ([css.md](css.md))
 
+- Font fallback metrics: calibrate `size-adjust` on the site's own text
+- Figma sizes come out small on classes with their own type size
+- Library CSS in new-classes.css fails the style guide check
+- The template's base CSS would restyle a live site during a migration
 - Webflow's body size variable is the text components' 1em
 - Prototype breakpoint proposals on `:root` lose to the Body tag's modes
 - The prototype had no fluid scaling
@@ -168,6 +180,13 @@ of them every session.
 
 **JavaScript modules** ([js.md](js.md))
 
+- SplitText with `tag: 'span'` leaves pieces inline (IX3 did not)
+- A line split cuts a not-yet-split heading into several headings
+- Nested Collection Lists and Finsweet's late pages
+- Once the bundle starts after first paint, every layout a module sets is a visible shift
+- A CSS fade inside a Webflow Dropdown List never plays on open
+- Closing a mobile menu played its transitions one after another
+- A sideways carousel caught the page's vertical wheel under Lenis
 - Never start the LCP element from opacity 0
 - Finsweet List 2.7: what the markup needs on Webflow
 - Webflow Dropdown accordions close each other page-wide
@@ -202,6 +221,11 @@ of them every session.
 
 **Loader, release and CI** ([loader-release-ci.md](loader-release-ci.md))
 
+- A staging page can't load a localhost bundle; port 3000 is shared across projects
+- Lighthouse counts anything that finishes before the first paint
+- The Embed editor reformats pasted loader code
+- A page capture misses scripts loaded at runtime
+- Staging screenshots can't isolate a batch when live is older
 - Filling in REPO in loader.html breaks the browser tests
 - Local Lighthouse adds a second to some hosts on some networks
 - Staging fetched its stylesheet twice before first paint

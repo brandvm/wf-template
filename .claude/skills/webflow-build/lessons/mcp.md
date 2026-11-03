@@ -6,6 +6,93 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-11-02 · IX2 is invisible to the MCP; `data-w-id` is not an attribute
+- Area: mcp, designer
+- Symptom: a plan said "remove the IX2 `data-w-id`" on one element, but
+  `query_elements` finds no such attribute, and `data_interactions_tool`
+  lists only IX3. An inventory made through the MCP found 1 IX2
+  interaction; the site had 15 (dropdowns, the menu, pop-ups, hovers).
+- Cause: `data-w-id` is the element's own Webflow id, written at publish
+  only because an IX2 event targets it. The MCP has no IX2 read or write.
+- Fix: read IX2 from the published `webflow.achunk.*.js` that contains
+  `eventTypeId` (events, selectors, `originalId` page or element, action
+  lists). Removing an IX2 event is a Designer step (Interactions panel).
+  Class-scoped events (`appliesTo: "CLASS"`) animate every element with
+  the class, not just the one carrying `data-w-id`.
+- Status: documented
+- Found by: claude
+
+### 2026-10-30 · Breakpoint auto-modes: link them in the Designer, never through the API
+- Area: mcp
+- Symptom: `set_style_variable_mode` on `body` at medium/small/tiny, and
+  `create_variable_mode` with `breakpoint_id` for a second collection,
+  failed with "[Conflict] The operation could not be applied to the style
+  block store" (BATCH_FAILED), with or without the Designer connected and
+  also for a brand-new collection. The Designer then gave the same
+  Conflict, and neither the API nor the Designer could remove the entries
+  (they stayed even after their collection was deleted, and a publish
+  didn't clear them).
+- Cause: `create_variable_mode` with `breakpoint_id` writes an entry on
+  Body at each breakpoint (`---mode--collection-<id>: mode-<id>`) that
+  compiles to an inert custom property and locks Body's variable-mode
+  slots there. Linked in the Designer, the same read-back appears, but the
+  published CSS redeclares the variables per breakpoint, and two
+  collections (Typography Role and Layout) both took auto-modes. So the
+  API stores something the read-back doesn't show; "Only one collection
+  can take breakpoint auto-modes" was this.
+- Fix: create the modes through the API without `breakpoint_id`, then
+  link them to Tablet / Mobile Landscape / Mobile in the Designer. A site
+  already stuck: restore a backup from before the API auto-modes and
+  recreate the variables (only Webflow can clear the entries otherwise).
+  A class can still take variable modes at breakpoints through the API.
+  The API has no call to attach a breakpoint to an existing mode, nor to
+  delete or rename modes.
+- Status: worked around (backup restore and Designer linking)
+- Found by: claude
+
+### 2026-10-30 · The style API rejects `-webkit-box-orient` and drops `-webkit-line-clamp`
+- Area: mcp
+- Symptom: `create_style` for a clamped title failed ("Invalid style
+  property -webkit-box-orient"); without it the class was created but
+  `-webkit-line-clamp: 2` was silently missing from the result.
+- Cause: the style API only knows the Designer's properties; line clamp
+  isn't one.
+- Fix: the class holds `display: -webkit-box` and `overflow: hidden`; the
+  clamp and orient are repo CSS (`repo-css: designer-cant`). Read every
+  style back after a create: a dropped property gives no error.
+- Status: fixed in that project's repo CSS
+- Found by: claude
+
+### 2026-10-30 · The Body element takes no class through the API; imported images publish lazy
+- Area: mcp
+- Symptom: `set_style` on a page's Body answered "This element doesn't
+  support styles"; `set_attributes` with `width` / `height` on an Image
+  failed ("An internal error occurred") while `data-*` and `loading`
+  worked. Imported images published `loading="lazy"`, so the fixed nav's
+  logo was 0px high until it loaded.
+- Cause: API limits; Webflow's default image loading is lazy.
+- Fix: put a page-level base class on a wrapper div instead of Body; size
+  logos by their class (`aspect-ratio`, see designer.md "A lazy image with
+  no width/height takes no space until it loads") and set the first
+  screen's images to `loading="eager"` through `set_attributes`.
+- Status: worked around
+- Found by: claude
+
+### 2026-10-29 · Rich-text images publish eager; `loading="lazy"` written through the CMS API is kept
+- Area: mcp, perf
+- Symptom: on a blog template both body images (233 and 169 KB, no
+  `srcset`) loaded before the first paint and held the mobile LCP (the
+  lead paragraph) at 4.5 s.
+- Cause: Webflow publishes rich-text `<img>` without a `loading`
+  attribute, and the Designer and CMS editor have no setting for it.
+- Fix: write the rich-text field through the CMS API with
+  `loading="lazy"` on each `<img>`: it is stored and published as written.
+  Images an editor adds later in the CMS editor are eager again, so do it
+  for long posts with several images, or keep the first body image below
+  the lead.
+- Status: worked around
+- Found by: claude
+
 ### 2026-10-29 · Collection List query writes: intermittent conflicts, one key at a time
 - Area: mcp
 - Symptom: `filters` (Switch `isOn`, Option `equals`) and `sort` writes on
@@ -93,6 +180,12 @@ refer to the project the lesson came from; Status is that project's.
   publish. Check the published `<img>` for `srcset` after setting any
   image. See "API-uploaded assets stay size 0 and don't render in
   components".
+  Seen again: a new Image built with `data_element_builder` on an
+  API-uploaded asset that already had variants published without
+  `srcset`, also after `compress_assets` (WebP, same asset id) and
+  `set_image_asset`; only a re-pick or upload in the Designer remains for
+  plain Images. `compress_assets` replaces the file in place and keeps the
+  asset id, which is useful on its own.
 - Status: worked around
 - Found by: claude
 
@@ -241,6 +334,11 @@ refer to the project the lesson came from; Status is that project's.
   script that reads a bound date must parse that format and treat it as
   wall time in the site's time zone: Webflow can't publish a date with its
   offset.
+  A date field can be bound through the API: `set_settings` key `text`
+  with a `cms` binding (collection and field id from
+  `get_bindable_sources`). It publishes in the default format, "MMMM D,
+  YYYY" ("August 25, 2026"), which Finsweet's `fs-list-fieldtype="date"`
+  parses, so a hidden bound text can carry a full date for sorting.
 - Status: open (Designer steps)
 - Found by: claude
 
@@ -262,6 +360,12 @@ refer to the project the lesson came from; Status is that project's.
   the helper component when no page needs it. On a duplicated page, find
   the copied content with `query_elements` and remove it, or use it as
   the anchor.
+  Seen again moving content into the slot on many pages: every
+  `move_element` form into an empty slot failed ("Anchor element not
+  found", "Cannot append an element to a component instance"); once a
+  slot holds something, `before` / `after` / `append` on it work. Don't run
+  MCP writes while a person edits the same pages: concurrent edits change
+  element ids.
 - Status: worked around
 - Found by: claude
 
@@ -423,6 +527,9 @@ refer to the project the lesson came from; Status is that project's.
 - Fix: set links afterwards with `data_element_tool` › `set_link`; put
   list text in a `span` inside each `li`. Check the published HTML for
   hrefs and text after any build, not only the tool's success message.
+  Seen again with Link Blocks built inside a component definition with
+  `set_link` (link_type page): they published `href="#"`. `set_link`
+  afterwards, then check `return_element_info` shows `link.pageId`.
 - Status: worked around
 - Found by: human
 
@@ -558,6 +665,9 @@ refer to the project the lesson came from; Status is that project's.
   the Layout mode at Tablet, Mobile Landscape and Mobile instead (the
   pattern earlier projects used). Either do the same for every responsive
   collection, or pick the one collection that gets auto-modes up front.
+  Update 2026-10-30: it was the API, not a one-collection limit: see
+  "Breakpoint auto-modes: link them in the Designer, never through the
+  API". Linked in the Designer, two collections both took auto-modes.
 - Status: open
 - Found by: claude
 
@@ -890,6 +1000,9 @@ refer to the project the lesson came from; Status is that project's.
   each one). Give breakpoint auto-modes to Typography Role before any
   other collection (see "Only one collection can take breakpoint
   auto-modes").
+  Update 2026-10-30: don't create breakpoint auto-modes through the API
+  at all; link them in the Designer (see "Breakpoint auto-modes: link
+  them in the Designer, never through the API").
 - Status: workaround confirmed
 - Found by: claude
 
@@ -1376,6 +1489,15 @@ refer to the project the lesson came from; Status is that project's.
   `data-order` was written, and removed again the same day when a person
   rebuilt the list with a native sort. Report a refused native setting
   as a Designer step first, before writing workaround code.
+  Update 2026-10-30, lists inside a component definition: build the list
+  with `data_element_builder` (`CMSCollection`, `scope_component_id`) and
+  set `source` and `limit` (one call each); every field binding inside the
+  definition answers "Element is not inside a CMS context", and
+  `curatedItemIds` failed with "[Conflict] … component map" after
+  `queryMode: "curated"` took (sent with `static_text`, not
+  `static_json`). Filters, sort, curated items and field bindings in a
+  component are Designer steps; `queryMode` back to `dynamic` still
+  worked.
 - Status: workaround confirmed
 - Found by: claude
 

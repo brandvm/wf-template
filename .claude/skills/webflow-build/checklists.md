@@ -10,6 +10,15 @@ Tags: **[Claude]** Claude does it · **[Claude checks]** Claude verifies and
 reports · **[Person]** a person does it; Claude may track it, never claim it.
 Commands are the check scripts (`pnpm wf:*`, see SKILL.md › Checks).
 
+How to record progress: when an item is done, tick it in
+`docs/handoff/progress.json` with `pnpm progress tick "<checklist>" "<the
+start of the item>"`, adding `--page /path` for Page done and `--component
+<Name>` for Component done. Use `--by check` when a `pnpm wf:*` script
+decided it, and leave `--by` out (Claude) otherwise. Never tick a
+**[Person]** item for the person: say it's theirs, or add it to their list
+with `pnpm progress todo "<text>"` when they ask. Commit the file with the
+work it records.
+
 ## Before building (design handoff, approved in writing)
 
 Don't start building a page in Webflow until its inputs exist. Missing →

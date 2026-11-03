@@ -13,6 +13,74 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.15.0 — 2026-11-03
+
+Harvested from four client builds (2026-10-29 to 11-02): two fixes in the
+prototype starter, one in `wf:install`, 24 lessons and eight existing ones
+extended. One new agent rule: never create breakpoint auto-modes through the
+API.
+
+**For client repos:** `pnpm update-skills`. No loader snippet changed. A
+project with a prototype already copied from the starter can add
+`src/css/repo.css` and its `<link>` in `partials/head.html` by hand.
+
+- **Prototype starter:** `src/css/repo.css` holds a library's own CSS
+  (Lenis, Swiper…), linked after the new classes and moved to the repo's
+  `styles.css` as is. In `new-classes.css` those classes failed
+  `check:style-guide`, which reads every class there as one to create in
+  Webflow. `proposed.css` says a breakpoint value goes in every breakpoint
+  block below the one it starts at, since each smaller block redeclares
+  the variables on `body`.
+- **`wf:install`:** ignores quote style and the spacing around
+  punctuation. The Embed editor's Format action rewrites pasted code (double
+  quotes to single, one-line bodies split), which was reported as drift
+  right after a correct paste.
+- **AGENTS.md › Webflow MCP limits:** `create_variable_mode` with
+  `breakpoint_id` can lock Body's mode slots for good; create modes without
+  it and link them in the Designer.
+- **Lessons (mcp):** breakpoint auto-modes (and the earlier "one
+  collection" lessons corrected); IX2 is invisible to the MCP; line clamp
+  through the style API; Body takes no class and imported images publish
+  lazy; lazy rich-text images through the CMS API. Extended: `srcset` after
+  `compress_assets`, binding a CMS date and its default format, moving
+  content into empty slots, Link Blocks in component definitions,
+  Collection Lists in components.
+- **Lessons (loader, release):** Lighthouse bills anything that finishes
+  before the first paint (the bundle, swap fonts) to it; the dev port shared
+  across projects and staging pages that can't read localhost; the Embed
+  editor's reformatting; captures that miss runtime ES module imports;
+  staging baselines when live is older.
+- **Lessons (js):** module first states in CSS once the bundle starts after
+  the first paint; SplitText pieces left inline; line splits cutting
+  unsplit headings; nested Collection Lists and Finsweet's late pages; CSS
+  fades in a Dropdown List; a mobile menu's close as one motion; Lenis and
+  sideways scrollers.
+- **Lessons (css, designer):** calibrated font fallback metrics; Figma
+  sizes on classes with their own type size; library CSS and the style
+  guide check; base CSS during a live-site migration; style guide rows for
+  states, whole sections and out-of-flow classes.
+
+## 0.14.0 — 2026-11-02
+
+Plans get their own checklists: SEO, Maintenance and Optimization each have a skill (`webflow-seo`, `webflow-maintenance`, `webflow-optimization`) with a SKILL.md for the cycle and a `checklists.md` that Bench's Tasks panel and `pnpm progress` read, in the same tagged format as the build lists.
+
+**For client repos:** `pnpm update-skills` brings the three skills. Nothing else changes; a client without those plans doesn't see their lists.
+
+- SEO: Baseline (once), Every cycle, Content and links, Monthly report.
+- Maintenance: Monthly health check, Updates, Monthly note. Requests stay in the progress file's `todos`.
+- Optimization: Baseline, Fixes, Before and after; the plan ends when its `targets` are met.
+- `pnpm progress tick` picks from the checklists of the plans that are running (`--plan` to say which, as SEO and Optimization both have a Baseline), and `show` lists each plan's checklists. New test in `tests/progress.check.mjs`.
+
+## 0.13.0 — 2026-11-02
+
+Task progress lives in the repo, by plan: `docs/handoff/progress.json` (format 2) records the client's plans (New build, Migration, Optimization, SEO, Maintenance), which checklist items are done and who did them (you, Claude or a check), each plan's stage, and the requests. Bench's Tasks panel, Claude and CI share it, and Sync carries it between Macs. Format and ids: `docs/bench.md` › Task progress (an optional part of contract 1, so the contract number stays 1).
+
+**For client repos:** `pnpm update-skills` brings `scripts/progress.mjs`, the `progress` script and an empty `docs/handoff/progress.json`. Commit the file. Ticks from Bench's earlier per-Mac store move into it the next time Bench opens the project.
+
+- `pnpm progress tick "<checklist>" "<start of the item>"` (`--page`, `--component`, `--by check`, `--plan`), `untick`, `todo`, `todo-done`, `stage`, `plan list|add <kind>|end <id>`, and `show` for each plan's stage, open checklists and the requests. A fresh project has no plan; the first build tick starts the build plan. A format 1 file (from a pre-release of this change) reads as one build plan, with the same item ids. It parses the checklists with the same rules as Bench, so both compute the same item ids, and writes one tick per line so two Macs merge cleanly.
+- `webflow-build`: session start runs `pnpm progress show`; checklists.md › How to record progress says when and how to tick, and never to tick a [Person] item. `webflow-launch` records items the same way instead of copying the lists into `LAUNCH.md`.
+- `new-project` writes an empty file when the template has none; `update-skills` seeds it. New test: `tests/progress.check.mjs`.
+
 ## 0.12.0 — 2026-10-30
 
 The check widths cover all four of Webflow's default breakpoints: **667 × 375** (Mobile landscape, 767 px and down) joins 1440 × 900 (Desktop), 820 × 1180 (Tablet) and 390 × 844 (Mobile). The new width is 667 because a phone on its side is often wider: 844 px falls in Webflow's Tablet range, so it would check the Tablet layout again.

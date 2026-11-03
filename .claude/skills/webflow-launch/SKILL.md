@@ -18,8 +18,11 @@ add `--live` to check what visitors get). Where a list names another skill
 the session has it; otherwise do the check by hand and say so.
 
 How to run it:
-1. Copy the lists below into the project's `docs/handoff/LAUNCH.md` (or the
-   agency's tracker) and tick items there, with the date and who did it.
+1. Record each item as it's done with `pnpm progress tick "<checklist>"
+   "<the start of the item>"` (`--by check` when a `pnpm wf:*` script
+   decided it), as in `webflow-build` › checklists.md › How to record
+   progress. Bench's Tasks panel shows the same list; `pnpm progress show`
+   prints it, with the person's own to-dos.
 2. Work top to bottom; report each section's result before moving on.
 3. Anything that fails goes into the known issues list as "fix before
    launch" or "fix after launch", with an owner.

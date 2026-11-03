@@ -163,6 +163,10 @@ Worked around, not fixed — do not rediscover these.
 - `custom_value` is rejected for Color and Size variables (`color-mix()`,
   `oklch()`, `calc()`). Create those through the variables JSON import with
   `valueType: "custom"`.
+- Never create breakpoint auto-modes through the API
+  (`create_variable_mode` with `breakpoint_id`): it can lock Body's mode
+  slots for good. Create the modes without it and link them to the
+  breakpoints in the Designer.
 - No variable reorder within a collection. `rename_variable` works and
   keeps ids and aliases (recreating does not); check the `name` in every
   create result, which can come back suffixed ("-9").

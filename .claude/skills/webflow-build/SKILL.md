@@ -12,7 +12,9 @@ listed.
 
 - [checklists.md](checklists.md) gates every step: the design handoff,
   the Webflow foundation, the media page, each component, each finished
-  page and the build handoff.
+  page and the build handoff. Progress on them is recorded in
+  `docs/handoff/progress.json` with `pnpm progress` (checklists.md › How
+  to record progress), which Bench's Tasks panel shows.
 - [conventions.md](conventions.md) sets the page and section structure,
   class and variable naming, and the component, CMS and style-guide
   patterns every build starts from.
@@ -54,8 +56,10 @@ Every checklist item says who does it:
    for today's area (MCP work: `lessons/mcp.md`). Never repeat a mistake
    already logged.
 2. Read the project memory: where the last session stopped, open manual
-   steps, open questions. Say in one line where things stand and what's
-   next; ask which page or section if it isn't clear.
+   steps, open questions. Run `pnpm progress show` for the stage, the
+   checklists still open and the person's own to-dos. Say in one line
+   where things stand and what's next; ask which page or section if it
+   isn't clear.
 3. Run **Before building** in `checklists.md` before the first Webflow
    batch (the inputs and the prototype gates are `webflow-prototype`'s). Agree
    any change to `conventions.md` with the designer. If an input is

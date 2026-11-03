@@ -54,6 +54,7 @@ test('fills in every placeholder and writes the config', { skip }, () => {
   assert.match(meta.version, /^\d+\.\d+\.\d+$/);
   assert.match(meta.created, /^\d{4}-\d{2}-\d{2}$/);
   assert.equal(meta.template, 'example/wf-template');
+  assert.deepEqual(JSON.parse(read('docs/handoff/progress.json')).ticks, {}, 'task progress starts empty');
 });
 
 test('refuses to run twice', { skip }, () => {

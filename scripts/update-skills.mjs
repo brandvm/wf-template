@@ -14,7 +14,8 @@
 //      repo lacks are added. Nothing that exists is changed.
 //   4. Seeds: files a new feature needs that the site owns afterwards are
 //      added once, when missing (the icon font and its import in
-//      src/styles.css). They are never overwritten.
+//      src/styles.css, docs/handoff/progress.json). They are never
+//      overwritten.
 // A skill folder that is new also gets its link in the workspace around
 // the repo (<Client>/.claude/skills), when that workspace links the others.
 // --skills-only does step 1 and the wf:* shortcuts, nothing else.
@@ -36,7 +37,7 @@ const dry = argv.includes('--dry-run');
 const skillsOnly = argv.includes('--skills-only');
 const from = opt('from');
 // Files the template owns in every repo made from it.
-const TOOLING = ['build.mjs', 'scripts/update-skills.mjs', 'scripts/phosphor.mjs', 'scripts/check-repo.mjs', 'THIRD-PARTY-NOTICES.md'];
+const TOOLING = ['build.mjs', 'scripts/update-skills.mjs', 'scripts/phosphor.mjs', 'scripts/check-repo.mjs', 'scripts/progress.mjs', 'THIRD-PARTY-NOTICES.md'];
 // package.json scripts that belong to the template repo only.
 const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'new-project', 'pack-template'];
 const metaFile = path.join(root, '.wf-template.json');
@@ -159,6 +160,15 @@ if (!skillsOnly) {
 @import "./phosphor.css";
 
 ` + css.slice(lead));
+    }
+  }
+  // Task progress (docs/bench.md › Task progress): an empty file, once.
+  const progress = path.join(root, 'docs/handoff/progress.json');
+  if (!fs.existsSync(progress) && fs.existsSync(path.join(source, 'docs/handoff/progress.json'))) {
+    seeded.push('+ docs/handoff/progress.json');
+    if (!dry) {
+      fs.mkdirSync(path.dirname(progress), { recursive: true });
+      fs.copyFileSync(path.join(source, 'docs/handoff/progress.json'), progress);
     }
   }
   if (seeded.length) console.log(`Seeds ${dry ? 'to add' : 'added'}:\n${seeded.map((t) => '  ' + t).join('\n')}`);
