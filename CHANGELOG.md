@@ -13,6 +13,14 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.17.0 — 2026-11-04
+
+Checklist items that Bench's checks prove say only what the check tests.
+
+**For client repos:** `pnpm update-skills`. These items get new ids, so an old tick shows as "changed" once; a check ticks its items again on its next run.
+
+- Checklist items that Bench's checks prove are in plain words and say only what the check tests, with the script in brackets at the end (`docs/bench.md` › Items a Bench check proves). Page done: matching the prototype, accessibility and broken links are separate items, and explaining differences is Claude's. Build handoff: speed (Home on a phone, 90 or more) and SEO basics are split from the key-page numbers and the rest of the SEO report. Pre-launch QA: the accessibility scan, the keyboard walkthrough and the screen reader check are three items, and the SEO basics are split from OG tags, JSON-LD and noindex. SEO plan: the staging SEO check is split from duplicates, the 404 and schema.
+
 ## 0.16.0 — 2026-11-04
 
 `pnpm new-project` writes `.bench/site.json`: Bench's answers about the site

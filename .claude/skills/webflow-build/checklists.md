@@ -86,14 +86,18 @@ Procedure: [media.md](media.md).
 
 ## Page done (per page, before showing it for review)
 
-- [Claude checks] `pass` and `compare` match the design at all three
-  widths; differences are explained or fixed.
+- [Claude checks] Matches the prototype at all three widths (`compare`,
+  with `pass` for the details).
+- [Claude] Any difference from the design that stays is explained in the
+  changes log (`BUILD-NOTES.md`); the rest are fixed.
 - [Claude checks] `outline`: one H1, no skipped levels, no words glued at
   line breaks; matches the H1 to H3 marked in the design.
 - [Claude checks] `anchors`: every in-page and cross-page link lands on
   its section.
-- [Claude checks] `a11y` at all widths: no serious or critical failures;
-  `links`: no broken links (`#` placeholders listed in the known issues).
+- [Claude checks] No serious or critical accessibility failures at any
+  width (`a11y`).
+- [Claude checks] No broken links; `#` placeholders are listed in the
+  known issues. Run `links`.
 - [Claude checks] `html`: nothing Webflow rewrote on publish breaks the
   page (roles, dropped attributes, form field names, variant classes).
 - [Claude checks] `overflow`: nothing runs off the right edge and the page
@@ -124,12 +128,16 @@ notes, integrations, changes log, redirect map and known issues.
 - [Claude checks] Style guide final check: `pnpm check:style-guide`
   passes and the published style guide holds every class; page section
   previews whose page now exists are removed.
-- [Claude checks] `pnpm wf:perf` on the key pages, mobile and desktop
-  (the median of several runs); the numbers go in `BUILD-NOTES.md`.
+- [Claude checks] Fast on a phone: Home scores 90 or more
+  (`pnpm wf:perf`).
+- [Claude checks] The key pages measured on mobile and desktop, the median
+  of several runs; the numbers go in `BUILD-NOTES.md`.
 - [Claude checks] `pnpm wf:install` on every page template: the installed
   snippets match `loader.html`, one viewport meta, no localhost request.
-- [Claude checks] `pnpm wf:seo`: every page has its title, description,
-  OG tags, one H1 and valid JSON-LD; noindex only where planned.
+- [Claude checks] Every page has its title, description, canonical and
+  one H1 (`pnpm wf:seo`).
+- [Claude checks] Open Graph tags and valid JSON-LD on every page, and
+  noindex only where planned: the rest of the SEO report.
 - [Claude] CMS notes: how to edit what (collections, fields, conditional
   sections, components and their props).
 - [Claude] Integration list and configuration notes (no credentials).

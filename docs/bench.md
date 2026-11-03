@@ -166,6 +166,8 @@ A fresh project's file has no plan; Bench and the first build tick both treat it
 
 **Writing it:** one plan and one tick per line, groups and ticks sorted by key, two-space indent, as `pnpm progress` writes it. Two Macs ticking different items then change different lines, and git merges them without a conflict. Collapsed groups and other view settings stay in Bench, per Mac.
 
+**Items a Bench check proves:** a `[Claude checks]` item that names its script in brackets right after its plain words, as in "No serious or critical accessibility failures at any width (`a11y`)", is proved by Bench's own check of the same name: `compare` or `pass` (Matches the prototype), `a11y`, `wf:perf` (Speed: Home on a phone, 90 or more) and `wf:seo` (title, description, canonical and one H1). Bench shows a status mark instead of a checkbox, ticks it (`by: "check"`) when its check passes, and unticks it when a later run fails. Write such an item only when the check tests exactly what it says; anything else (a walkthrough, a report to read) goes in its own item, and a script named elsewhere in an item (`` `pnpm wf:seo --live` … ``) doesn't link it.
+
 **Manual Designer steps:** ticking a row of `docs/handoff/MANUAL-TODO.md` in Bench writes `☑` into that row's Done cell, as a person would; that file stays the record for those steps.
 
 `new-project` creates an empty file, and `update-skills` adds one to projects that don't have it.
