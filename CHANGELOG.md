@@ -13,6 +13,19 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.18.0 — 2026-11-04
+
+The prototype is always built first, from the Figma design, in Bench (or by Claude in the terminal with the same steps), before the Webflow build.
+
+**For client repos:** `pnpm update-skills`. A client already past its prototype keeps its stage; the Prototype stage counts only for a site Bench set up from Figma, or once one of its items is ticked.
+
+- **`webflow-build` SKILL.md:** "The prototype, from Figma": frames with the same name across Desktop, Tablet and Mobile are one page; tokens as CSS custom properties from the file's variables and text styles; fonts; images to `prototype/images/` (photos as WebP, icons as SVG); only what's in the file, ask before inventing; each page at `prototype/<page>/index.html` and in `pages` in `vite.config.js`. The same steps Bench's AI follows. The Figma-only handoff (building from the frames with no prototype) is gone.
+- **`webflow-build` checklists.md:** a Prototype stage before Before building, with the items of Bench's pack 2026.11.2 in the same words and order. Bench proves the first four.
+- **`webflow-prototype`:** setup in Bench or from the one message; the design is always a Figma file; images exported to `prototype/images/`; review against the frames in Compare › With Figma; the client approves the prototype in writing.
+- **`scripts/progress.mjs`:** the Prototype stage comes first for a site from Figma (`.bench/prototype-build.json` in the client folder, or a Prototype tick).
+- **`docs/bench.md`:** "A new site, from Figma": how Bench sets up the repo and the prototype, builds and updates the pages.
+- README, `HANDOFF.md`, the workspace `CLAUDE.md` from `new-project` and the prototype starter's README say the same.
+
 ## 0.17.0 — 2026-11-04
 
 Checklist items that Bench's checks prove say only what the check tests.

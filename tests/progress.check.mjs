@@ -86,6 +86,10 @@ test('a plan’s stage is derived until it is set, and requests are listed', () 
   assert.match(run(dir, 'show'), /No plan running/);
   run(dir, 'plan', 'add', 'new-build');
   assert.match(run(dir, 'show'), /build \(new-build\) · stage: Before building/);
+  fs.mkdirSync(path.join(dir, '.bench'));
+  fs.writeFileSync(path.join(dir, '.bench/prototype-build.json'), '{}');
+  assert.match(run(dir, 'show'), /build \(new-build\) · stage: Prototype/, 'a site from Figma starts at the Prototype stage');
+  fs.rmSync(path.join(dir, '.bench'), { recursive: true });
   run(dir, 'stage', 'pre-launch');
   assert.equal(read(dir).plans[0].stage, 'Pre-launch QA');
   run(dir, 'stage', 'auto');

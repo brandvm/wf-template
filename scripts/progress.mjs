@@ -112,6 +112,7 @@ export function checklists() {
 
 // ── Stages: the order a site goes through, and the checklists in each ──
 export const STAGES = [
+  ['Prototype', (id) => id.startsWith('build/Prototype')],
   ['Before building', (id) => id.startsWith('build/Before building')],
   ['Foundation', (id) => id.startsWith('build/Foundation done') || id.startsWith('build/Media done')],
   ['Components', (id) => id.startsWith('build/component/')],
@@ -244,9 +245,19 @@ export function findItem(group, text) {
   return loose[0];
 }
 
+/**
+ * Whether the Prototype stage counts, as in Bench: a site from Figma (Bench's
+ * .bench/prototype-build.json in the client folder) or one with a Prototype tick.
+ */
+export function fromFigma(p, plan, dir = root) {
+  if (Object.keys(p.ticks[`${plan.id}/build/Prototype`] ?? {}).length) return true;
+  return [path.join(dir, '.bench/prototype-build.json'), path.join(dir, '../.bench/prototype-build.json')].some((f) => fs.existsSync(f));
+}
+
 /** A plan's first stage with something left to do (pages from the config; components from the file). */
 export function deriveStage(p, lists, pages, plan = p.plans.find((x) => x.status === 'active') ?? buildPlan()) {
   const groups = [];
+  if (!fromFigma(p, plan)) lists = lists.filter((g) => !(g.set === 'build' && g.title === 'Prototype'));
   for (const g of lists) {
     if (g.title === 'Page done') for (const pg of pages) groups.push({ id: `build/page/${pg}`, items: g.items });
     else if (g.title === 'Component done') for (const c of p.components ?? []) groups.push({ id: `build/component/${c}`, items: g.items });

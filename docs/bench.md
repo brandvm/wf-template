@@ -108,6 +108,35 @@ Client settings › Code changes it. A repo without it works as before.
 }
 ```
 
+## A new site, from Figma
+
+Every new site starts from a Figma file, and its prototype is built before
+anything in Webflow. Bench uses the repo like this:
+
+1. **Set up.** Add client › from a Figma design names the client from the
+   file and makes the client folder, the repo from a pack (`new-project`)
+   and an empty `prototype/`: a copy of
+   `.claude/skills/webflow-prototype/prototype-starter/`, run once to see
+   it answer.
+2. **Pick the pages.** Frames with the same name across Desktop, Tablet
+   and Mobile are one page. The person picks and orders them, each with
+   its address; two pages at one address are refused.
+3. **Build them.** One AI job builds the pages one at a time, following
+   the `webflow-build` skill (SKILL.md › The prototype, from Figma): each
+   page is `prototype/<page>/index.html` at its address, listed in `pages`
+   in `prototype/vite.config.js`. Tokens, fonts and images come from the
+   file; a value it doesn't give becomes a to-do. The AI doesn't commit,
+   push or publish.
+4. **Compare and update.** Each built page keeps its Figma frame for
+   Compare › With Figma, and the Matches the Figma frame check compares
+   them at each width. Bench looks at the file when the client opens and
+   hourly, and offers to update the pages whose frames changed.
+
+Bench keeps the build plan in `<Client>/.bench/prototype-build.json` and
+each page's frame in `<Client>/.bench/pages.json`, outside the repo, per
+Mac. The **Prototype** stage in `webflow-build/checklists.md` tracks it,
+before Before building; Bench proves its first four items (below).
+
 ## Template contract, version 1
 
 What any template needs for Bench to create and update projects from it. `node scripts/check-template.mjs <folder>` checks all of it and lists anything missing. Bench runs the copy from its official pack against templates users bring.
@@ -157,7 +186,7 @@ An optional part of contract 1: a template without it still works, and Bench fal
 | `ticks` | By `<plan>/<group>`, then by item. A group is `build/<checklist>` (from `webflow-build/checklists.md`), `launch/<checklist>` (from `webflow-launch/SKILL.md`), `build/page/<path>` or `build/component/<name>`; SEO, Maintenance and Optimization use their skills' checklists (`webflow-<kind>/checklists.md`) when the template has them. A checklist with sub-headings uses `<heading> · <sub-heading>`, e.g. `launch/Pre-launch QA · Content`. A New build has the build and launch checklists; a Migration has the build ones. |
 | item id | The first 12 hex characters of `sha1("<group>\n<item text>")` for the `build` plan, and of `sha1("<plan>/<group>\n<item text>")` for any other, where the text is the item with Markdown emphasis and links removed and spaces collapsed. Rewording an item changes its id, so an old tick shows as "changed", not done. |
 | `by` | `you` (ticked in Bench), `claude` (Claude did the work) or `check` (a `pnpm wf:*` script passed). |
-| stage | Derived per build plan: the first stage with an unticked item, in the order Before building, Foundation, Components, Pages, Build handoff, SEO plan, Pre-launch QA, Launch day, Client handoff, After launch. |
+| stage | Derived per build plan: the first stage with an unticked item, in the order Prototype (for a site from Figma: `.bench/prototype-build.json` in the client folder, or a Prototype tick), Before building, Foundation, Components, Pages, Build handoff, SEO plan, Pre-launch QA, Launch day, Client handoff, After launch. |
 | `todos` | Requests: the person's (or the client's) to-dos, across plans. Claude reads them; it adds one only when asked. |
 | `components` | The components that get a Component done group. |
 | `history` | Plans started and finished. |
@@ -166,7 +195,7 @@ A fresh project's file has no plan; Bench and the first build tick both treat it
 
 **Writing it:** one plan and one tick per line, groups and ticks sorted by key, two-space indent, as `pnpm progress` writes it. Two Macs ticking different items then change different lines, and git merges them without a conflict. Collapsed groups and other view settings stay in Bench, per Mac.
 
-**Items a Bench check proves:** a `[Claude checks]` item that names its script in brackets right after its plain words, as in "No serious or critical accessibility failures at any width (`a11y`)", is proved by Bench's own check of the same name: `compare` or `pass` (Matches the prototype), `a11y`, `wf:perf` (Speed: Home on a phone, 90 or more) and `wf:seo` (title, description, canonical and one H1). Bench shows a status mark instead of a checkbox, ticks it (`by: "check"`) when its check passes, and unticks it when a later run fails. Write such an item only when the check tests exactly what it says; anything else (a walkthrough, a report to read) goes in its own item, and a script named elsewhere in an item (`` `pnpm wf:seo --live` … ``) doesn't link it.
+**Items a Bench check proves:** a `[Claude checks]` item that names its script in brackets right after its plain words, as in "No serious or critical accessibility failures at any width (`a11y`)", is proved by Bench's own check of the same name: `compare` or `pass` (Matches the prototype), `a11y`, `wf:perf` (Speed: Home on a phone, 90 or more) and `wf:seo` (title, description, canonical and one H1). Bench shows a status mark instead of a checkbox, ticks it (`by: "check"`) when its check passes, and unticks it when a later run fails. The Prototype stage's first four items are proved by their words: the match with each frame by the Matches the Figma frame check, and the file linked, the frames picked and every frame built by Bench's own prototype build. Write such an item only when the check tests exactly what it says; anything else (a walkthrough, a report to read) goes in its own item, and a script named elsewhere in an item (`` `pnpm wf:seo --live` … ``) doesn't link it.
 
 **Manual Designer steps:** ticking a row of `docs/handoff/MANUAL-TODO.md` in Bench writes `☑` into that row's Done cell, as a person would; that file stays the record for those steps.
 

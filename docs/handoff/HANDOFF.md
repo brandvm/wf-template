@@ -10,7 +10,7 @@ current during the build. Agents read it after `AGENTS.md` and `GOTCHAS.md`.
 2. This file, then `MANUAL-TODO.md` and `BUILD-NOTES.md` in this folder;
    after the build handoff, `REVIEW.md` (feedback rounds until launch) and
    `SEO-PLAN.md`.
-3. The approved design: <prototype folder and its URL, Figma file, or both>.
+3. The approved design: <prototype folder and its URL>, built from <Figma file link>.
 
 ## Status
 
@@ -26,7 +26,7 @@ current during the build. Agents read it after `AGENTS.md` and `GOTCHAS.md`.
 
 | URL | Design source | Webflow page | Notes |
 | --- | --- | --- | --- |
-| `/` | <prototype file or Figma frame> | Home | |
+| `/` | <prototype file> · <Figma frame link> | Home | |
 | `/<page>` | | | |
 | `/<collection>/<item>` | | <Collection> template | CMS template |
 | `/design/style-guide` | | Style guide (folder `design`) | first page built; excluded from search |

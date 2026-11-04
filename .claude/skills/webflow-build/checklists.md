@@ -1,10 +1,11 @@
 # Build checklists
 
-Gates for the Webflow build, from the agency's project checklist. The
-gates before it (the inputs, each prototype page, the prototype handoff)
-are in the `webflow-prototype` skill
-([checklists.md](../webflow-prototype/checklists.md)); these lists start
-at the design handoff and end at the build handoff.
+Gates for the Webflow build, from the agency's project checklist. They
+start with the prototype (from the Figma file to a prototype the client
+approved), then run from the design handoff to the build handoff. The
+`webflow-prototype` skill has the prototype's working rhythm, and its
+[checklists.md](../webflow-prototype/checklists.md) the inputs and the
+gates for each prototype page.
 
 Tags: **[Claude]** Claude does it · **[Claude checks]** Claude verifies and
 reports · **[Person]** a person does it; Claude may track it, never claim it.
@@ -18,6 +19,25 @@ decided it, and leave `--by` out (Claude) otherwise. Never tick a
 **[Person]** item for the person: say it's theirs, or add it to their list
 with `pnpm progress todo "<text>"` when they ask. Commit the file with the
 work it records.
+
+## Prototype (from the Figma file to a prototype the client approved)
+
+Bench proves the first four: Compare › With Figma the match, and Bench's
+own prototype build the link, the picks and the pages built. Don't tick
+them by hand. Outside Bench, Claude ticks them when they are true: the
+match after looking at each page beside its frame at the three widths.
+The steps are in SKILL.md › The prototype, from Figma.
+
+- [Claude checks] Each page matches its Figma frame at Desktop, Tablet and
+  Mobile.
+- [Claude checks] The Figma file is linked to the client.
+- [Claude checks] Frames picked, in order, each with its page address.
+- [Claude checks] Every picked frame built as a prototype page.
+- [Claude checks] Tokens, fonts and images come from the file; nothing
+  made up.
+- [Claude checks] The Figma prototype's links work: menus, tabs and forms.
+- [Person] Each page approved in the prototype (right-click in Pages).
+- [Person] The client approved the prototype in writing.
 
 ## Before building (design handoff, approved in writing)
 

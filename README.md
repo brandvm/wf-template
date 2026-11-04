@@ -49,13 +49,20 @@ fails the push if they disagree, and staging does not deploy until it passes.
 3. **Person:** open Claude Code in the repo and send one message:
 
    > New project: Webflow site <name>, Figma <link>. Set up the repo and
-   > workspace, run Before the prototype, then build the prototype page by
-   > page; wait for my go-ahead before any Webflow change.
+   > workspace, run Before the prototype, then build the prototype from the
+   > Figma file page by page; wait for my go-ahead before any Webflow
+   > change.
+
+Every site starts from a Figma file, and the prototype is always built
+from it first. In Bench, Add client › from a Figma design sets up the
+folder, the repo and an empty prototype, and builds the prototype from the
+frames, one page at a time ([`docs/bench.md`](docs/bench.md) › A new site,
+from Figma).
 
 Claude finds the site through the Webflow connector, runs
 `pnpm new-project`, lists the steps below that are yours, collects the
 inputs (design frame, CMS, SEO, states, content), and builds the
-prototype page by page. From the second session on, open Claude in
+prototype from the Figma frames, page by page. From the second session on, open Claude in
 `<Client>/`, not in the repo. The `webflow-prototype` skill
 ([SKILL.md](.claude/skills/webflow-prototype/SKILL.md) › Project setup)
 has the details; the Webflow build then starts in its own session with
@@ -296,8 +303,8 @@ Claude Code keeps one sign-in per server name, on the machine — so every
 client repo keeps its own, and opening a repo loads the sign-in for its
 site. The token is never in the repo (these repos are public); the sign-in
 is repeated on each new machine. The cloud (claude.ai/code) can't run it:
-do Webflow MCP work locally. The Figma connector (for designs sent as a
-Figma link) is connected once per account.
+do Webflow MCP work locally. The Figma connector (every site starts
+from a Figma file) is connected once per account.
 
 Repos created before 0.7.2 share the name `webflow`, so signing in for one
 client replaced the other. Rename the key in the repo's and the
