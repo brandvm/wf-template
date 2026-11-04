@@ -13,6 +13,23 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.16.0 — 2026-11-04
+
+`pnpm new-project` writes `.bench/site.json`: Bench's answers about the site
+(which Webflow site, how it runs, what the published site loads from the
+repo, how code reaches staging and live), the same ones Bench works out from
+`loader.html` and `webflow-build.config.json`. Bench now works with repos that
+aren't made from this template too; for template repos the file only writes
+down what it already knew.
+
+**For client repos:** nothing to do. A repo without `.bench/site.json` works as
+before; Bench › Client settings › Code can save one.
+
+- **`scripts/new-project.mjs`:** writes `.bench/site.json` (the staging branch
+  is the one the repo is on); keeps one that's already there unless `--force`.
+- **`docs/bench.md`:** "Bench's answers about the site", with the file's shape.
+- **`tests/new-project.check.mjs`:** checks the file.
+
 ## 0.15.0 — 2026-11-03
 
 Harvested from four client builds (2026-10-29 to 11-02): two fixes in the

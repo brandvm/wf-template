@@ -5,7 +5,7 @@
 // Missing values are asked for when run in a terminal. Writes:
 //   package.json name · AGENTS.md project facts · loader.html REPO ·
 //   docs/handoff/HANDOFF.md title · .mcp.json server name (webflow-<slug>) ·
-//   webflow-build.config.json · .wf-template.json
+//   webflow-build.config.json · .wf-template.json · .bench/site.json
 // and removes the files that only belong in the template (CONTRIBUTING…).
 // Then sets up the workspace around the repo (the folder that holds it):
 //   CLAUDE.md · .mcp.json · .claude/skills links · prototype/ · Assets/
@@ -158,6 +158,37 @@ const configFile = path.join(root, 'webflow-build.config.json');
 console.log(`${flag('dry-run') ? 'would write' : 'wrote'} webflow-build.config.json`);
 // One line per width, like the example file.
 if (!flag('dry-run')) fs.writeFileSync(configFile, JSON.stringify(config, null, 2).replace(/\[\s+(\d+),\s+(\d+)\s+\]/g, '[$1, $2]').replace(/\[\s+("[^\]]*")\s+\]/g, '[$1]') + '\n');
+
+// Bench's five answers about the site (Bench docs/ANY-REPO.md): which
+// Webflow site, how it runs here, what the published site loads from the
+// repo, how code reaches staging and live. Committed with the repo, so Bench
+// reads them instead of working them out; Bench › Client settings › Code
+// changes them. The same values Bench gets from this repo's files.
+const branch = (() => {
+  try { return execSync('git branch --show-current', { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() || 'master'; } catch { return 'master'; }
+})();
+const site = {
+  kind: 'wf-template',
+  webflow: { ...(siteId ? { siteId } : {}), staging: `https://${slug}.webflow.io` },
+  local: { command: 'pnpm dev', reload: 'esbuild' },
+  loads: [
+    { url: `https://${org}.github.io/${repo}/*`, local: '/*' },
+    { url: `https://cdn.jsdelivr.net/gh/${org}/${repo}@*/dist/*`, local: '/*' },
+    { match: config.bundlePattern, local: '$1' },
+  ],
+  staging: { kind: 'pages', branch, build: 'pnpm build', page: 'loader' },
+  live: { kind: 'jsdelivr-tag' },
+  packs: { from: 'repo' },
+};
+const siteFile = path.join(root, '.bench', 'site.json');
+if (fs.existsSync(siteFile) && !flag('force')) console.log('kept .bench/site.json (already there)');
+else {
+  console.log(`${flag('dry-run') ? 'would write' : 'wrote'} .bench/site.json`);
+  if (!flag('dry-run')) {
+    fs.mkdirSync(path.dirname(siteFile), { recursive: true });
+    fs.writeFileSync(siteFile, JSON.stringify(site, null, 2) + '\n');
+  }
+}
 
 // The workspace: the folder around the repo, where Claude is opened. It
 // imports the repo's agent rules and handoff, and links the repo's skills
