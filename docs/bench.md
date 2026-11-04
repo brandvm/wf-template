@@ -83,6 +83,31 @@ When a project has a `bench` record, `pnpm update-skills` without `--from` stops
 
 `template` (the GitHub repo) stays as it was. For official projects it remains `brandvm/wf-template`, so a developer who has the repo can still run `pnpm update-skills --repo brandvm/wf-template` themselves.
 
+## Bench's answers about the site
+
+`pnpm new-project` also writes `.bench/site.json`: Bench's five answers about
+the site (which Webflow site, how it runs here, what the published site loads
+from the repo, how code reaches staging and live). They're the same values
+Bench works out from `loader.html` and `webflow-build.config.json`, written
+down so Bench reads them instead. Commit the file with the repo; Bench ›
+Client settings › Code changes it. A repo without it works as before.
+
+```json
+{
+  "kind": "wf-template",
+  "webflow": { "siteId": "<24 hex>", "staging": "https://<slug>.webflow.io" },
+  "local": { "command": "pnpm dev", "reload": "esbuild" },
+  "loads": [
+    { "url": "https://<ORG>.github.io/<REPO>/*", "local": "/*" },
+    { "url": "https://cdn.jsdelivr.net/gh/<ORG>/<REPO>@*/dist/*", "local": "/*" },
+    { "match": "<bundlePattern>", "local": "$1" }
+  ],
+  "staging": { "kind": "pages", "branch": "master", "build": "pnpm build", "page": "loader" },
+  "live": { "kind": "jsdelivr-tag" },
+  "packs": { "from": "repo" }
+}
+```
+
 ## Template contract, version 1
 
 What any template needs for Bench to create and update projects from it. `node scripts/check-template.mjs <folder>` checks all of it and lists anything missing. Bench runs the copy from its official pack against templates users bring.
