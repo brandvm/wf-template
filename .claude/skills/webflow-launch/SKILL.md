@@ -64,10 +64,12 @@ from the client.
   printed under "needs a look" is checked and edited in the file.
   [Person] approves the map, and exports the site's existing 301s if it
   has any (an import replaces them all; re-run with `--existing`).
-- [Claude checks] `pnpm wf:seo` on staging: every page in the sitemap
-  passes (no duplicate titles or descriptions, a real 404); long titles and short descriptions are fixed or accepted;
-  pages with no schema are in `seo.noSchemaOk`. Then Google's Rich
-  Results Test on one page of each type.
+- [Claude checks] Every page in the sitemap has its title, description,
+  canonical and one H1 on staging (`pnpm wf:seo`).
+- [Claude checks] No duplicate titles or descriptions and a real 404; long
+  titles and short descriptions are fixed or accepted; pages with no
+  schema are in `seo.noSchemaOk`. Then Google's Rich Results Test on one
+  page of each type.
 - [Person] Supplies the official name, address, phone, hours, social
   profiles and the production domain (www or apex).
 
@@ -101,18 +103,22 @@ Devices, accessibility, speed
 - [Claude checks] `pnpm wf:overflow` on every page template: nothing
   runs off the right edge and no sideways scroll, at every width from
   2560 to 360 (laptop widths between the breakpoints included).
-- [Claude checks] Automated accessibility scan on every page
-  (`pnpm wf:a11y --all-widths`, no serious or critical failures), keyboard-only walkthrough of every page (focus visible, order, menus,
-  dialogs, Escape); [Person] screen reader spot check. Target: WCAG 2.2 AA.
+- [Claude checks] No serious or critical accessibility failures on any
+  page, at every width (`pnpm wf:a11y --all-widths`). Target: WCAG 2.2 AA.
+- [Claude] Keyboard-only walkthrough of every page: focus visible, order,
+  menus, dialogs, Escape.
+- [Person] Screen reader spot check.
 - [Claude checks] Performance on a phone profile: CLS < 0.1, INP < 200 ms,
   LCP < 2.5 s as targets (`webflow-performance-optimizer`); note what the
   design trades off.
 
 SEO and tracking
-- [Claude checks] Titles, meta descriptions, OG tags, one H1 per page and
-  JSON-LD that parses with no HTML entities, on every page in the sitemap
-  (`pnpm wf:seo`); noindex only on the pages in `seo.noindexOk`. Alt text
-  (`asset-audit`), favicon, schema where `SEO-PLAN.md` plans it.
+- [Claude checks] Every page in the sitemap has its title, description,
+  canonical and one H1 (`pnpm wf:seo`).
+- [Claude checks] OG tags and JSON-LD that parses with no HTML entities on
+  every page, and noindex only on the pages in `seo.noindexOk`: the rest of
+  the SEO report. Alt text (`asset-audit`), favicon, schema where
+  `SEO-PLAN.md` plans it.
 - [Claude checks] Canonicals point to the live domain (after the domain is
   attached: `liveUrl` in the config, then `pnpm wf:seo --live --canonical`).
 - [Claude checks] `pnpm wf:tracking --live` once the tags are on the
