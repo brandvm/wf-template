@@ -3,7 +3,8 @@
 Gates for the first phase of a Webflow project: the inputs, then each
 prototype page. Setup, discovery and design work (contracts, kickoff,
 research, client access) are people work and stay in the agency's own
-checklist. The gates of the Webflow build itself are in the
+checklist. The **Prototype** stage, from the Figma file to the client's
+approval, and the gates of the Webflow build itself are in the
 `webflow-build` skill ([checklists.md](../webflow-build/checklists.md)).
 
 Tags: **[Claude]** Claude does it · **[Claude checks]** Claude verifies and
@@ -16,8 +17,7 @@ inputs change the structure of everything after them, so they come
 before code. Missing → ask; Claude never fills them in with guesses.
 
 - [Person] The design: a Figma link with a frame per breakpoint for every
-  page ([figma.md](figma.md)), or the agreement to design in the
-  prototype.
+  page ([figma.md](figma.md)).
 - [Person] The desktop design frame and the width range it scales over,
   for the fluid scaling in `src/styles.css` §01 (default 1680, scaling
   1440–1680). [Claude] sets `--size-container-ideal`, `-min` and `-max`
@@ -76,7 +76,7 @@ comes back as rework in Webflow, where it costs more.
 ## Prototype handoff (once, before the Webflow build starts)
 
 - [Person] Every prototype page approved at the four widths, and the
-  style guide with it.
+  style guide with it; the client approved the prototype in writing.
 - [Claude] `docs/handoff/HANDOFF.md` is filled in: pages, variables and
   classes, CMS, components to make (from the component plan), modules with
   their `data-*` hooks, the video list.

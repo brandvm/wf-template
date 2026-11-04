@@ -250,14 +250,14 @@ Claude is opened in this folder, one level above the repo. Written by
 - \`${repoDir}/\` — the GitHub repo: custom code, the skills, the handoff
   docs. Paths in its \`AGENTS.md\` are relative to it; run \`pnpm\` and
   \`git\` there.
-- \`prototype/\` — the localhost prototype (webflow-prototype ›
-  prototype-starter). Not in git.
+- \`prototype/\` — the localhost prototype, built from the Figma file
+  (webflow-prototype › prototype-starter). Not in git.
 - \`Assets/\` — design exports, brand files and fonts; Figma frame
   screenshots in \`Assets/figma/\`. Not in git.
 - \`.claude/skills/\` links to the repo's skills (\`pnpm update-skills\` in
   the repo updates them); \`.mcp.json\` is a copy of the repo's.
 
-Design: <Figma link, or "prototype/">
+Design: <Figma link>, built as prototype/
 
 @${repoDir}/AGENTS.md
 @${repoDir}/GOTCHAS.md
