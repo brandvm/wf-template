@@ -1,7 +1,9 @@
 <!-- G | Nav W: one Webflow Component, shared by every page. A placeholder,
      like the starter site's: the project designs the nav and adds its
-     classes to new-classes.css (a class with no CSS fails wf:preflight). -->
-  <div class="g-nav-w" data-nav>
+     classes to new-classes.css (a class with no CSS fails wf:preflight).
+     data-component marks the component's root for tools; it is not made
+     in Webflow (README › Component and CMS markers). -->
+  <div class="g-nav-w" data-component="G | Nav W" data-nav>
     <nav class="g-nav" aria-label="Main">
       <a href="/" aria-label="Home">Logo</a>
       <div id="nav-menu" data-nav-menu>

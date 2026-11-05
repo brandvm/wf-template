@@ -126,6 +126,15 @@ duplicated the starter site under the client's name
   479), the Webflow class names, and the page shell and section structure
   of `conventions.md`. Nav and footer are single partials (one component
   each).
+- **It marks components and CMS:** `data-component="<Component name>"` on
+  a component instance's root (the Nav and Footer partials have theirs),
+  `data-prop="<Prop name>"` on what a component property sets,
+  `data-collection="<Collection name>"` on a Collection List wrapper and
+  `data-field="<Field name>"` on an element bound to a CMS field (in a
+  list item or on a CMS template page). Nothing visible changes, and they
+  are not made in Webflow, which has its own components and CMS bindings
+  ([prototype-starter/README.md](prototype-starter/README.md) › Component
+  and CMS markers).
 - **It reads the site's variables** from a snapshot of Webflow
   ([prototype-starter/README.md](prototype-starter/README.md) › Webflow
   snapshot). After writing or refreshing the snapshot: `pnpm css`, then

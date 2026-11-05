@@ -93,6 +93,38 @@ button down (an `:active` rule on it or inside it, or a visible change).
 It finds controls itself, so it needs no list of selectors; the style
 guide's specimens are checked too (it lifts their `inert`).
 
+## Component and CMS markers
+
+Four attributes mark what will be a component or CMS content in Webflow,
+so a tool (Bench's element tree) can show the page as components and
+collections:
+
+| Attribute | On |
+| --- | --- |
+| `data-component="<Component name>"` | the root element of a component instance (Nav and Footer partials, and any component) |
+| `data-prop="<Prop name>"` | an element inside a component instance whose content or visibility is a component property |
+| `data-collection="<Collection name>"` | a Collection List wrapper |
+| `data-field="<Field name>"` | an element bound to a CMS field inside a Collection List item, and a CMS template page's bound elements |
+
+```html
+<a class="c-button" href="/contact" data-component="C | Button">
+  <span data-prop="Label">Get in touch</span>
+</a>
+
+<div class="blog-list" data-collection="Blog Posts">
+  <article class="blog-card">
+    <h3 data-field="Name">First post</h3>
+    <img src="/images/post.webp" alt="" data-field="Thumbnail">
+  </article>
+</div>
+```
+
+The names are the Webflow component, prop, collection and field names. The
+markers change nothing visible, and they are never recreated in Webflow:
+Webflow has its own components, props and CMS bindings, so the build makes
+those and leaves the attributes behind. The partials' roots already carry
+theirs (`G | Nav W`, `G | Footer W`).
+
 ## Webflow snapshot
 
 Claude writes the two files from the Webflow MCP (variables with all modes
