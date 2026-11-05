@@ -13,6 +13,16 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.19.0 — 2026-11-05
+
+The prototype marks its components and CMS content with four neutral attributes, so a tool (Bench's element tree) can show a page as components and collections.
+
+**For client repos:** `pnpm update-skills`. Copy the two attributes into `prototype/partials/nav.html` and `footer.html` by hand if the prototype already exists (optional).
+
+- **`webflow-prototype` prototype-starter:** `data-component="<Component name>"` on a component instance's root, `data-prop="<Prop name>"` on what a component property sets, `data-collection="<Collection name>"` on a Collection List wrapper, `data-field="<Field name>"` on an element bound to a CMS field (in a list item or on a CMS template page). README › Component and CMS markers, with examples. They change nothing visible and are never recreated in Webflow, which has its own components and CMS bindings.
+- **Partials:** `nav.html` and `footer.html` roots carry `data-component="G | Nav W"` and `data-component="G | Footer W"`.
+- **`webflow-prototype` SKILL.md** and **`webflow-build` conventions.md** (§10 Components, §11 CMS, §13): the same convention, with short examples.
+
 ## 0.18.0 — 2026-11-04
 
 The prototype is always built first, from the Figma design, in Bench (or by Claude in the terminal with the same steps), before the Webflow build.

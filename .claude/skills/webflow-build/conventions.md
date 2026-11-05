@@ -322,6 +322,12 @@ has been set on it), then bind through the MCP:
 - **Content in a component** (heading levels, links to the current CMS item,
   slot names) is often a Designer step; list it in
   `docs/handoff/MANUAL-TODO.md`.
+- **In the prototype,** a component instance's root carries
+  `data-component="<Component name>"`, and an element whose content or
+  visibility is a prop carries `data-prop="<Prop name>"`:
+  `<a class="c-button" data-component="C | Button"><span data-prop="Label">Get in touch</span></a>`.
+  They only mark the tree for tools, change nothing visible, and are not
+  made in Webflow (the component and its props are).
 
 ## 11. CMS
 
@@ -339,6 +345,13 @@ has been set on it), then bind through the MCP:
   never by id.
 - Plan the collections (fields, references, sort field) with the designer
   before the template page is built.
+- **In the prototype,** a Collection List wrapper carries
+  `data-collection="<Collection name>"`, and an element bound to a field
+  (in a list item, or on a CMS template page) carries
+  `data-field="<Field name>"`:
+  `<div class="blog-list" data-collection="Blog Posts"><article><h3 data-field="Name">…</h3></article></div>`.
+  Like the component markers they change nothing visible and are not made
+  in Webflow, where the list and its bindings are.
 
 ## 12. Style guide page
 
@@ -372,6 +385,8 @@ the folder a project starts from). In short:
 - **It mirrors Webflow:** the same URLs, the same breakpoints (991, 767, 479),
   the Webflow class names, and the page shell and section structure above.
   Nav and footer are single partials (one component each).
+- **It marks components and CMS** with `data-component`, `data-prop`,
+  `data-collection` and `data-field` (§10, §11); Webflow doesn't get them.
 - **It reads the site's variables** from a snapshot of Webflow, and variable
   changes are proposed as old → new in one file, grouped and lettered for
   approval.
