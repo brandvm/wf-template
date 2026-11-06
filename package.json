@@ -12,6 +12,7 @@
     "new-project": "node scripts/new-project.mjs",
     "update-skills": "node scripts/update-skills.mjs",
     "harvest": "node scripts/harvest.mjs",
+    "clients": "node scripts/clients.mjs",
     "pack-template": "node scripts/pack.mjs",
     "phosphor": "node scripts/phosphor.mjs",
     "progress": "node scripts/progress.mjs",

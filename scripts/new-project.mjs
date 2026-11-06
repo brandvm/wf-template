@@ -89,7 +89,7 @@ const devPort = Number(values.devPort);
 const today = new Date().toISOString().slice(0, 10);
 
 const edits = {
-  'package.json': (s) => s.replace(/"name": "[^"]*"/, `"name": "${repo}"`).replace(/"license": "[^"]*"/, '"license": "UNLICENSED"').replace(/\n    "(harvest|pack-template)": "[^"]*",/g, ''),
+  'package.json': (s) => s.replace(/"name": "[^"]*"/, `"name": "${repo}"`).replace(/"license": "[^"]*"/, '"license": "UNLICENSED"').replace(/\n    "(harvest|clients|pack-template)": "[^"]*",/g, ''),
   'AGENTS.md': (s) => s
     .replace('Fill these in when the repo is created from the template (`pnpm new-project`).', `Filled in by \`pnpm new-project\` on ${today}.`)
     .replaceAll('<CLIENT>', client)
@@ -133,7 +133,7 @@ for (const [file, edit] of Object.entries(edits)) {
 // too: the client's own code is not released under it. THIRD-PARTY-NOTICES.md
 // stays.
 const TEMPLATE_ONLY = ['LICENSE', 'CONTRIBUTING.md', 'CHANGELOG.md', '.github/ISSUE_TEMPLATE', 'scripts/harvest.mjs',
-  'scripts/pack.mjs', 'scripts/check-template.mjs', 'docs/bench.md'];
+  'scripts/pack.mjs', 'scripts/clients.mjs', 'scripts/check-template.mjs', 'docs/bench.md'];
 for (const f of TEMPLATE_ONLY) {
   if (!fs.existsSync(path.join(root, f))) continue;
   console.log(`${flag('dry-run') ? 'would remove' : 'removed'} ${f} (template only)`);

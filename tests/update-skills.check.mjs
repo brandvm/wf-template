@@ -78,3 +78,29 @@ test('--skills-only leaves the build and the stylesheet alone', () => {
   const pkg = JSON.parse(read(dir, 'package.json'));
   assert.ok(pkg.scripts['wf:perf'] && !pkg.scripts.phosphor);
 });
+
+test('lists what\'s new with the steps for this repo, and --notes writes the entries', () => {
+  const dir = oldRepo();
+  const notes = path.join(dir, 'notes.md');
+  const out = run(dir, ['--notes', notes]);
+  assert.match(out, /What's new since 0\.2\.0:/);
+  assert.match(out, /^ {2}0\.20\.0 — /m);
+  assert.match(out, /^ {4}For this repo: `pnpm update-skills` brings the new `build\.mjs`/m);
+  assert.doesNotMatch(out, /^ {2}0\.2\.0 — /m, 'the version it has is not new');
+  const text = fs.readFileSync(notes, 'utf8');
+  assert.match(text, /^## What's new\n\n### \d+\.\d+\.\d+ — /);
+  // Up to date: nothing is new.
+  const again = run(dir, ['--notes', notes]);
+  assert.doesNotMatch(again, /What's new/);
+  assert.equal(fs.readFileSync(notes, 'utf8'), '');
+});
+
+test('seeds the weekly template-update workflow once; a site that deletes it keeps it deleted', () => {
+  const dir = oldRepo();
+  const wf = path.join(dir, '.github/workflows/template-update.yml');
+  assert.match(run(dir), /\+ \.github\/workflows\/template-update\.yml/);
+  assert.equal(read(dir, '.github/workflows/template-update.yml'), read(root, '.github/workflows/template-update.yml'));
+  fs.rmSync(wf);
+  assert.doesNotMatch(run(dir), /template-update\.yml/);
+  assert.ok(!fs.existsSync(wf));
+});

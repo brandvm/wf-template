@@ -13,6 +13,17 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.22.0 — 2026-11-05
+
+Client repos keep up with the template on their own: a weekly pull request with what's new, and a report of who is behind.
+
+**For client repos:** `pnpm update-skills` adds `.github/workflows/template-update.yml`. Turn on Settings › Actions › General › "Allow GitHub Actions to create and approve pull requests" so it can open its pull request; optionally add a `TEMPLATE_UPDATE_TOKEN` secret so that pull request runs the staging checks.
+
+- **`template-update` workflow:** every Monday (or Run workflow), runs `pnpm update-skills` and, when anything changed, `pnpm build`, then opens or updates one "Template update to vX.Y.Z" pull request with the changes and the release notes. Nothing merges by itself. Seeded once by `update-skills` and then the site's own: a site that deletes it doesn't get it back.
+- **`pnpm update-skills`:** lists what's new since the repo's version, each release with its **For client repos** line; `--notes <file>` writes those CHANGELOG entries in full.
+- **`pnpm clients`** (template only): every client repo in the org with the version it was created from, its skills version, behind or up to date, its open update pull request, and its template-candidate lessons not harvested yet. Read only.
+- **Docs:** README › Commands and the template-repo section, CONTRIBUTING step 5, AGENTS.md.
+
 ## 0.21.0 — 2026-11-05
 
 The rest of the earlier site-checking app's launch checks: placeholder content, the privacy link and the favicon.

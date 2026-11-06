@@ -1,6 +1,7 @@
 // Bring this repo's agent skills and template tooling up to date.
 //   pnpm update-skills [--ref <tag|branch>] [--repo <owner/repo>] [--dry-run]
 //                      [--skills-only] [--from <folder>] [--bench '<json>']
+//                      [--notes <file>]
 // Downloads the template from GitHub (default: the latest release tag,
 // else master; --from uses a local copy of the template instead) and
 // brings over four things, listing every change before it writes:
@@ -14,8 +15,11 @@
 //      repo lacks are added. Nothing that exists is changed.
 //   4. Seeds: files a new feature needs that the site owns afterwards are
 //      added once, when missing (the icon font and its import in
-//      src/styles.css, docs/handoff/progress.json). They are never
-//      overwritten.
+//      src/styles.css, docs/handoff/progress.json, the weekly
+//      template-update workflow). They are never overwritten.
+// It also lists what's new: each CHANGELOG entry newer than this repo's
+// version, with what a client repo has to do by hand. --notes writes those
+// entries in full to a file (the template-update workflow's pull request).
 // A skill folder that is new also gets its link in the workspace around
 // the repo (<Client>/.claude/skills), when that workspace links the others.
 // --skills-only does step 1 and the wf:* shortcuts, nothing else.
@@ -39,7 +43,7 @@ const from = opt('from');
 // Files the template owns in every repo made from it.
 const TOOLING = ['build.mjs', 'scripts/update-skills.mjs', 'scripts/phosphor.mjs', 'scripts/check-repo.mjs', 'scripts/progress.mjs', 'THIRD-PARTY-NOTICES.md'];
 // package.json scripts that belong to the template repo only.
-const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'new-project', 'pack-template'];
+const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'clients', 'new-project', 'pack-template'];
 const metaFile = path.join(root, '.wf-template.json');
 const meta = fs.existsSync(metaFile) ? JSON.parse(fs.readFileSync(metaFile, 'utf8')) : {};
 const bench = benchRecord(opt('bench'));
@@ -107,6 +111,23 @@ for (const f of before) if (!after.has(f)) changes.push(`- ${f}`);
 
 const version = /^v\d/.test(ref) || from ? ref : `${ref}@${commit.slice(0, 7)}`;
 console.log(`Template skills ${version} (${repo})`);
+// What's new: the template's CHANGELOG entries newer than this repo's
+// version (the skills' last update, else the version it was created from).
+const num = (v) => (String(v ?? '').match(/\d+\.\d+\.\d+/)?.[0] ?? '0.0.0').split('.').map(Number);
+const later = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+const current = num(meta.skills?.version ?? meta.version);
+const changelog = path.join(source, 'CHANGELOG.md');
+const entries = (fs.existsSync(changelog) ? fs.readFileSync(changelog, 'utf8') : '').split(/^(?=## \d+\.\d+\.\d+)/m)
+  .filter((e) => /^## \d/.test(e) && later(num(e.match(/^## (\S+)/)[1]), current) > 0);
+if (entries.length) {
+  console.log(`What's new since ${current.join('.')}:`);
+  for (const e of entries) {
+    console.log(`  ${e.match(/^## (.+)/)[1]}`);
+    const todo = e.match(/^\*\*For client repos:\*\* (.+)$/m)?.[1];
+    if (todo) console.log(`    For this repo: ${todo}`);
+  }
+}
+if (opt('notes')) fs.writeFileSync(opt('notes'), entries.length ? `## What's new\n\n${entries.join('').replace(/^## /gm, '### ')}` : '');
 console.log(changes.length ? changes.sort().map((c) => '  ' + c).join('\n') : '  already up to date');
 if (!dry && changes.length) {
   fs.rmSync(local, { recursive: true, force: true });
@@ -171,6 +192,15 @@ if (!skillsOnly) {
       fs.copyFileSync(path.join(source, 'docs/handoff/progress.json'), progress);
     }
   }
+  // The weekly template-update workflow, once: the site can change or delete it.
+  const workflow = '.github/workflows/template-update.yml';
+  if (!fs.existsSync(path.join(root, workflow)) && fs.existsSync(path.join(source, workflow)) && !meta.skills?.workflowSeeded) {
+    seeded.push(`+ ${workflow}`);
+    if (!dry) {
+      fs.mkdirSync(path.join(root, '.github/workflows'), { recursive: true });
+      fs.copyFileSync(path.join(source, workflow), path.join(root, workflow));
+    }
+  }
   if (seeded.length) console.log(`Seeds ${dry ? 'to add' : 'added'}:\n${seeded.map((t) => '  ' + t).join('\n')}`);
 }
 // New skills, linked where the workspace links the others.
@@ -188,7 +218,9 @@ if (!dry) {
   // A local copy says nothing about which GitHub repo the template lives in.
   if (!from || opt('repo')) meta.template = repo;
   if (bench) meta.bench = bench;
-  meta.skills = { version, commit, updated: new Date().toISOString().slice(0, 10) };
+  // Remembered so a site that deletes the workflow doesn't get it back.
+  const workflowSeeded = meta.skills?.workflowSeeded || fs.existsSync(path.join(root, '.github/workflows/template-update.yml'));
+  meta.skills = { version, commit, updated: new Date().toISOString().slice(0, 10), ...(workflowSeeded && { workflowSeeded: true }) };
   fs.writeFileSync(metaFile, JSON.stringify(meta, null, 2) + '\n');
   if (changes.length || added.length || deps.length || tooling.length || seeded.length) console.log(`Review the diff${tooling.length || seeded.length ? ', run pnpm build' : ''}, then commit.`);
 }
