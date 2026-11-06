@@ -20,7 +20,8 @@ function loader(release) {
 const js = readFileSync(new URL('../dist/index.js', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
 const stage = `https://${org}.github.io/${repo}/`;
-const local = 'http://localhost:3000/';
+// new-project gives each client its own dev port, so read it back too.
+const local = source.match(/http:\/\/localhost:\d+\//)[0];
 const release = `https://cdn.jsdelivr.net/gh/${org}/${repo}@1.0.0/dist/`;
 
 async function setup(page, {
@@ -149,7 +150,7 @@ test('supports keyboard access, Escape, outside clicks, and duplicate initializa
 
 for (const scenario of [
   { label: 'production', url: 'https://client.example/?wfc-dev=1' },
-  { label: 'localhost', url: 'http://localhost:3000/' },
+  { label: 'localhost', url: local },
   { label: 'Webflow editor', editor: true },
   { label: 'Designer', design: true },
 ]) test(`hidden in ${scenario.label}`, async ({ page }) => {

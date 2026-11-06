@@ -13,6 +13,16 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.23.1 — 2026-11-06
+
+`pnpm test` passes in a client repo straight after `pnpm new-project`. Found on wf-roncelli, whose first push failed CI.
+
+**For client repos:** `pnpm update-skills` doesn't copy `tests/`. If CI fails at `pnpm test` with `localhost:3000` or the progress seed, copy the four files below from this release.
+
+- **`tests/loader.check.mjs`, `tests/environment-switcher.spec.mjs`:** read the dev port back from `loader.html`. `new-project` gives each client its own port, and these tests had `localhost:3000` hard-coded.
+- **`tests/progress.check.mjs`:** the throwaway repos start from an empty seed instead of copying this repo's `progress.json`. A client's file holds its plans, so a second `plan add` was refused. The empty-seed test runs in the template only.
+- **`tests/update-skills.check.mjs`:** the what's-new test is skipped when there is no `CHANGELOG.md`, which `new-project` removes from client repos.
+
 ## 0.23.0 — 2026-11-05
 
 Bench is retired, so the template drops everything that was only there for it.

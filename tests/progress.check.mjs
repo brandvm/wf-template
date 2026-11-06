@@ -16,7 +16,8 @@ function repo() {
   const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'wf-progress-')), 'repo');
   fs.cpSync(path.join(root, '.claude/skills'), path.join(dir, '.claude/skills'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'docs/handoff'), { recursive: true });
-  fs.copyFileSync(path.join(root, 'docs/handoff/progress.json'), path.join(dir, 'docs/handoff/progress.json'));
+  // A fresh seed, not this repo's: a client repo's progress.json has its own plans.
+  fs.writeFileSync(path.join(dir, 'docs/handoff/progress.json'), serialize(empty()));
   fs.writeFileSync(path.join(dir, 'webflow-build.config.json'), JSON.stringify({ pages: ['/', '/about'] }));
   return dir;
 }
@@ -31,7 +32,9 @@ const fails = (dir, ...args) => {
 };
 const read = (dir) => JSON.parse(fs.readFileSync(path.join(dir, 'docs/handoff/progress.json'), 'utf8'));
 
-test('the seed file is empty and in the current format', () => {
+// Only the template ships an empty seed; a client repo's file holds its progress.
+const isTemplate = !JSON.parse(fs.readFileSync(path.join(root, '.wf-template.json'), 'utf8')).created;
+test('the seed file is empty and in the current format', { skip: !isTemplate && 'client repo' }, () => {
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'docs/handoff/progress.json'), 'utf8')), empty());
 });
 
