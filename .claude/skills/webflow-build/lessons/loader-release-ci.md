@@ -22,7 +22,7 @@ refer to the project the lesson came from; Status is that project's.
   /proto/`) to a scratch folder, save the published staging HTML there
   with the loader's staging URL rewritten to the local server, and serve
   it all from one local origin.
-- Status: open in the template (a dev port per project)
+- Status: fixed in template 0.20.0 (a dev port per project: `devPort`)
 - Found by: claude
 
 ### 2026-10-29 · Lighthouse counts anything that finishes before the first paint
