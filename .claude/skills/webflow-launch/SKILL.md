@@ -21,8 +21,8 @@ How to run it:
 1. Record each item as it's done with `pnpm progress tick "<checklist>"
    "<the start of the item>"` (`--by check` when a `pnpm wf:*` script
    decided it), as in `webflow-build` › checklists.md › How to record
-   progress. Bench's Tasks panel shows the same list; `pnpm progress show`
-   prints it, with the person's own to-dos.
+   progress. `pnpm progress show` prints the list, with the person's own
+   to-dos.
 2. Work top to bottom; report each section's result before moving on.
 3. Anything that fails goes into the known issues list as "fix before
    launch" or "fix after launch", with an owner.

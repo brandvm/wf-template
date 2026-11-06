@@ -65,10 +65,8 @@ fails the push if they disagree, and staging does not deploy until it passes.
    > change.
 
 Every site starts from a Figma file, and the prototype is always built
-from it first. In Bench, Add client › from a Figma design sets up the
-folder, the repo and an empty prototype, and builds the prototype from the
-frames, one page at a time ([`docs/bench.md`](docs/bench.md) › A new site,
-from Figma).
+from it first, one page at a time (the `webflow-build` skill › The
+prototype, from Figma).
 
 Claude finds the site through the Webflow connector, runs
 `pnpm new-project`, lists the steps below that are yours, collects the

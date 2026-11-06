@@ -104,3 +104,13 @@ test('seeds the weekly template-update workflow once; a site that deletes it kee
   assert.doesNotMatch(run(dir), /template-update\.yml/);
   assert.ok(!fs.existsSync(wf));
 });
+
+test('a repo Bench set up updates from brandvm/wf-template and drops the bench record', () => {
+  const dir = oldRepo();
+  fs.writeFileSync(path.join(dir, '.wf-template.json'), JSON.stringify({ bench: { template: 'official', name: 'Brand Vision', version: '0.6.0', base: '0.6.0' } }));
+  assert.match(run(dir, ['--dry-run']), /brandvm\/wf-template/);
+  run(dir);
+  const meta = JSON.parse(read(dir, '.wf-template.json'));
+  assert.equal(meta.bench, undefined);
+  assert.equal(meta.template, 'brandvm/wf-template');
+});

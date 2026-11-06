@@ -65,8 +65,7 @@ Per page, in this order:
   without a style is a question, not a new class.
 - **Re-read before building a page.** The file may have changed since the
   prototype; compare the frame's last-modified date with the approval
-  date in `HANDOFF.md` and ask if it is newer. Bench looks when the client
-  opens and hourly, and offers to update the pages whose frames changed.
+  date in `HANDOFF.md` and ask if it is newer.
 - **A layer's screenshot is clipped to its frame, at 1x at most.** The
   connector renders a node as it shows in its parent, so a background
   without the card drawn over it can't be exported, and Figma stays
@@ -81,7 +80,7 @@ Per page, in this order:
   returns an empty div for a VIDEO fill and no asset URL, and screenshots
   only render a frame. Ask for the `.fig` (below): the video is in it.
 - **Review against the frames:** each prototype page beside its frames
-  at Desktop, Tablet and Mobile (in Bench, Compare › With Figma). The
+  at Desktop, Tablet and Mobile. The
   Webflow build is then compared with the prototype (`pnpm wf:*`).
 
 ## Without the connector: a saved .fig file

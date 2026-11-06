@@ -1,6 +1,6 @@
 ---
 name: webflow-optimization
-description: Run an optimization push on a live Webflow site with targets: the baseline (speed, layout shift, accessibility, SEO), fixes in order of impact, and the before/after report. Use when a client has an Optimization plan in Bench (or docs/handoff/progress.json) or asks for a site to be made faster, steadier or more accessible, on a site built with wf-template.
+description: Run an optimization push on a live Webflow site with targets: the baseline (speed, layout shift, accessibility, SEO), fixes in order of impact, and the before/after report. Use when a client has an Optimization plan in docs/handoff/progress.json or asks for a site to be made faster, steadier or more accessible, on a site built with wf-template.
 ---
 
 # Webflow optimization: baseline → fixes → before/after
