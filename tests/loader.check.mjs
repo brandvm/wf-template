@@ -20,7 +20,8 @@ const scripts = [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) =>
 const cssLink = source.match(/<link\b[^>]*id="wfc-css"[^>]*>/)?.[0];
 const [head, embed, footer] = scripts;
 const stage = `https://${org}.github.io/${repo}/`;
-const local = 'http://localhost:3000/';
+// new-project gives each client its own dev port, so read it back.
+const local = source.match(/var DEV = "(http:\/\/localhost:\d+\/)"/)[1];
 const release = (v) => `https://cdn.jsdelivr.net/gh/${org}/${repo}@${v}/dist/`;
 
 // A page with the loader pieces in it. `pieces` picks which ones are
@@ -94,7 +95,7 @@ test('loader.html has the four pieces and ships with RELEASE null', () => {
   assert.ok(cssLink, 'Embed 2a is a <link id="wfc-css">');
   assert.match(cssLink, new RegExp(`href="${stage}styles\\.css\\?v=1"`));
   assert.ok(raw.includes('var RELEASE = null;'), 'loader.html must ship with `var RELEASE = null;`');
-  assert.doesNotMatch(source, /localhost:3000\/styles\.css"/, 'no static localhost link outside the comments');
+  assert.doesNotMatch(source, /localhost:\d+\/styles\.css"/, 'no static localhost link outside the comments');
 });
 
 test('host detection: webflow.io and the Designer preview are staging, anything else is production', () => {

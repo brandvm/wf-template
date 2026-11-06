@@ -79,7 +79,8 @@ test('--skills-only leaves the build and the stylesheet alone', () => {
   assert.ok(pkg.scripts['wf:perf'] && !pkg.scripts.phosphor);
 });
 
-test('lists what\'s new with the steps for this repo, and --notes writes the entries', () => {
+// The changelog is template-only (new-project removes it), so a client repo skips this.
+test('lists what\'s new with the steps for this repo, and --notes writes the entries', { skip: !fs.existsSync(path.join(root, 'CHANGELOG.md')) && 'no CHANGELOG.md in a client repo' }, () => {
   const dir = oldRepo();
   const notes = path.join(dir, 'notes.md');
   const out = run(dir, ['--notes', notes]);
