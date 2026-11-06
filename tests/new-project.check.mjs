@@ -30,7 +30,7 @@ test('fills in every placeholder and writes the config', { skip }, () => {
   run(dir, ['--client', 'Acme Homes', '--slug', 'acme-homes', '--repo', 'wf-acme', '--org', 'acme-org', '--site-id', 'a'.repeat(24), '--template', 'example/wf-template']);
   const read = (f) => fs.readFileSync(path.join(dir, f), 'utf8');
   assert.match(read('package.json'), /"name": "wf-acme"/);
-  assert.doesNotMatch(read('package.json'), /"harvest"/);
+  assert.doesNotMatch(read('package.json'), /"harvest"|"clients"/);
   assert.match(read('package.json'), /"license": "UNLICENSED"/);
   const agents = read('AGENTS.md');
   assert.doesNotMatch(agents, /<CLIENT>|<REPO>|<SITE_ID>|<SLUG>|<DOMAIN|<RELEASE/);

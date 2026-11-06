@@ -1,0 +1,61 @@
+# Keeps this client repo on the latest template release: once a week it
+# runs `pnpm update-skills` and, when anything changed, opens (or updates)
+# a "Template update" pull request with what's new and what to do by hand.
+# Nothing merges by itself.
+#
+# Needs: Settings › Actions › General › Workflow permissions › "Allow GitHub
+# Actions to create and approve pull requests". A pull request opened with
+# the built-in token doesn't start the staging checks: add a token with
+# contents and pull-requests write as the TEMPLATE_UPDATE_TOKEN secret for
+# that, or close and reopen the pull request.
+#
+# Seeded by `pnpm update-skills` and then the site's own: change the
+# schedule or delete the file to stop it.
+name: template-update
+on:
+  schedule: [{ cron: '0 6 * * 1' }]
+  workflow_dispatch:
+permissions: { contents: write, pull-requests: write }
+concurrency: { group: template-update }
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { token: '${{ secrets.TEMPLATE_UPDATE_TOKEN || github.token }}' }
+      # The template itself has no "created" date: nothing to update there.
+      - id: repo
+        run: |
+          node -e "const m = require('./.wf-template.json'); if (!m.created) process.exit(0); console.log('template=' + (m.template || ''))" >> "$GITHUB_OUTPUT"
+      - if: steps.repo.outputs.template
+        uses: pnpm/action-setup@v4
+      - if: steps.repo.outputs.template
+        uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - if: steps.repo.outputs.template
+        id: update
+        env: { GITHUB_TOKEN: '${{ github.token }}' }
+        run: |
+          node scripts/update-skills.mjs --repo "${{ steps.repo.outputs.template }}" --notes "$RUNNER_TEMP/notes.md" | tee "$RUNNER_TEMP/update.txt"
+          # The date update-skills records changes on every run: only the rest counts.
+          if git diff --quiet -- . ':!.wf-template.json' && [ -z "$(git ls-files --others --exclude-standard)" ]; then exit 0; fi
+          pnpm install --no-frozen-lockfile
+          pnpm build
+          echo "version=$(node -p "require('./.wf-template.json').skills.version")" >> "$GITHUB_OUTPUT"
+      - if: steps.update.outputs.version
+        env: { GH_TOKEN: '${{ secrets.TEMPLATE_UPDATE_TOKEN || github.token }}' }
+        run: |
+          v="${{ steps.update.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c template-update
+          git add -A
+          git commit -q -m "Template update to $v"
+          git push -f origin template-update
+          { echo "Template update to **$v**, from \`pnpm update-skills\`. Review the diff and CI, then merge."
+            echo; echo '```'; cat "$RUNNER_TEMP/update.txt"; echo '```'; echo; cat "$RUNNER_TEMP/notes.md"; } > "$RUNNER_TEMP/body.md"
+          if gh pr view template-update --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit template-update --title "Template update to $v" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr create --head template-update --title "Template update to $v" --body-file "$RUNNER_TEMP/body.md"
+          fi

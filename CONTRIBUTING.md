@@ -26,6 +26,10 @@ up skill changes with `pnpm update-skills`.
    (patch: fixes and wording; minor: new checks, scripts or lessons; major:
    client repos must change something by hand).
 4. Open a pull request against `master` and fill in the template.
+5. After it merges and is tagged, client repos get it from their weekly
+   `template-update` pull request. Write the CHANGELOG entry's **For client
+   repos:** line for them: that pull request shows it, and so does
+   `pnpm update-skills`. `pnpm clients --org <org>` shows who is behind.
 
 ## Rules
 

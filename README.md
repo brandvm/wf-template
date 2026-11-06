@@ -33,6 +33,17 @@ pnpm phosphor        # Phosphor icon font in the bundle: regular by default, `pn
 and, after `pnpm update-skills`, the skills' version. The template's own
 history is in `CHANGELOG.md` (template repo only).
 
+`pnpm update-skills` lists what's new since the repo's version, with what
+the repo has to do by hand for each release. Once a week the
+`template-update` workflow (`.github/workflows/template-update.yml`) runs it
+and, when anything changed, opens a "Template update" pull request with
+those notes; nothing merges by itself. It needs Settings › Actions ›
+General › "Allow GitHub Actions to create and approve pull requests". A
+pull request from the built-in token doesn't start the staging checks: add
+a `TEMPLATE_UPDATE_TOKEN` secret (contents and pull-requests write) for
+that, or close and reopen it. Run it now from Actions › template-update ›
+Run workflow; delete the file to stop it.
+
 `dist/` is committed. `pnpm dev` serves from memory and never touches it;
 run `pnpm build` and commit `dist/` together with any `src/` change — CI
 fails the push if they disagree, and staging does not deploy until it passes.
@@ -287,9 +298,11 @@ Every repo CSS rule carries a `/* repo-css: <tag> — why */` comment; the
 allowed tags are listed in `AGENTS.md`. Styling the Designer can express
 belongs in the Designer.
 
-To collect template improvements from client repos (template repo only):
+To see which client repos are behind and collect their lessons (template
+repo only):
 
 ```bash
+GITHUB_TOKEN=… pnpm clients --org <org>   # each repo's versions, its update pull request, lessons to give back
 GITHUB_TOKEN=… pnpm harvest --org <org>   # new template-candidate entries → .harvest/<date>.md
 ```
 

@@ -128,6 +128,7 @@ pnpm wf:pass /   # webflow-build checks: wf:compare, wf:pass, wf:anchors, wf:out
                  # wf:tracking, wf:redirects, wf:domain;
                  # on the prototype: wf:preflight, wf:styles
 pnpm update-skills   # skills, build tooling and new scripts from the latest template release (ask first)
+                     # (the weekly template-update workflow opens the same as a pull request)
 pnpm phosphor regular bold   # icon font weights in the bundle (default: regular; --subset keeps only the icons used)
 ```
 
