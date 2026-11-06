@@ -22,10 +22,8 @@ work it records.
 
 ## Prototype (from the Figma file to a prototype the client approved)
 
-Bench proves the first four: Compare › With Figma the match, and Bench's
-own prototype build the link, the picks and the pages built. Don't tick
-them by hand. Outside Bench, Claude ticks them when they are true: the
-match after looking at each page beside its frame at the three widths.
+Claude ticks the first four when they are true: the match after looking
+at each page beside its frame at the three widths.
 The steps are in SKILL.md › The prototype, from Figma.
 
 - [Claude checks] Each page matches its Figma frame at Desktop, Tablet and

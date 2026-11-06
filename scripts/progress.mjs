@@ -1,8 +1,8 @@
 // Task progress: the client's plans (New build, SEO, Maintenance…), which
 // checklist items are done and who did them, and the requests, in
-// docs/handoff/progress.json (format 2). Bench's Tasks panel, Claude (through
-// this script) and CI all read and write the same file, and Sync carries it
-// between Macs (docs/bench.md › Task progress).
+// docs/handoff/progress.json (format 2). Claude (through this script) and
+// CI read and write it; it's committed, so every Mac sees the same progress
+// (docs/progress.md).
 //   pnpm progress show [--json]
 //   pnpm progress tick   "<checklist>" "<item, or the start of it>" [--page /about] [--component Nav] [--by claude|check|you] [--plan build]
 //   pnpm progress untick "<checklist>" "<item>" [--page …] [--component …] [--plan …]
@@ -22,7 +22,7 @@ import { pathToFileURL } from 'node:url';
 const root = process.cwd();
 export const FILE = 'docs/handoff/progress.json';
 
-// ── Checklists (the same rules as Bench's parser, so the ids match) ─────
+// ── Checklists ───────────────────────────────────────────────────────────
 const OWNERS = { claude: 'claude', 'claude checks': 'claude-checks', person: 'person' };
 const ITEM = /^- \[(Claude checks|Claude|Person)\]\s+(.*)$/i;
 
@@ -165,7 +165,7 @@ export function planFor(p, set, wanted) {
 export const planItemId = (plan, group, text) => itemId(plan.id === 'build' ? group : `${plan.id}/${group}`, text);
 
 // ── The file ─────────────────────────────────────────────────────────────
-/** The file a new project starts with: no plan yet (Bench or the first build tick adds one). */
+/** The file a new project starts with: no plan yet (the first build tick adds one). */
 export const empty = () => ({ format: 2, plans: [], ticks: {}, todos: [], components: [], history: [] });
 
 /** Format 1 (no plans) is one New build plan: its ticks move under build/ and its stage onto the plan. */
@@ -246,12 +246,12 @@ export function findItem(group, text) {
 }
 
 /**
- * Whether the Prototype stage counts, as in Bench: a site from Figma (Bench's
- * .bench/prototype-build.json in the client folder) or one with a Prototype tick.
+ * Whether the Prototype stage counts: a site whose workspace has a localhost
+ * prototype (`new-project` makes ../prototype) or one with a Prototype tick.
  */
 export function fromFigma(p, plan, dir = root) {
   if (Object.keys(p.ticks[`${plan.id}/build/Prototype`] ?? {}).length) return true;
-  return [path.join(dir, '.bench/prototype-build.json'), path.join(dir, '../.bench/prototype-build.json')].some((f) => fs.existsSync(f));
+  return fs.existsSync(path.join(dir, '../prototype/package.json'));
 }
 
 /** A plan's first stage with something left to do (pages from the config; components from the file). */

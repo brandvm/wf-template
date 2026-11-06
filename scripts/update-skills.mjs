@@ -1,6 +1,6 @@
 // Bring this repo's agent skills and template tooling up to date.
 //   pnpm update-skills [--ref <tag|branch>] [--repo <owner/repo>] [--dry-run]
-//                      [--skills-only] [--from <folder>] [--bench '<json>']
+//                      [--skills-only] [--from <folder>]
 //                      [--notes <file>]
 // Downloads the template from GitHub (default: the latest release tag,
 // else master; --from uses a local copy of the template instead) and
@@ -25,9 +25,9 @@
 // --skills-only does step 1 and the wf:* shortcuts, nothing else.
 // Everything else in the repo (src/, loader.html, docs, AGENTS.md) is left
 // alone. Review the diff, run pnpm build, then commit.
-// A project Bench manages (a "bench" record in .wf-template.json) updates
-// from Bench, which passes --from and --bench; without --from (or --repo)
-// this stops, so the two never disagree on the version (docs/bench.md).
+// A project Bench (retired) set up has a "bench" record in .wf-template.json
+// instead of "template": it updates from brandvm/wf-template, and the record
+// is dropped.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -43,15 +43,10 @@ const from = opt('from');
 // Files the template owns in every repo made from it.
 const TOOLING = ['build.mjs', 'scripts/update-skills.mjs', 'scripts/phosphor.mjs', 'scripts/check-repo.mjs', 'scripts/progress.mjs', 'THIRD-PARTY-NOTICES.md'];
 // package.json scripts that belong to the template repo only.
-const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'clients', 'new-project', 'pack-template'];
+const TEMPLATE_ONLY_SCRIPTS = ['harvest', 'clients', 'new-project'];
 const metaFile = path.join(root, '.wf-template.json');
 const meta = fs.existsSync(metaFile) ? JSON.parse(fs.readFileSync(metaFile, 'utf8')) : {};
-const bench = benchRecord(opt('bench'));
-if (meta.bench && !from && !opt('repo')) {
-  console.error(`Bench manages this project's template (${meta.bench.name ?? meta.bench.template} ${meta.bench.version}): update it from Bench.\nOr pass --from <template folder>, or --repo <owner/repo> to update from GitHub instead.`);
-  process.exit(1);
-}
-const repo = opt('repo') ?? meta.template ?? (from && 'local');
+const repo = opt('repo') ?? meta.template ?? (meta.bench && 'brandvm/wf-template') ?? (from && 'local');
 if (!repo) {
   console.error('Which template? Pass --repo <owner/repo>, or set "template" in .wf-template.json.');
   process.exit(1);
@@ -115,7 +110,7 @@ console.log(`Template skills ${version} (${repo})`);
 // version (the skills' last update, else the version it was created from).
 const num = (v) => (String(v ?? '').match(/\d+\.\d+\.\d+/)?.[0] ?? '0.0.0').split('.').map(Number);
 const later = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
-const current = num(meta.skills?.version ?? meta.version);
+const current = num(meta.skills?.version ?? meta.version ?? meta.bench?.version);
 const changelog = path.join(source, 'CHANGELOG.md');
 const entries = (fs.existsSync(changelog) ? fs.readFileSync(changelog, 'utf8') : '').split(/^(?=## \d+\.\d+\.\d+)/m)
   .filter((e) => /^## \d/.test(e) && later(num(e.match(/^## (\S+)/)[1]), current) > 0);
@@ -183,7 +178,7 @@ if (!skillsOnly) {
 ` + css.slice(lead));
     }
   }
-  // Task progress (docs/bench.md › Task progress): an empty file, once.
+  // Task progress (docs/progress.md): an empty file, once.
   const progress = path.join(root, 'docs/handoff/progress.json');
   if (!fs.existsSync(progress) && fs.existsSync(path.join(source, 'docs/handoff/progress.json'))) {
     seeded.push('+ docs/handoff/progress.json');
@@ -216,8 +211,9 @@ if (fs.existsSync(wsSkills) && fs.readdirSync(wsSkills).some((n) => isLink(path.
 }
 if (!dry) {
   // A local copy says nothing about which GitHub repo the template lives in.
-  if (!from || opt('repo')) meta.template = repo;
-  if (bench) meta.bench = bench;
+  // A Bench record gives way to the template it stood for.
+  if (!from || opt('repo') || meta.bench) meta.template = repo;
+  delete meta.bench;
   // Remembered so a site that deletes the workflow doesn't get it back.
   const workflowSeeded = meta.skills?.workflowSeeded || fs.existsSync(path.join(root, '.github/workflows/template-update.yml'));
   meta.skills = { version, commit, updated: new Date().toISOString().slice(0, 10), ...(workflowSeeded && { workflowSeeded: true }) };
@@ -226,15 +222,3 @@ if (!dry) {
 }
 fs.rmSync(tmp, { recursive: true, force: true });
 
-// --bench '<json>': the record Bench keeps of the project's template
-// (docs/bench.md › The project record). Written as given, after checking it.
-function benchRecord(text) {
-  if (text === undefined) return undefined;
-  let rec;
-  try { rec = JSON.parse(text); } catch { rec = null; }
-  if (!rec || typeof rec !== 'object' || !/^(official|(custom|own)\/[a-z0-9-]+)$/.test(rec.template ?? '') || typeof rec.version !== 'string') {
-    console.error('--bench takes the JSON record, e.g. \'{"template":"official","name":"Brand Vision","version":"0.10.0","base":"0.10.0"}\'');
-    process.exit(1);
-  }
-  return rec;
-}

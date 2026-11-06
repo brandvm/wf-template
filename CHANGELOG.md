@@ -13,6 +13,18 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.23.0 — 2026-11-05
+
+Bench is retired, so the template drops everything that was only there for it.
+
+**For client repos:** `pnpm update-skills`. A repo Bench set up (a `bench` record in `.wf-template.json`) now updates from brandvm/wf-template like any other, and the record is replaced by `template`. A committed `.bench/` folder can be deleted.
+
+- **Removed:** template packs (`pnpm pack-template`, `scripts/pack.mjs`), the template contract and its checker (`scripts/check-template.mjs`, `contract` in `.wf-template.json`), `docs/bench.md`, and their tests.
+- **`pnpm new-project`:** no `--bench` record and no `.bench/site.json`.
+- **`pnpm update-skills`:** no `--bench`, and no longer refuses to run in a repo with a `bench` record.
+- **Task progress:** documented in `docs/progress.md`. The Prototype stage counts when the workspace has a `prototype/` folder (`new-project` makes one) or there's a Prototype tick, instead of Bench's `.bench/prototype-build.json`.
+- **Skills and README:** the Bench-only steps are gone; the prototype-from-Figma steps are the same for everyone.
+
 ## 0.22.0 — 2026-11-05
 
 Client repos keep up with the template on their own: a weekly pull request with what's new, and a report of who is behind.

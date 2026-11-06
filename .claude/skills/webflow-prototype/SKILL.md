@@ -1,6 +1,6 @@
 ---
 name: webflow-prototype
-description: Start a Webflow project and build its Figma design as a localhost prototype that mirrors Webflow, before anything is written to Webflow. Covers setting up the repo and workspace from wf-template (pnpm new-project, or Bench's Add client from a Figma design), collecting the inputs, reading the Figma file, taking the Webflow snapshot, building the style guide and then each page with the site's own variables and class names, and the handoff pack for the Webflow build. Use for "New project: Webflow site <name>, Figma <link>", setting up a repo and workspace, reading a Figma file, starting or continuing a localhost prototype, proposing variables and classes, or preparing the handoff to the Webflow build. For building in Webflow, use webflow-build.
+description: Start a Webflow project and build its Figma design as a localhost prototype that mirrors Webflow, before anything is written to Webflow. Covers setting up the repo and workspace from wf-template (pnpm new-project), collecting the inputs, reading the Figma file, taking the Webflow snapshot, building the style guide and then each page with the site's own variables and class names, and the handoff pack for the Webflow build. Use for "New project: Webflow site <name>, Figma <link>", setting up a repo and workspace, reading a Figma file, starting or continuing a localhost prototype, proposing variables and classes, or preparing the handoff to the Webflow build. For building in Webflow, use webflow-build.
 ---
 
 # Webflow prototype: Figma design → approved localhost prototype
@@ -23,8 +23,7 @@ its own session, after the prototype is approved.
 - [figma.md](figma.md) reads the Figma file through the Figma connector:
   frames per breakpoint, screenshots, variables, measurements.
 - The steps that build one page from its frames are in `webflow-build`
-  ([SKILL.md](../webflow-build/SKILL.md) › The prototype, from Figma), the
-  same ones Bench's AI follows. The **Prototype** stage of its
+  ([SKILL.md](../webflow-build/SKILL.md) › The prototype, from Figma). The **Prototype** stage of its
   [checklists.md](../webflow-build/checklists.md) tracks the prototype up
   to the client's approval.
 - The `webflow-style-guide` skill makes the style guide, the first page
@@ -57,12 +56,7 @@ Every checklist item says who does it: **[Claude]**, **[Claude checks]**
 
 ## Project setup (new project)
 
-**In Bench,** Add client › from a Figma design sets up the client folder,
-the repo from this template and an empty `prototype/`, then builds the
-prototype from the frames the person picks (step 6). The person's steps
-(4) and the inputs still apply.
-
-**Not in Bench,** the flow starts from one message (README › Starting a
+The flow starts from one message (README › Starting a
 project), e.g. *"New project: Webflow site <name>, Figma <link>. Set up the
 repo and workspace, run Before the prototype, then build the prototype from
 the Figma file page by page; wait for my go-ahead before any Webflow

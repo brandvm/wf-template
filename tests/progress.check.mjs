@@ -12,7 +12,8 @@ import { itemId, parseChecklists, serialize, empty, migrate } from '../scripts/p
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function repo() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-progress-'));
+  // Inside a workspace folder of its own, so ../prototype is this test's.
+  const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'wf-progress-')), 'repo');
   fs.cpSync(path.join(root, '.claude/skills'), path.join(dir, '.claude/skills'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'docs/handoff'), { recursive: true });
   fs.copyFileSync(path.join(root, 'docs/handoff/progress.json'), path.join(dir, 'docs/handoff/progress.json'));
@@ -34,7 +35,7 @@ test('the seed file is empty and in the current format', () => {
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'docs/handoff/progress.json'), 'utf8')), empty());
 });
 
-test('item ids are sha1 of group and text (Bench uses the same)', () => {
+test('item ids are sha1 of group and text', () => {
   assert.equal(
     itemId('build/Before building', 'Final designs approved in writing, every page at every breakpoint (an approved localhost prototype counts).'),
     'aee8a1a351c7',
@@ -86,10 +87,10 @@ test('a plan’s stage is derived until it is set, and requests are listed', () 
   assert.match(run(dir, 'show'), /No plan running/);
   run(dir, 'plan', 'add', 'new-build');
   assert.match(run(dir, 'show'), /build \(new-build\) · stage: Before building/);
-  fs.mkdirSync(path.join(dir, '.bench'));
-  fs.writeFileSync(path.join(dir, '.bench/prototype-build.json'), '{}');
-  assert.match(run(dir, 'show'), /build \(new-build\) · stage: Prototype/, 'a site from Figma starts at the Prototype stage');
-  fs.rmSync(path.join(dir, '.bench'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '../prototype'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '../prototype/package.json'), '{}');
+  assert.match(run(dir, 'show'), /build \(new-build\) · stage: Prototype/, 'a site with a prototype starts at the Prototype stage');
+  fs.rmSync(path.join(dir, '../prototype'), { recursive: true });
   run(dir, 'stage', 'pre-launch');
   assert.equal(read(dir).plans[0].stage, 'Pre-launch QA');
   run(dir, 'stage', 'auto');

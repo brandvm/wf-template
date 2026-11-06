@@ -21,8 +21,7 @@ It mirrors Webflow on purpose:
 ## Start
 
 `pnpm new-project` copies this folder to `<Client>/prototype`, next to the
-repo, and so does Bench for a new site from Figma (copy it by hand for a
-workspace set up without either). Then:
+repo (copy it by hand for a workspace set up without it). Then:
 
 ```bash
 pnpm install
@@ -96,7 +95,7 @@ guide's specimens are checked too (it lifts their `inert`).
 ## Component and CMS markers
 
 Four attributes mark what will be a component or CMS content in Webflow,
-so a tool (Bench's element tree) can show the page as components and
+so a tool can show the page as components and
 collections:
 
 | Attribute | On |

@@ -59,18 +59,6 @@ test('fills in every placeholder and writes the config', { skip }, () => {
   assert.match(meta.created, /^\d{4}-\d{2}-\d{2}$/);
   assert.equal(meta.template, 'example/wf-template');
   assert.deepEqual(JSON.parse(read('docs/handoff/progress.json')).ticks, {}, 'task progress starts empty');
-  // Bench's five answers, the same ones it reads from this repo's files.
-  const site = JSON.parse(read('.bench/site.json'));
-  assert.equal(site.kind, 'wf-template');
-  assert.deepEqual(site.webflow, { siteId: 'aaaaaaaaaaaaaaaaaaaaaaaa', staging: 'https://acme-homes.webflow.io' });
-  assert.deepEqual(site.loads.slice(0, 2), [
-    { url: 'https://acme-org.github.io/wf-acme/*', local: '/*' },
-    { url: 'https://cdn.jsdelivr.net/gh/acme-org/wf-acme@*/dist/*', local: '/*' },
-  ]);
-  assert.equal(site.loads[2].match, cfg.bundlePattern);
-  assert.equal(site.staging.kind, 'pages');
-  assert.ok(site.staging.branch, 'the staging branch is the one the repo is on');
-  assert.deepEqual(site.live, { kind: 'jsdelivr-tag' });
 });
 
 test('refuses to run twice', { skip }, () => {

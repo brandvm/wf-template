@@ -1,11 +1,11 @@
 // Fill in a repo created from this template, once.
 //   pnpm new-project --client "Client Name" --slug client-site [--repo wf-client]
 //                    [--org <github-org>] [--site-id <24-hex>] [--prototype-url URL] [--dev-port N]
-//                    [--template <owner/repo>] [--bench '<json>']
+//                    [--template <owner/repo>]
 // Missing values are asked for when run in a terminal. Writes:
 //   package.json name · AGENTS.md project facts · loader.html REPO and DEV ·
 //   docs/handoff/HANDOFF.md title · .mcp.json server name (webflow-<slug>) ·
-//   webflow-build.config.json · .wf-template.json · .bench/site.json
+//   webflow-build.config.json · .wf-template.json
 // and removes the files that only belong in the template (CONTRIBUTING…).
 // Then sets up the workspace around the repo (the folder that holds it):
 //   CLAUDE.md · .mcp.json · .claude/skills links · prototype/ · Assets/
@@ -69,8 +69,6 @@ if (values.siteId && !/^[0-9a-f]{24}$/.test(values.siteId)) {
   console.error('--site-id is the 24-character hex id from Site settings or the MCP');
   process.exit(1);
 }
-// Bench records which of its templates the project came from (docs/bench.md).
-const bench = benchRecord(opt('bench'));
 // Each project's prototype gets its own port (5200–5999, from the slug), so
 // two clients' prototypes can run at once and the config never points at
 // the wrong one. The prototype's dev script uses --strictPort to match.
@@ -89,7 +87,7 @@ const devPort = Number(values.devPort);
 const today = new Date().toISOString().slice(0, 10);
 
 const edits = {
-  'package.json': (s) => s.replace(/"name": "[^"]*"/, `"name": "${repo}"`).replace(/"license": "[^"]*"/, '"license": "UNLICENSED"').replace(/\n    "(harvest|clients|pack-template)": "[^"]*",/g, ''),
+  'package.json': (s) => s.replace(/"name": "[^"]*"/, `"name": "${repo}"`).replace(/"license": "[^"]*"/, '"license": "UNLICENSED"').replace(/\n    "(harvest|clients)": "[^"]*",/g, ''),
   'AGENTS.md': (s) => s
     .replace('Fill these in when the repo is created from the template (`pnpm new-project`).', `Filled in by \`pnpm new-project\` on ${today}.`)
     .replaceAll('<CLIENT>', client)
@@ -133,7 +131,7 @@ for (const [file, edit] of Object.entries(edits)) {
 // too: the client's own code is not released under it. THIRD-PARTY-NOTICES.md
 // stays.
 const TEMPLATE_ONLY = ['LICENSE', 'CONTRIBUTING.md', 'CHANGELOG.md', '.github/ISSUE_TEMPLATE', 'scripts/harvest.mjs',
-  'scripts/pack.mjs', 'scripts/clients.mjs', 'scripts/check-template.mjs', 'docs/bench.md'];
+  'scripts/clients.mjs'];
 for (const f of TEMPLATE_ONLY) {
   if (!fs.existsSync(path.join(root, f))) continue;
   console.log(`${flag('dry-run') ? 'would remove' : 'removed'} ${f} (template only)`);
@@ -143,7 +141,6 @@ for (const f of TEMPLATE_ONLY) {
 const metaFile = path.join(root, '.wf-template.json');
 const meta = fs.existsSync(metaFile) ? JSON.parse(fs.readFileSync(metaFile, 'utf8')) : {};
 meta.created = today;
-if (bench) meta.bench = bench;
 // Where the template lives, for `pnpm update-skills`: GitHub records it on
 // repos created with "Use this template". --template overrides.
 meta.template = opt('template') ?? meta.template;
@@ -153,10 +150,10 @@ if (!meta.template && remoteOrg && remoteRepo) {
     if (res.ok) meta.template = (await res.json()).template_repository?.full_name;
   } catch {}
 }
-if (!meta.template && !bench) console.log('Template repo unknown: pass --template <owner/repo> (used by pnpm update-skills).');
+if (!meta.template) console.log('Template repo unknown: pass --template <owner/repo> (used by pnpm update-skills).');
 if (!flag('dry-run')) fs.writeFileSync(metaFile, JSON.stringify(meta, null, 2) + '\n');
 
-// Task progress starts empty (docs/bench.md › Task progress); a template
+// Task progress starts empty (docs/progress.md); a template
 // without the file still gets one.
 const progressFile = path.join(root, 'docs/handoff/progress.json');
 if (!fs.existsSync(progressFile)) {
@@ -171,37 +168,6 @@ const configFile = path.join(root, 'webflow-build.config.json');
 console.log(`${flag('dry-run') ? 'would write' : 'wrote'} webflow-build.config.json`);
 // One line per width, like the example file.
 if (!flag('dry-run')) fs.writeFileSync(configFile, JSON.stringify(config, null, 2).replace(/\[\s+(\d+),\s+(\d+)\s+\]/g, '[$1, $2]').replace(/\[\s+("[^\]]*")\s+\]/g, '[$1]') + '\n');
-
-// Bench's five answers about the site (Bench docs/ANY-REPO.md): which
-// Webflow site, how it runs here, what the published site loads from the
-// repo, how code reaches staging and live. Committed with the repo, so Bench
-// reads them instead of working them out; Bench › Client settings › Code
-// changes them. The same values Bench gets from this repo's files.
-const branch = (() => {
-  try { return execSync('git branch --show-current', { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() || 'master'; } catch { return 'master'; }
-})();
-const site = {
-  kind: 'wf-template',
-  webflow: { ...(siteId ? { siteId } : {}), staging: `https://${slug}.webflow.io` },
-  local: { command: 'pnpm dev', reload: 'esbuild' },
-  loads: [
-    { url: `https://${org}.github.io/${repo}/*`, local: '/*' },
-    { url: `https://cdn.jsdelivr.net/gh/${org}/${repo}@*/dist/*`, local: '/*' },
-    { match: config.bundlePattern, local: '$1' },
-  ],
-  staging: { kind: 'pages', branch, build: 'pnpm build', page: 'loader' },
-  live: { kind: 'jsdelivr-tag' },
-  packs: { from: 'repo' },
-};
-const siteFile = path.join(root, '.bench', 'site.json');
-if (fs.existsSync(siteFile) && !flag('force')) console.log('kept .bench/site.json (already there)');
-else {
-  console.log(`${flag('dry-run') ? 'would write' : 'wrote'} .bench/site.json`);
-  if (!flag('dry-run')) {
-    fs.mkdirSync(path.dirname(siteFile), { recursive: true });
-    fs.writeFileSync(siteFile, JSON.stringify(site, null, 2) + '\n');
-  }
-}
 
 // The workspace: the folder around the repo, where Claude is opened. It
 // imports the repo's agent rules and handoff, and links the repo's skills
@@ -242,18 +208,6 @@ if (!flag('no-workspace')) {
   }
 }
 function isLink(p) { try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; } }
-// --bench '<json>': the record Bench keeps of the project's template
-// (docs/bench.md › The project record). Written as given, after checking it.
-function benchRecord(text) {
-  if (text === undefined) return undefined;
-  let rec;
-  try { rec = JSON.parse(text); } catch { rec = null; }
-  if (!rec || typeof rec !== 'object' || !/^(official|(custom|own)\/[a-z0-9-]+)$/.test(rec.template ?? '') || typeof rec.version !== 'string') {
-    console.error('--bench takes the JSON record, e.g. \'{"template":"official","name":"Brand Vision","version":"0.10.0","base":"0.10.0"}\'');
-    process.exit(1);
-  }
-  return rec;
-}
 function workspaceClaudeMd() {
   return `# ${client} — workspace
 

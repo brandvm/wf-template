@@ -1,6 +1,6 @@
 ---
 name: webflow-seo
-description: Run a client's SEO plan on a live Webflow site, month by month: the baseline, technical SEO, on-page work for the pages that matter, content and links, and the monthly report. Use when a client has an SEO plan in Bench (or docs/handoff/progress.json), for the monthly SEO cycle, or when asked for SEO work on a site built with wf-template.
+description: Run a client's SEO plan on a live Webflow site, month by month: the baseline, technical SEO, on-page work for the pages that matter, content and links, and the monthly report. Use when a client has an SEO plan in docs/handoff/progress.json, for the monthly SEO cycle, or when asked for SEO work on a site built with wf-template.
 ---
 
 # Webflow SEO plan: baseline → monthly cycle → report
@@ -13,7 +13,7 @@ person sends to the client. The checklists are in
 The standing rules of `webflow-build` apply: no publish to a custom domain,
 release or DNS change without an explicit OK, no credentials in chat.
 Webflow settings (titles, descriptions, Open Graph, redirects) change in the
-Designer or through Bench's page settings; say exactly what to set.
+Designer; say exactly what to set.
 
 Each cycle:
 

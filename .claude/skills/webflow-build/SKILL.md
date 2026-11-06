@@ -1,6 +1,6 @@
 ---
 name: webflow-build
-description: Build a Webflow site in Webflow from its approved localhost prototype (built first from the Figma design, in Bench or by Claude), with the Webflow MCP and this wf-template repo: variables, tag styles, classes and CMS, the repo port and loader, the style guide page, the media page, components, then pages section by section, each verified against the prototype at four widths, up to the build handoff. Use when building prototype pages from Figma frames, starting or continuing a Webflow build (Designer through the MCP plus JS/CSS in the repo), building components or pages, comparing Webflow staging with the prototype, checking anchors, page transitions, load flicker or the published HTML, or wrapping up a build session. For project setup, the inputs and the Webflow snapshot, use webflow-prototype; for launch, webflow-launch; for a site that is already live, webflow-audit.
+description: Build a Webflow site in Webflow from its approved localhost prototype (built first from the Figma design), with the Webflow MCP and this wf-template repo: variables, tag styles, classes and CMS, the repo port and loader, the style guide page, the media page, components, then pages section by section, each verified against the prototype at four widths, up to the build handoff. Use when building prototype pages from Figma frames, starting or continuing a Webflow build (Designer through the MCP plus JS/CSS in the repo), building components or pages, comparing Webflow staging with the prototype, checking anchors, page transitions, load flicker or the published HTML, or wrapping up a build session. For project setup, the inputs and the Webflow snapshot, use webflow-prototype; for launch, webflow-launch; for a site that is already live, webflow-audit.
 ---
 
 # Webflow build: approved design → Webflow, section by section
@@ -14,15 +14,14 @@ listed.
   the Webflow foundation, the media page, each component, each finished
   page and the build handoff. Progress on them is recorded in
   `docs/handoff/progress.json` with `pnpm progress` (checklists.md › How
-  to record progress), which Bench's Tasks panel shows.
+  to record progress); `pnpm progress show` prints it.
 - [conventions.md](conventions.md) sets the page and section structure,
   class and variable naming, and the component, CMS and style-guide
   patterns every build starts from.
 - [lessons/](lessons/README.md) holds what cost time on earlier builds, by
   area. Read the file for the area you are about to work in.
 - The prototype comes first, always: it is built from the Figma file,
-  page by page, in Bench (or by Claude in the terminal with the same
-  steps), and the client approves it before anything is built in Webflow.
+  page by page, and the client approves it before anything is built in Webflow.
   The steps are below (The prototype, from Figma); the
   `webflow-prototype` skill has project setup, the inputs, the snapshot
   and the style guide, and its [figma.md](../webflow-prototype/figma.md)
@@ -108,20 +107,12 @@ The shared rules are in [rules.md](rules.md). The build adds:
 Every site starts from a Figma file. The prototype is built from it, page
 by page, and approved before anything is built in Webflow.
 
-**In Bench.** Add client › from a Figma design sets up the client folder,
-the repo from this template and an empty `prototype/` (a copy of
-[prototype-starter/](../webflow-prototype/prototype-starter/README.md)).
-Build the prototype from Figma groups the frames into pages; the person
-picks and orders them, each with its address. One AI job then builds them
-one page at a time: each page comes as its own message with its frames'
-node ids. Each built page keeps its Figma frame for Compare › With Figma.
-Bench looks at the file again when the client opens and hourly, and
-offers to update the pages whose frames changed: change only what changed
-in those frames, and keep edits made in the prototype since.
-
-**Not in Bench,** Claude follows the same steps in the terminal: list the
-frames, agree the pages, their order and addresses with the person, then
-build one page at a time.
+`pnpm new-project` sets up the workspace with an empty `prototype/` (a
+copy of [prototype-starter/](../webflow-prototype/prototype-starter/README.md)).
+List the frames, agree the pages, their order and addresses with the
+person, then build one page at a time. When the Figma file changes later,
+update only the pages whose frames changed, change only what changed in
+those frames, and keep edits made in the prototype since.
 
 **One page:**
 
@@ -143,8 +134,7 @@ build one page at a time.
 4. **Images** exported from the file into `prototype/images/`: photos as
    WebP at the largest size the design uses, icons as SVG.
 5. **Only what's in the file.** A value, state, text or image the file
-   doesn't give is a question: ask before inventing it (in Bench, add it
-   with `mcp__bench__todo_add` and carry on).
+   doesn't give is a question: ask before inventing it.
 6. **Where it goes:** `prototype/<page>/index.html` at its Webflow address
    (Home is `prototype/index.html`), added to `pages` in
    `prototype/vite.config.js`. Nav and footer are shared partials. Change
@@ -155,12 +145,12 @@ build one page at a time.
 
 Then the page runs **Prototype page done** (`webflow-prototype`'s
 [checklists.md](../webflow-prototype/checklists.md)) and the person
-approves it (in Bench: right-click in Pages). The **Prototype** stage in
+approves it. The **Prototype** stage in
 [checklists.md](checklists.md) tracks it all, up to the client's approval
 in writing:
 
 - each page matches its Figma frame at Desktop, Tablet and Mobile
-  (Bench's "Matches the Figma frame" check);
+  (the Matches the Figma frame item);
 - the Figma file is linked to the client;
 - frames picked, in order, each with its page address;
 - every picked frame built as a prototype page;
