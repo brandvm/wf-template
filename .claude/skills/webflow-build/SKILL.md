@@ -275,7 +275,7 @@ pnpm wf:outline /path                                            # heading outli
 pnpm wf:film /path [selector] [width]                            # first seconds of a load (flicker)
 pnpm wf:transitions /start /a /b [--width W]                     # Barba swaps, leaks, full page loads
 pnpm wf:a11y [/path…] [--all-widths]                             # axe scan, WCAG 2.2 A/AA rules
-pnpm wf:links [/path…] [--max 50] [--external]                   # crawl: broken, # and placeholder links
+pnpm wf:links [/path…] [--max 50] [--external]                   # crawl: broken and # links, placeholder text and images, http content, privacy link
 pnpm wf:baseline save|compare [/path…]                           # full-page visual baselines (launch, releases)
 pnpm wf:html [/path…]                                            # published HTML: what Webflow changed on publish
 pnpm wf:perf [/path…] [--runs 5] [--mobile|--desktop]            # Lighthouse, median of several runs

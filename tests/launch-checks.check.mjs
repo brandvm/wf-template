@@ -188,8 +188,8 @@ function serve(routes) {
     const r = routes[req.url.split('?')[0]];
     if (!r) { res.writeHead(404); return res.end('not found'); }
     if (r.to) { res.writeHead(r.status ?? 301, { location: r.to }); return res.end(); }
-    res.writeHead(200, { 'content-type': r.xml ? 'application/xml' : 'text/html' });
-    res.end(r.xml ?? `<html><head><title>${r.title} | Brand</title></head><body>${(r.links ?? []).map((l) => `<a href="${l}">x</a>`).join('')}</body></html>`);
+    res.writeHead(r.status ?? 200, { 'content-type': r.xml ? 'application/xml' : 'text/html' });
+    res.end(r.xml ?? r.html ?? `<html><head><title>${r.title} | Brand</title></head><body>${(r.links ?? []).map((l) => `<a href="${l}">x</a>`).join('')}</body></html>`);
   });
   return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve(server)));
 }
@@ -250,4 +250,82 @@ test('followHops stops at the first answer that isn\'t a redirect', async () => 
   const answers = { 'https://a.example/1': [301, '/2'], 'https://a.example/2': [308, 'https://b.example/3'], 'https://b.example/3': [200, null] };
   const fake = async (url) => ({ status: answers[url][0], headers: new Headers(answers[url][1] ? { location: answers[url][1] } : {}) });
   assert.deepEqual(await followHops('https://a.example/1', fake), [{ status: 301, url: 'https://a.example/1' }, { status: 308, url: 'https://a.example/2' }, { status: 200, url: 'https://b.example/3' }]);
+});
+
+// ---- the content checks from the earlier site-checking app (wf:links, wf:seo)
+
+const check = (name, dir, ...argv) => run(process.execPath, [path.join(scripts, name), ...argv], { cwd: dir }).then(
+  (r) => ({ code: 0, out: r.stdout }), (e) => ({ code: e.code, out: e.stdout + e.stderr }));
+const page = (body, head = '') => `<html><head><title>Page | Brand</title>${head}</head><body>${body}</body></html>`;
+const footer = '<footer><a href="/privacy">Privacy policy</a></footer>';
+
+test('wf:links: Webflow default text, notes left in the copy, placeholder images and the privacy link', async () => {
+  const site = await serve({
+    '/': { html: page(`<a href="/about">About</a><a href="/clean">Clean</a><div>This is some text inside of a div block.</div><h2>Heading</h2><a class="button" href="/about">Button Text</a><p>Opening hours TODO confirm</p><p>Price: TBD</p><img src="/images/placeholder.60f9b1840c.svg" alt="">`) },
+    '/about': { html: page('<h1>About us</h1><p>Real copy.</p>') },
+    '/clean': { html: page('<h1>Clean</h1>') },
+  });
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-links-'));
+  try {
+    fs.writeFileSync(path.join(dir, 'webflow-build.config.json'), JSON.stringify({ stagingUrl: origin(site), repoDir: root }));
+    const r = await check('links.mjs', dir);
+    assert.equal(r.code, 1, r.out);
+    assert.match(r.out, /Webflow's default text \("This is some text inside of a div block"\) +on \//);
+    assert.match(r.out, /Webflow's default element text "Heading"/);
+    assert.match(r.out, /Webflow's default element text "Button Text"/);
+    assert.match(r.out, /a note left in the copy: "TODO confirm"/);
+    assert.match(r.out, /\(note\) "TBD" in the copy/);
+    assert.match(r.out, /a placeholder image +on \//);
+    assert.match(r.out, /no link to a privacy policy/);
+    assert.match(r.out, /\(note\) no link to terms/);
+    assert.doesNotMatch(r.out, /on \/about|on \/clean/, 'real copy is left alone');
+  } finally {
+    site.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('wf:links: a site with its privacy link and final copy passes', async () => {
+  const site = await serve({ '/': { html: page(`<h1>Home</h1><p>Final copy.</p>${footer}`) }, '/privacy': { html: page(`<h1>Privacy</h1>${footer}`) } });
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-links-'));
+  try {
+    fs.writeFileSync(path.join(dir, 'webflow-build.config.json'), JSON.stringify({ stagingUrl: origin(site), repoDir: root }));
+    const r = await check('links.mjs', dir);
+    assert.equal(r.code, 0, r.out);
+    assert.match(r.out, /no problems/);
+  } finally {
+    site.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('wf:seo: no favicon, Webflow\'s default favicon and webclip, a password page', async () => {
+  const head = '<meta name="description" content="A description that is long enough to pass the check here."><meta property="og:title" content="t"><meta property="og:description" content="d"><meta property="og:image" content="i">';
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-seo-'));
+  const sites = [];
+  const at = async (routes) => {
+    const s = await serve(routes); sites.push(s);
+    fs.writeFileSync(path.join(dir, 'webflow-build.config.json'), JSON.stringify({ stagingUrl: origin(s), liveUrl: origin(s), repoDir: root, seo: { noSchemaOk: ['.*'] } }));
+  };
+  try {
+    await at({ '/': { html: page('<h1>Home</h1>', head) } });
+    let r = await check('seo.mjs', dir, '/');
+    assert.match(r.out, /no favicon: Site settings › General › Favicon/);
+
+    await at({ '/': { html: page('<h1>Home</h1>', head + '<link href="https://cdn.prod.website-files.com/img/favicon.ico" rel="shortcut icon" type="image/x-icon"><link href="https://cdn.prod.website-files.com/img/webclip.png" rel="apple-touch-icon">') } });
+    r = await check('seo.mjs', dir, '/');
+    assert.match(r.out, /Webflow's default favicon/);
+    assert.match(r.out, /\(note\) Webflow's default webclip/);
+
+    await at({ '/': { html: page('<h1>Home</h1>', head + '<link href="/icon.png" rel="icon">') } });
+    r = await check('seo.mjs', dir, '/');
+    assert.equal(r.code, 0, r.out);
+
+    await at({ '/': { status: 401, html: page('Protected') } });
+    r = await check('seo.mjs', dir, '/', '--live');
+    assert.match(r.out, /asks for a password \(HTTP 401\)/);
+  } finally {
+    for (const s of sites) s.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

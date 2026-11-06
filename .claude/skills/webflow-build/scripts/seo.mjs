@@ -18,7 +18,9 @@
 //   - two indexable pages with the same title or the same description;
 //   - a made-up path that answers 200 instead of 404 (search engines index
 //     the error pages);
-//   - with --live, robots.txt blocking every page (`Disallow: /` for `*`).
+//   - with --live, robots.txt blocking every page (`Disallow: /` for `*`);
+//   - no favicon, or Webflow's default one (also noted: its default webclip);
+//   - a site password (HTTP 401) on the live domain.
 // An `X-Robots-Tag: noindex` header counts as noindex.
 // Noted, not failed: noindex pages on staging, titles over 60 characters,
 // descriptions outside 50–160, no JSON-LD on a page outside
@@ -88,6 +90,7 @@ const seenOn = (map, text, p) => map.set(text, [...(map.get(text) ?? []), p]);
 function check(p, { status, html, error, xRobots = '' }, inSitemap) {
   const bad = [];
   const note = [];
+  if (status === 401) return { bad: [live ? 'asks for a password (HTTP 401): turn the site password off before launch' : 'HTTP 401 (a password page)'], note, noindex: false };
   if (status !== 200) return { bad: [error ? `no answer (${error})` : `HTTP ${status}`], note, noindex: false };
   const noindex = /noindex/i.test(content(html, 'name', 'robots') ?? '') || /noindex/i.test(xRobots);
   if (noindex && live && !matches(noindexOk, p)) bad.push('noindex (not in seo.noindexOk)');
@@ -144,6 +147,18 @@ for (const [what, map] of [['title', titlesSeen], ['description', descsSeen]]) {
 }
 const missingPage = await get(`${base}/wf-seo-check-missing-${Date.now()}`);
 if (missingPage.status === 200) site.push('a page that doesn\'t exist answers 200 instead of 404');
+// Webflow serves its own icons until the site's are uploaded (Site settings ›
+// General › Favicon and Webclip).
+const home = found.pages.get('/') ?? (await get(base + '/'));
+if (home.status === 200) {
+  const icon = (rel) => [...home.html.matchAll(/<link\b[^>]*>/gi)].map((m) => m[0]).find((t) => new RegExp(`(^|\\s)${rel}(\\s|$)`, 'i').test(attr(t, 'rel') ?? ''));
+  const fav = icon('icon');
+  const webflowDefault = (t) => /(website-files\.com|webflow\.com)\/img\/(favicon|webclip)/i.test(attr(t, 'href') ?? '');
+  if (!fav && (await get(base + '/favicon.ico')).status !== 200) site.push('no favicon: Site settings › General › Favicon');
+  else if (fav && webflowDefault(fav)) site.push('Webflow\'s default favicon: upload the site\'s own (Site settings › General › Favicon)');
+  const clip = icon('apple-touch-icon');
+  if (clip && webflowDefault(clip)) console.log('\n(note) Webflow\'s default webclip (the home screen icon): upload the site\'s own in Site settings › General');
+}
 if (live) {
   const robots = await get(base + '/robots.txt');
   if (robots.status === 200 && robotsBlocksAll(robots.html)) site.push('robots.txt blocks every page (Disallow: /): Site settings › SEO › Indexing');
