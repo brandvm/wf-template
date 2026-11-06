@@ -13,6 +13,17 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.21.0 — 2026-11-05
+
+The rest of the earlier site-checking app's launch checks: placeholder content, the privacy link and the favicon.
+
+**For client repos:** `pnpm update-skills`. `wf:links` and `wf:seo` can now fail a site that passed before. Two Pre-launch QA items are reworded, so an old tick shows as "changed" once.
+
+- **`wf:links`:** Webflow's default text ("This is some text inside of a div block", and elements whose whole text is "Heading", "Text Link", "Button Text" and the like), TODO or XXX notes in the copy (TBD is noted), placeholder images, http:// images, scripts, styles and frames on an https page, and no link to a privacy policy on any page crawled (no terms link is noted). Findings it only notes print as "(note)" and don't fail the run.
+- **`wf:seo`:** no favicon, or Webflow's default one (its default webclip is noted), and with `--live` a site password (HTTP 401) named as such.
+- **webflow-launch › Pre-launch QA:** the content, legal and SEO items say what the checks now find.
+- Tests: both checks end to end against a local server.
+
 ## 0.20.0 — 2026-11-05
 
 Each project has its own dev port, so two clients' `pnpm dev` can run at once.

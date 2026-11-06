@@ -76,15 +76,17 @@ from the client.
 ## Pre-launch QA
 
 Content
-- [Claude checks] No placeholder text or `#` links (`pnpm wf:links`, which
-  also flags lorem ipsum); stand-in images checked against the known issues.
+- [Claude checks] No placeholder text, Webflow default text, TODO notes,
+  placeholder images, `#` links or http:// content on an https page
+  (`pnpm wf:links`); stand-in images checked against the known issues.
 - [Person] Proofread every page.
 - [Claude checks] No `data-manual-todo` marker left in the published HTML
   (every manual step done); `docs/handoff/REVIEW.md` › Before launch all
   ticked.
 - [Claude checks] Contact data: phones as `tel:` links, addresses,
   emails, hours; [Person] confirms they're correct.
-- [Claude checks] Legal pages present and linked in the footer; copyright
+- [Claude checks] Legal pages present and linked in the footer
+  (`pnpm wf:links` fails when no page links a privacy policy); copyright
   year and social links.
 
 Function
@@ -117,7 +119,8 @@ SEO and tracking
   canonical and one H1 (`pnpm wf:seo`).
 - [Claude checks] OG tags and JSON-LD that parses with no HTML entities on
   every page, and noindex only on the pages in `seo.noindexOk`: the rest of
-  the SEO report. Alt text (`asset-audit`), favicon, schema where
+  the SEO report. Alt text (`asset-audit`), the site's own favicon (the
+  report flags none or Webflow's default), schema where
   `SEO-PLAN.md` plans it.
 - [Claude checks] Canonicals point to the live domain (after the domain is
   attached: `liveUrl` in the config, then `pnpm wf:seo --live --canonical`).
