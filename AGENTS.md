@@ -117,7 +117,7 @@ lives only in the Webflow head code; record it in Project facts above.
 ## Commands and release
 
 ```bash
-pnpm dev      # watch + server on :3000
+pnpm dev      # watch + server on the project's devPort (webflow-build.config.json; 3000 if unset)
 pnpm build    # minified -> dist/
 pnpm check    # tsc --noEmit + repo checks (scripts parse, skill links)
 pnpm test     # build + Playwright checks + the new-project test

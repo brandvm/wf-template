@@ -51,7 +51,7 @@ published.
     var OWNER = "ORG"; // the GitHub org or user that owns this repo
     var SITE = "REPO"; // this repo's name
     var STAG = "https://" + OWNER + ".github.io/" + SITE + "/";
-    var DEV = "http://localhost:3000/";
+    var DEV = "http://localhost:3000/"; // the dev server: devPort in webflow-build.config.json (3000 if unset)
     // *.canvas.webflow.com is the Designer's custom-code preview: a separate
     // origin, with its own URL flag and localStorage.
     var staging = /\.webflow\.io$|\.canvas\.webflow\.com$/.test(location.hostname);
@@ -160,7 +160,7 @@ published.
 
    There is deliberately no static localhost <link> here. It used to
    let the canvas show unsaved local CSS, but every public visitor's
-   browser then requested http://localhost:3000 before the script could
+   browser then requested the localhost dev server before the script could
    remove it — which can block rendering and triggers Chrome's
    local-network-access prompt. To see local CSS on the canvas while
    designing, add this link below wfc-css TEMPORARILY, with `pnpm dev`

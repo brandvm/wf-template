@@ -47,6 +47,10 @@ test('fills in every placeholder and writes the config', { skip }, () => {
   const cfg = JSON.parse(read('webflow-build.config.json'));
   assert.equal(cfg.stagingUrl, 'https://acme-homes.webflow.io');
   assert.ok(new RegExp(cfg.bundlePattern).test('https://acme-org.github.io/wf-acme/index.js'));
+  // A dev port per project, the same in the config (build.mjs) and the head code's DEV.
+  assert.ok(cfg.devPort >= 3100 && cfg.devPort < 3900, 'devPort from the slug');
+  assert.match(loader, new RegExp(`var DEV = "http://localhost:${cfg.devPort}/";`));
+  assert.doesNotMatch(loader, /localhost:3000/, 'no 3000 left in the loader');
   assert.ok(!fs.existsSync(path.join(dir, 'CONTRIBUTING.md')) && !fs.existsSync(path.join(dir, 'CHANGELOG.md')), 'template-only files removed');
   assert.ok(!fs.existsSync(path.join(dir, 'LICENSE')), 'MIT-0 licence not carried into the client repo');
   assert.ok(fs.existsSync(path.join(dir, 'THIRD-PARTY-NOTICES.md')), 'third-party notices kept');
@@ -119,4 +123,11 @@ test('--no-workspace leaves the folder alone', { skip }, () => {
   const { ws, dir } = copyIntoWorkspace();
   run(dir, ['--client', 'Acme', '--slug', 'acme', '--org', 'acme-org', '--template', 'example/wf-template', '--no-workspace']);
   assert.deepEqual(fs.readdirSync(ws), ['wf-acme']);
+});
+
+test('--dev-port sets the dev port', { skip }, () => {
+  const dir = copy();
+  run(dir, ['--client', 'Acme', '--slug', 'acme', '--org', 'acme-org', '--dev-port', '3456', '--template', 'example/wf-template', '--no-workspace']);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'webflow-build.config.json'), 'utf8')).devPort, 3456);
+  assert.match(fs.readFileSync(path.join(dir, 'loader.html'), 'utf8'), /var DEV = "http:\/\/localhost:3456\/";/);
 });

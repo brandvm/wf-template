@@ -5,6 +5,7 @@
 //
 // {
 //   "prototypeUrl": "http://127.0.0.1:5173",       // approved localhost prototype (port per project)
+//   "devPort":      3417,                          // pnpm dev's port (per project; 3000 if unset), = DEV in the head code
 //   "stagingUrl":   "https://<site>.webflow.io",    // published Webflow staging
 //   "repoDir":      ".",                           // this repo (has dist/ and @playwright/test), relative to the config
 //   "bundlePattern": "<org>\\.github\\.io/<repo>/(index\\.js|styles\\.css)",

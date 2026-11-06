@@ -13,6 +13,16 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.20.0 — 2026-11-05
+
+Each project has its own dev port, so two clients' `pnpm dev` can run at once.
+
+**For client repos:** `pnpm update-skills` brings the new `build.mjs`; nothing changes until you choose a port. To move off 3000, add `"devPort": <port>` to `webflow-build.config.json` and set `DEV` in the Webflow head code to `http://localhost:<port>/`, then publish (optional).
+
+- **`build.mjs`:** `pnpm dev` serves on `PORT`, else `devPort` in `webflow-build.config.json`, else 3000. A port already taken stops it with "Port 3417 is in use (another project's pnpm dev?)" instead of an esbuild error.
+- **`pnpm new-project`:** picks `devPort` from the slug (3100–3899, like the prototype's 5200–5999), writes it to the config and to `DEV` in `loader.html`. `--dev-port N` chooses it.
+- **Docs:** README, AGENTS.md, `loader.html` and the config example say where the port comes from. The lesson "port 3000 is shared across projects" is marked fixed.
+
 ## 0.19.0 — 2026-11-05
 
 The prototype marks its components and CMS content with four neutral attributes, so a tool (Bench's element tree) can show a page as components and collections.

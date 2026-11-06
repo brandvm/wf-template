@@ -21,7 +21,7 @@ pnpm install
 ## Commands
 
 ```bash
-pnpm dev      # esbuild watch + server on :3000 (in memory, sourcemaps)
+pnpm dev      # esbuild watch + server on the project's devPort (in memory, sourcemaps)
 pnpm build    # minified -> dist/ (commit the result)
 pnpm check    # tsc --noEmit
 pnpm test     # build + browser checks
@@ -177,7 +177,13 @@ before touching any of them.
 | -------------- | ----------------------- |
 | Production     | pinned jsDelivr tag (`RELEASE`) |
 | `*.webflow.io` | GitHub Pages staging    |
-| `?wfc-dev=1`    | `http://localhost:3000` |
+| `?wfc-dev=1`    | `http://localhost:<devPort>` |
+
+Each project has its own dev port, `devPort` in `webflow-build.config.json`
+(`pnpm new-project` picks one from the slug, 3100–3899, and writes it into
+the head code's `DEV`), so two clients' `pnpm dev` can run at once. Without
+`devPort` it is 3000. `PORT=<port> pnpm dev` overrides it for one run; the
+head code's `DEV` must point at the same port.
 
 Dev mode is localhost-only by design: `http://localhost` is a
 potentially-trustworthy origin so an https page may load it, but a LAN IP is
