@@ -13,6 +13,17 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.24.0 — 2026-11-09
+
+Webflow's default stylesheet is kept in the template, so a style nobody set can be traced to the default it falls back to.
+
+**For client repos:** `pnpm update-skills`. Nothing to change by hand.
+
+- **`webflow-build/reference/webflow-default.css`:** what a new, empty Webflow project publishes (normalize, `.w-*`, the default site styles), saved unchanged. Reference only: never linked or bundled. Listed in `THIRD-PARTY-NOTICES.md`, as it is Webflow's, not MIT-0.
+- **`reference/README.md`:** the defaults that most often cause trouble (`.w-layout-grid`, body type, heading, paragraph and list margins, form controls, `.w-button`, `.w-container`) and the Designer fix for each, plus how to refresh the copy.
+- **Lesson (designer):** a Grid element whose class sets no columns or rows publishes `.w-layout-grid`'s two columns, two rows and 16px gaps.
+- **AGENTS.md › Webflow canvas facts** and the webflow-build skill point to the reference.
+
 ## 0.23.0 — 2026-11-05
 
 Bench is retired, so the template drops everything that was only there for it.
