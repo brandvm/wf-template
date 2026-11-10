@@ -1,9 +1,10 @@
 # Contributing to wf-template
 
 Anyone with a GitHub account can improve this template: the toolchain, the
-loader, the agent rules, and the five skills in `.claude/skills/`
+loader, the agent rules, and the eight skills in `.claude/skills/`
 (`webflow-prototype`, `webflow-build`, `webflow-style-guide`,
-`webflow-launch`, `webflow-audit`). Repos created from the template pick
+`webflow-launch`, `webflow-audit`, and the plan skills `webflow-seo`,
+`webflow-maintenance`, `webflow-optimization`). Repos created from the template pick
 up skill changes with `pnpm update-skills`.
 
 ## What helps most

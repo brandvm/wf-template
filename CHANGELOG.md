@@ -13,7 +13,7 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
-## 0.24.1 — 2026-11-09
+## 0.24.2 — 2026-11-10
 
 `pnpm test` passes in a client repo straight after `pnpm new-project`. Found on wf-roncelli, whose first push failed CI.
 
@@ -22,6 +22,12 @@ by hand to follow (e.g. the loader snippets).
 - **`tests/loader.check.mjs`, `tests/environment-switcher.spec.mjs`:** read the dev port back from `loader.html`. `new-project` gives each client its own port, and these tests had `localhost:3000` hard-coded.
 - **`tests/progress.check.mjs`:** the throwaway repos start from an empty seed instead of copying this repo's `progress.json`. A client's file holds its plans, so a second `plan add` was refused. The empty-seed test runs in the template only.
 - **`tests/update-skills.check.mjs`:** the what's-new test is skipped when there is no `CHANGELOG.md`, which `new-project` removes from client repos.
+
+## 0.24.1 — 2026-11-10
+
+**For client repos:** nothing to do.
+
+- **CONTRIBUTING.md:** lists all eight skills (the plan skills `webflow-seo`, `webflow-maintenance` and `webflow-optimization` were missing).
 
 ## 0.24.0 — 2026-11-09
 
