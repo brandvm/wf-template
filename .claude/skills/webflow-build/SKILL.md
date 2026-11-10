@@ -20,6 +20,9 @@ listed.
   patterns every build starts from.
 - [lessons/](lessons/README.md) holds what cost time on earlier builds, by
   area. Read the file for the area you are about to work in.
+- [reference/](reference/README.md) keeps Webflow's default stylesheet,
+  what every property a class leaves unset falls back to, and the
+  defaults that most often cause trouble.
 - The prototype comes first, always: it is built from the Figma file,
   page by page, and the client approves it before anything is built in Webflow.
   The steps are below (The prototype, from Figma); the

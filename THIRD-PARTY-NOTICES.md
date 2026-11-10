@@ -34,6 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 | --- | --- | --- |
 | Phosphor Icons (icon font, `pnpm phosphor`) | MIT | `src/phosphor/LICENSE` |
 | Geist font (prototype starter) | SIL Open Font License 1.1 | `.claude/skills/webflow-prototype/prototype-starter/public/fonts/Geist-OFL.txt` |
+| Webflow's default stylesheet, kept for reference only (never linked or bundled); its first part is normalize.css v3 | Webflow's own output, not covered by MIT-0; normalize.css is MIT | `.claude/skills/webflow-build/reference/webflow-default.css` |
 
 npm packages installed with `pnpm install` (Finsweet Attributes and the
 rest) are not copied into this repo; each carries its own licence in

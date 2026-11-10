@@ -6,6 +6,28 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-11-09 · A Grid element publishes Webflow's 2×2 template when the class sets none
+- Area: designer
+- Symptom: a grid whose class sets no columns or rows lays its children
+  out in two equal columns with 16px gaps, on the canvas and on the
+  published page.
+- Cause: the Grid element carries `.w-layout-grid`, and Webflow's default
+  stylesheet gives it `grid-template-columns: 1fr 1fr`,
+  `grid-template-rows: auto auto`, `grid-auto-columns: 1fr` and 16px row
+  and column gaps. Any of these the class leaves unset falls back to
+  them. A Div Block with `display: grid` has no such rule: it publishes
+  one column, though the canvas draws it 2×2 (see "Designer canvas draws
+  a templateless grid as 2×2" below).
+- Fix: set columns, rows and both gaps on every grid class, at base, so
+  nothing falls through to `.w-layout-grid`. Never change `.w-layout-grid`
+  in repo CSS (`override-webflow`). Webflow's other defaults (body type,
+  heading and paragraph margins, form controls, buttons) are in
+  [reference/webflow-default.css](../reference/webflow-default.css), with
+  the ones that cause trouble listed in its
+  [README](../reference/README.md).
+- Status: in the template (reference/, 0.24.0)
+- Found by: human
+
 ### 2026-10-29 · Style guide specimens can't show hover or focus
 - Area: designer
 - Symptom: the Figma design system shows every button and field in

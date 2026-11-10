@@ -104,6 +104,12 @@ Before writing any CSS, decide where it belongs.
 - No live reload on the canvas. Reload the Designer tab.
 - Debug "is my CSS loading?" with `background`, not `outline` — outlines on
   `body` paint outside the canvas iframe and get clipped.
+- **Unset properties fall back to Webflow's defaults.** A margin, size,
+  colour or grid track nobody set usually comes from Webflow's own
+  stylesheet: a Grid element without columns and rows gets two columns,
+  two rows and 16px gaps from `.w-layout-grid`. The webflow-build skill's
+  `reference/webflow-default.css` is that stylesheet; its README lists the
+  defaults that cause trouble. Fix them on the class in the Designer.
 
 ## Snippets are not versioned
 

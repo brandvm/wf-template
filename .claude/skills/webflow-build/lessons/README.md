@@ -7,10 +7,13 @@ of them every session.
 | File | Covers | Entries |
 | --- | --- | --- |
 | [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 92 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 39 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 40 |
 | [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 24 |
 | [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 38 |
 | [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 18 |
+
+Webflow's own default stylesheet, what any unset property falls back
+to, is in [../reference/](../reference/README.md).
 
 ## Titles
 
@@ -111,6 +114,7 @@ of them every session.
 
 **Designer and canvas** ([designer.md](designer.md))
 
+- A Grid element publishes Webflow's 2×2 template when the class sets none
 - Style guide specimens can't show hover or focus
 - A style guide row that wraps a whole section squeezes the component
 - Style guide rows empty or floating for fixed, absolute and desktop-hidden classes
