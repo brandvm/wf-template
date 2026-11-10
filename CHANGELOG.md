@@ -13,6 +13,12 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 0.24.1 — 2026-11-10
+
+**For client repos:** nothing to do.
+
+- **CONTRIBUTING.md:** lists all eight skills (the plan skills `webflow-seo`, `webflow-maintenance` and `webflow-optimization` were missing).
+
 ## 0.24.0 — 2026-11-09
 
 Webflow's default stylesheet is kept in the template, so a style nobody set can be traced to the default it falls back to.
