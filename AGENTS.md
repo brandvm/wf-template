@@ -168,8 +168,10 @@ sign-in (OAuth token) never goes in the repo: these repos are public.
 Worked around, not fixed — do not rediscover these.
 
 - `custom_value` is rejected for Color and Size variables (`color-mix()`,
-  `oklch()`, `calc()`). Create those through the variables JSON import with
-  `valueType: "custom"`.
+  `oklch()`, `calc()`). Pass the value in the shape `get_variables`
+  returns, `value: {type: "custom", value: "calc(…)"}`, instead (accepted
+  for Size variables in every mode); otherwise create them through the
+  variables JSON import with `valueType: "custom"`.
 - Never create breakpoint auto-modes through the API
   (`create_variable_mode` with `breakpoint_id`): it can lock Body's mode
   slots for good. Create the modes without it and link them to the

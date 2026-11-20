@@ -6,6 +6,140 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-11-18 · Rich-text margin trims flatten designed embeds
+- Area: css
+- Symptom: designed blocks pasted into a CMS rich-text field as Embeds
+  (cards, a diagram, a row of tiles) lost their spacing; a cards row sat
+  on the button above it.
+- Cause: the repo's rich-text rule that zeroes the first child's top
+  margin and the last child's bottom margin also matched elements inside
+  the embed. A `.w-embed` is a `div`, so `div:first-child > :first-child`
+  hits its first child, and a version that matched any depth with
+  `!important` flattened every nested first and last child.
+- Fix: keep the trim to direct children of `.w-richtext`, and exclude
+  designed embeds with `:not(:where(.w-embed, .w-embed *))` (or a list of
+  the embed classes). Check every new designed embed in rich text against
+  the trim.
+- Status: fixed in that project
+
+### 2026-11-18 · Embed markup collides with the site's own class names
+- Area: css, designer
+- Symptom: rows in a block pasted into a CMS rich-text Embed overlapped
+  and their text was squashed.
+- Cause: the embed was generated from prototype markup with short class
+  names (`d1`–`d5`, `dot`) that were also Webflow site classes (display
+  headings, a decorative dot); the site stylesheet styled the embed's
+  elements too.
+- Fix: give embed markup its own prefix (for example `sx-*`) in the
+  generator and in the CMS HTML. Before adding prototype markup to an
+  Embed or rich text, check its class names against the published site
+  CSS (every class in the site's `webflow.css`).
+- Status: fixed in that project
+
+### 2026-11-18 · A decorative image behind a canvas became the LCP and a flicker
+- Area: css, perf
+- Symptom: a hero painted flat colour, then jumped to its gradient when a
+  ~240 KB poster JPEG arrived; mobile LCP was 6.2 s, on that image.
+- Cause: the decorative background behind a WebGL canvas was an `<img>`
+  in an Embed, so it was both late and the largest paint.
+- Fix: ship a tiny (about 48px wide) copy of the same frame inline in the
+  stylesheet as the section's background (a ~1.5 KB data URI, scaled up,
+  tagged `repo-css: designer-cant` for the inline data URI), drop the
+  `<img>`, and fade the canvas in over it. Mobile LCP went from 6.2 to
+  4.1 s, with no colour jump.
+- Status: fixed in that project
+
+### 2026-11-13 · Backdrop blur on a moving element stutters
+- Area: css, perf
+- Symptom: a card carousel moved by a CSS transform loop was "not smooth"
+  on a phone and on desktop. Headless Chromium showed nothing: its frame
+  rate and trace looked fine, and script work was under 15 ms in 3 s.
+- Cause: each card had a frosted frame (`backdrop-filter: blur`) and
+  small glass dots (also `backdrop-filter`), dozens per copy of the
+  track. A backdrop blur on a moving layer is re-rendered on the GPU every
+  frame; headless or emulated GPUs don't show the cost.
+- Fix: bake the frost into the image: the photo under the frame is a
+  pre-blurred, slightly darkened WebP (about 10 KB; mirrored edges so the
+  blur doesn't darken them), and the frame has no blur and no tint. Small
+  glass elements inside the moving track get a flat tint. A plain
+  `filter: blur` on the photo also works, but a flattened image costs
+  nothing. Keep `backdrop-filter` off anything that animates, and judge
+  smoothness on a real device, not in headless Chrome.
+- Status: fixed in that project
+
+### 2026-11-13 · A later stylesheet's base rule beats an earlier breakpoint rule
+- Area: css
+- Symptom: (1) in the repo, a rule for a width the Designer has no
+  breakpoint for (`@media (max-width: 1279px)`) also won at 991px and
+  below, so a stacked side nav was 224px tall instead of 59px and the
+  content started 165px lower than the prototype. (2) In a prototype,
+  restyling existing classes in a second CSS file broke the phone layout:
+  a stacked intro was 43em tall and panels kept their desktop padding.
+- Cause: the same specificity, so source order decides. Repo CSS loads
+  after `webflow.css`, so its rule beats the Designer's 991/767/479
+  values for the same class and property. In the prototype the newer
+  file's plain rule beats the older file's `@media` rule. (A `flex-basis`
+  meant as a width also becomes a height once the parent is a column.)
+- Fix: give a repo rule for an in-between width a floor:
+  `@media (min-width: 992px) and (max-width: 1279px)`, for every property
+  the Designer also sets at a smaller breakpoint. In a prototype override
+  file, restate every changed property that has a breakpoint value in
+  that file's own media blocks. In Webflow itself this can't happen (one
+  class, one value per breakpoint). After either, check 820 and 390, not
+  only the width you changed.
+- Status: fixed in two projects
+
+### 2026-11-10 · Inside an embedded form's iframe, breakpoints read the iframe's width
+- Area: css, js
+- Symptom: a two-column form grid with a one-column style at the 767
+  breakpoint showed one column in a 576px-wide form on a 1440 screen.
+- Cause: the form embed (HubSpot) copies the page's stylesheets into its
+  iframe, so every media query there tests the iframe's viewport, not the
+  page's.
+- Fix: classes used inside the iframe size by their own width, not by
+  breakpoints, e.g. `repeat(auto-fit, minmax(min(100%, 16em), 1fr))`.
+  Also: `:has()` can't be nested, and one invalid selector in a list drops
+  the whole rule (split such rules); an IntersectionObserver only sees
+  targets in its own window, so observe iframe elements with the frame's
+  own `IntersectionObserver`. A reserved min-height for the form must be
+  re-measured whenever its layout changes.
+- Status: fixed in that project
+
+### 2026-11-09 · Double, missing and clipped focus rings on wrapped controls
+- Area: css, designer
+- Symptom: a native select showed its square ring inside a rounded pill
+  that drew its own; an input showed its focus border plus an outline 3px
+  away (two indicators, on mouse click too); custom radios showed their
+  own ring inside the wrapper's Focus Within ring; visually hidden radios
+  had no visible focus at all; a focusable panel's ring was clipped by its
+  card's `overflow: hidden`.
+- Cause: a fallback `:focus-visible` ring lands on whichever element has
+  focus, also when its wrapper draws the ring; a `<select>` matches
+  `:focus-visible` on a mouse click; the Designer has Focus Within but no
+  keyboard-only state for a parent.
+- Fix: one indicator per control. Inputs: Focus and Focus Visible = the
+  active border plus one outline at offset 0. Wrappers that draw the ring
+  (a pill, a choice, a segmented tab) carry its colour, width and offset
+  in the Designer with `outline-style: none`; a `designer-cant` repo rule
+  `.wrapper:has(:focus-visible) { outline-style: solid }` only switches
+  the style on, so the colour stays a Designer variable and repo CSS reads
+  no variable name. The inner control's Focus Visible is outline none.
+  Inside an `overflow: hidden` parent, use a negative (inset) offset.
+  Audit with Tab and with mouse clicks, at desktop and phone width.
+- Status: fixed in that project
+
+### 2026-10-12 · `mix-blend-mode` stops blending inside S Wrapper
+- Area: css, designer
+- Symptom: a logo row with `mix-blend-mode` disappeared (or stopped
+  blending) once it was moved inside the section's S Wrapper.
+- Cause: S Wrapper is `position: relative` with a `z-index`, which makes
+  it a stacking context; a blend mode only blends with what is inside the
+  same stacking context, not with the section background behind it.
+- Fix: keep blended elements out of S Wrapper (cap their width directly),
+  or put the background they blend with inside the same stacking context.
+  Any `z-index` on an ancestor has the same effect.
+- Status: fixed in that project
+
 ### 2026-10-30 · Font fallback metrics: calibrate `size-adjust` on the site's own text
 - Area: css, perf
 - Symptom: while the web fonts loaded, headings moved 2–3px and hero text
@@ -71,6 +205,11 @@ refer to the project the lesson came from; Status is that project's.
   `dist/live/styles.css` (build.mjs), and a `BUNDLE = "live/"` folder in
   loader.html (also in 2a's href); the tests read it like SITE. At the
   redesign's launch BUNDLE becomes `""` and `src/live/` is deleted.
+  `pnpm update-skills` replaces `build.mjs` with the template's and drops
+  the `src/live/` entries: `pnpm build` then deletes `dist/live/`, and a
+  push removes the bundle the live pages load. After every update, check
+  `git diff build.mjs` and restore project entries (mark them with a
+  comment) before building or pushing.
 - Status: open in the template (a bundle folder in the loader)
 - Found by: claude
 
@@ -375,5 +514,10 @@ refer to the project the lesson came from; Status is that project's.
   group the same `fs-list-operator`, spelled `contain`, and every label a
   custom `for`. Check attribute values against the Finsweet v2 docs and
   `recipes/finsweet/`: typos fail silently.
+  An "All" built as `fs-list-element="clear"` never gets the active class
+  (Finsweet toggles it on radio and checkbox labels only): make All a
+  radio in the group with `value=""`, `fs-list-value=""` and `checked`.
+  `fs-list-activeclass="is-active"` on each radio uses a Designer combo
+  instead of `.is-list-active`.
 - Status: fixed in two projects
 - Found by: claude + codex

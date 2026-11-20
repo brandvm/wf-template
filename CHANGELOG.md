@@ -13,7 +13,7 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
-## 0.24.2 — 2026-11-10
+## 0.25.1 — 2026-11-20
 
 `pnpm test` passes in a client repo straight after `pnpm new-project`. Found on wf-roncelli, whose first push failed CI.
 
@@ -22,6 +22,19 @@ by hand to follow (e.g. the loader snippets).
 - **`tests/loader.check.mjs`, `tests/environment-switcher.spec.mjs`:** read the dev port back from `loader.html`. `new-project` gives each client its own port, and these tests had `localhost:3000` hard-coded.
 - **`tests/progress.check.mjs`:** the throwaway repos start from an empty seed instead of copying this repo's `progress.json`. A client's file holds its plans, so a second `plan add` was refused. The empty-seed test runs in the template only.
 - **`tests/update-skills.check.mjs`:** the what's-new test is skipped when there is no `CHANGELOG.md`, which `new-project` removes from client repos.
+
+## 0.25.0 — 2026-11-20
+
+57 new lessons harvested from the client repos' `GOTCHAS.md` (`pnpm harvest`), written generically, and new facts added to about 70 existing lessons.
+
+**For client repos:** `pnpm update-skills`. Nothing to change by hand. After the update, the `template-candidate` entries collected here can be marked `harvested` in each repo's `GOTCHAS.md`.
+
+- **Lessons (mcp, 19 new):** Collection List conflicts and write order, Form Blocks and form controls through the importer, `<i data-wftag>` stand-ins, an Image's `sizes`, CMS field groups, `tel:` links, publishing from an old Designer tab, page folders and duplicated pages, building a page in a slot, refreshing the snapshot, CMS drafts, redirects and robots.txt without an API, DOM headings, form names, the sitemap switch adding noindex. Corrections: `transition` can be written through the style API; pages can move into a folder.
+- **Lessons (designer, 12 new):** icons, keyboard shortcuts after inserting, conditional visibility, semantic colours, component root link targets, renamed slugs, `display` beating `hidden`, the 404 page, copy and paste between pages, style guide specimens.
+- **Lessons (js, 13 new):** WebGL on PageSpeed Insights, anchor focus rings, marquees, parallax jitter, custom dropdowns, before/after sliders, Finsweet "load all" and TOC, several sliders in one wrapper, canvas screenshots, form validation, starting after Webflow's own scripts.
+- **Lessons (css, 8 new):** rich-text margin trims, embed class collisions, a decorative LCP image, backdrop blur on moving elements, cascade order across stylesheets, embedded-form breakpoints, focus rings, `mix-blend-mode`.
+- **Lessons (loader-release-ci, 5 new):** template tests in a client repo, a GitHub Pages outage, a site duplicated from the starter, a tag name in an HTML comment, `wf:* --live`.
+- **AGENTS.md › Webflow MCP limits** and `starter-site.md`: a Size variable takes `calc()` through the MCP as `value: {type: "custom", value}`.
 
 ## 0.24.1 — 2026-11-10
 
