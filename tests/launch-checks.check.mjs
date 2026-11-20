@@ -321,6 +321,15 @@ test('wf:seo: no favicon, Webflow\'s default favicon and webclip, a password pag
     r = await check('seo.mjs', dir, '/');
     assert.equal(r.code, 0, r.out);
 
+    // A heading drawn as an SVG carries its words in the SVG's <title>: not a second page title.
+    await at({ '/': { html: page('<h1><svg role="img" aria-label="Home"><title>Home</title></svg></h1>', head + '<link href="/icon.png" rel="icon">') } });
+    r = await check('seo.mjs', dir, '/');
+    assert.equal(r.code, 0, r.out);
+
+    await at({ '/': { html: page('<h1>Home</h1>', head + '<title>Another title</title><link href="/icon.png" rel="icon">') } });
+    r = await check('seo.mjs', dir, '/');
+    assert.match(r.out, /2 <title> tags/);
+
     await at({ '/': { status: 401, html: page('Protected') } });
     r = await check('seo.mjs', dir, '/', '--live');
     assert.match(r.out, /asks for a password \(HTTP 401\)/);
