@@ -31,7 +31,6 @@ It builds on [smooth-scroll](../smooth-scroll/README.md) (`gsap.ts`,
    function boot() {
      document.documentElement.classList.remove('is-loading');
      // Global: once per visit, outside the Barba container.
-     run('environment-switcher', initEnvironmentSwitcher);
      const lenis = initSmoothScroll();
      run('anchor-scroll', () => initAnchorScroll(lenis ?? undefined));
      run('nav', initNav);

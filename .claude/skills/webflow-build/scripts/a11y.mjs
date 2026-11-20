@@ -6,9 +6,6 @@
 // exits 1 when anything serious or critical fails. Automated rules catch
 // roughly a third of WCAG issues: the keyboard walkthrough and a screen
 // reader check still belong to a person (webflow-launch › Pre-launch QA).
-// The Dev / Staging switcher (#wfc-environment) is left out: it renders on
-// *.webflow.io only, never for visitors, and its faded idle state failed
-// color-contrast on every staging page.
 import { loadConfig, args, browser, page, bust, repoRequire, paths } from './lib.mjs';
 
 const cfg = loadConfig();
@@ -16,7 +13,6 @@ const { pos, flags, live } = args();
 const axePath = repoRequire(cfg).resolve('axe-core/axe.min.js');
 const sizes = flags.has('--all-widths') ? [cfg.widths[0], cfg.widths.at(-1)] : [cfg.widths[0]];
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
-const EXCLUDE = [['#wfc-environment']];
 const b = await browser(cfg);
 let serious = 0;
 
@@ -26,7 +22,7 @@ for (const route of paths(cfg, pos)) {
     await p.goto(bust(cfg.stagingUrl + route), { waitUntil: 'load' });
     await p.waitForTimeout(2500);
     await p.addScriptTag({ path: axePath });
-    const result = await p.evaluate(({ tags, exclude }) => window.axe.run({ exclude }, { runOnly: { type: 'tag', values: tags } }), { tags: TAGS, exclude: EXCLUDE });
+    const result = await p.evaluate((tags) => window.axe.run(document, { runOnly: { type: 'tag', values: tags } }), TAGS);
     const v = result.violations;
     console.log(`\n== ${route}  ${size[0]}×${size[1]}  ${v.length ? `${v.length} rules fail` : 'no violations'}  (${result.passes.length} pass, ${result.incomplete.length} to check by hand)`);
     for (const r of v) {

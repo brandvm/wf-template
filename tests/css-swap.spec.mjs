@@ -12,7 +12,7 @@ async function setup(page, releaseRoute) {
   await page.route(stage + 'styles.css*', (r) => r.fulfill({ contentType: 'text/css', body: ':root{--sheet:stage}' }));
   await page.route(prod + 'styles.css', releaseRoute);
   await page.route('https://site.test/', (r) => r.fulfill({ contentType: 'text/html', body: `<html><head><script>
-    window.WFC = { staging: false, dev: false, devBase: 'http://localhost:3000/', stag: '${stage}', release: '9.9.9', prod: '${prod}' };
+    window.WFC = { staging: false, stag: '${stage}', release: '9.9.9', prod: '${prod}' };
     </script></head><body><link id="wfc-css" rel="stylesheet" href="${stage}styles.css?v=1"><script>${script2b}</script></body></html>` }));
   await page.goto('https://site.test/', { waitUntil: 'domcontentloaded' });
   return () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--sheet').trim());

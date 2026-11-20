@@ -1,5 +1,5 @@
 name: Bug
-description: The loader, switcher, a script or a skill doesn't work as documented
+description: The loader, a script or a skill doesn't work as documented
 labels: [bug]
 body:
   - type: markdown

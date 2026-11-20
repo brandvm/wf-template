@@ -13,15 +13,30 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
-## 0.25.1 — 2026-11-20
+## 1.0.1 — 2026-11-20
 
 `pnpm test` passes in a client repo straight after `pnpm new-project`. Found on wf-roncelli, whose first push failed CI.
 
-**For client repos:** `pnpm update-skills` doesn't copy `tests/`. If CI fails at `pnpm test` with `localhost:3000` or the progress seed, copy the four files below from this release.
+**For client repos:** `pnpm update-skills` doesn't copy `tests/`. If CI fails at `pnpm test` on the progress seed or the changelog, copy the two files below from this release.
 
-- **`tests/loader.check.mjs`, `tests/environment-switcher.spec.mjs`:** read the dev port back from `loader.html`. `new-project` gives each client its own port, and these tests had `localhost:3000` hard-coded.
 - **`tests/progress.check.mjs`:** the throwaway repos start from an empty seed instead of copying this repo's `progress.json`. A client's file holds its plans, so a second `plan add` was refused. The empty-seed test runs in the template only.
 - **`tests/update-skills.check.mjs`:** the what's-new test is skipped when there is no `CHANGELOG.md`, which `new-project` removes from client repos.
+- The hard-coded `localhost:3000` in the loader tests, also found on wf-roncelli, went away with dev mode in 1.0.0.
+
+## 1.0.0 — 2026-11-20
+
+Dev mode and the Dev / Staging switcher are gone. No page loads code from this machine any more: Webflow pages run the staging bundle on `*.webflow.io` and the pinned release elsewhere. Try code in the localhost prototype, then push.
+
+**For client repos (by hand, once):**
+1. `pnpm update-skills`, then `pnpm install`.
+2. Delete `src/modules/environment-switcher.ts` and its import and `run()` line in `src/index.ts`; remove `dev` and `devBase` from `WFC` in `src/globals.d.ts`; delete the `"dev"` script from `package.json` (`build.mjs --dev` now stops with a message) and `devPort` from `webflow-build.config.json`. Run `pnpm build` and commit `src/` and `dist/`.
+3. Re-paste the head code (keep the site's `RELEASE`), Embed 2b and the footer code from `loader.html`, remove any `wfc-css-dev` link, and publish. Embed 2a is unchanged. Either order works: an old switcher's buttons do nothing on the new snippets.
+
+- **`loader.html`:** no `DEV`, no `?wfc-dev` flag or `localStorage`, no localhost stylesheet or bundle; `window.WFC` loses `dev` and `devBase`. The staging → release fallback stays.
+- **Removed:** `src/modules/environment-switcher.ts`, `pnpm dev` (the esbuild dev server in `build.mjs`), `devPort` and `--dev-port` in `pnpm new-project`.
+- **Tests:** `tests/environment-switcher.spec.mjs` becomes `tests/loader.spec.mjs` with the loader's browser checks and new ones: the staging → release fallback, and `?wfc-dev=1` doing nothing. `tests/loader.check.mjs` asserts no localhost or dev flag in the installed code.
+- **Checks:** `wf:a11y` and `wf:parity` no longer skip `#wfc-environment`; `wf:install` no longer adds `wfc-dev=0`, and still reports a static localhost stylesheet.
+- **Docs:** README (Daily, Verify the loader, How the files reach the page), AGENTS.md, CONTRIBUTING.md, the bug issue template and the barba recipe.
 
 ## 0.25.0 — 2026-11-20
 
