@@ -2,7 +2,6 @@
 // Feature code lives in src/modules/<name>.ts and exports an init
 // function that no-ops when its selector is absent from the page.
 import { initAriaRoles } from './modules/aria-roles';
-import { initEnvironmentSwitcher } from './modules/environment-switcher';
 import { initPlaceholders } from './modules/placeholders';
 import { initUniqueFormIds } from './modules/unique-form-ids';
 
@@ -23,7 +22,6 @@ function boot() {
   // head snippet also has a fallback timeout.
   document.documentElement.classList.remove('is-loading');
 
-  run('environment-switcher', initEnvironmentSwitcher);
   // Starter fixes for markup Webflow publishes (conventions.md §9–11).
   run('aria-roles', initAriaRoles);
   run('placeholders', initPlaceholders);

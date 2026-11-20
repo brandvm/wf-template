@@ -1,9 +1,9 @@
 // Fill in a repo created from this template, once.
 //   pnpm new-project --client "Client Name" --slug client-site [--repo wf-client]
-//                    [--org <github-org>] [--site-id <24-hex>] [--prototype-url URL] [--dev-port N]
+//                    [--org <github-org>] [--site-id <24-hex>] [--prototype-url URL]
 //                    [--template <owner/repo>]
 // Missing values are asked for when run in a terminal. Writes:
-//   package.json name · AGENTS.md project facts · loader.html REPO and DEV ·
+//   package.json name · AGENTS.md project facts · loader.html ORG and REPO ·
 //   docs/handoff/HANDOFF.md title · .mcp.json server name (webflow-<slug>) ·
 //   webflow-build.config.json · .wf-template.json
 // and removes the files that only belong in the template (CONTRIBUTING…).
@@ -46,7 +46,6 @@ const values = {
   siteId: opt('site-id'),
   org: opt('org') ?? remoteOrg,
   prototypeUrl: opt('prototype-url'),
-  devPort: opt('dev-port'),
 };
 const questions = { client: 'Client / site name', org: 'GitHub org or user that owns this repo', slug: 'Webflow staging subdomain (<slug>.webflow.io)', siteId: 'Webflow site ID (Enter to fill in later)' };
 if (process.stdin.isTTY) {
@@ -73,17 +72,7 @@ if (values.siteId && !/^[0-9a-f]{24}$/.test(values.siteId)) {
 // two clients' prototypes can run at once and the config never points at
 // the wrong one. The prototype's dev script uses --strictPort to match.
 values.prototypeUrl ??= `http://127.0.0.1:${5200 + [...values.slug].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 800, 0)}`;
-// The same for the dev server (3100–3899), which build.mjs reads from the
-// config's devPort and the head code's DEV points at: with one fixed port,
-// a second project's pnpm dev took it and the first's pages loaded the
-// wrong bundle.
-values.devPort ??= String(3100 + [...values.slug].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 800, 0));
-if (!/^\d+$/.test(values.devPort) || +values.devPort < 1024 || +values.devPort > 65535) {
-  console.error('--dev-port is a port number from 1024 to 65535');
-  process.exit(1);
-}
 const { client, repo, slug, siteId, org, prototypeUrl } = values;
-const devPort = Number(values.devPort);
 const today = new Date().toISOString().slice(0, 10);
 
 const edits = {
@@ -101,8 +90,7 @@ const edits = {
     .replace('Replace ORG and REPO (all occurrences, pieces 1 and 2).', `ORG and REPO are filled in (${org}/${repo}).`)
     .replace('var OWNER = "ORG";', `var OWNER = "${org}";`)
     .replace('var SITE = "REPO";', `var SITE = "${repo}";`)
-    .replaceAll('https://ORG.github.io/REPO/', `https://${org}.github.io/${repo}/`)
-    .replaceAll('http://localhost:3000/', `http://localhost:${devPort}/`),
+    .replaceAll('https://ORG.github.io/REPO/', `https://${org}.github.io/${repo}/`),
   'docs/handoff/HANDOFF.md': (s) => s.replace('<CLIENT>', client),
   // Claude Code keeps one Webflow sign-in per MCP server name, on the
   // machine (never in the repo). A name per project gives each client repo
@@ -112,7 +100,6 @@ const edits = {
 };
 const config = {
   prototypeUrl,
-  devPort,
   stagingUrl: `https://${slug}.webflow.io`,
   repoDir: '.',
   bundlePattern: `${org.replace(/\./g, '\\.')}\\.github\\.io/${repo}/(index\\.js|styles\\.css)`,

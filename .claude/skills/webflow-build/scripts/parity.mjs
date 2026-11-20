@@ -49,7 +49,7 @@ const freeze = () => {
 };
 
 const snapshot = () => {
-  const skip = 'script,style,noscript,iframe,template,svg defs,#wfc-environment';
+  const skip = 'script,style,noscript,iframe,template,svg defs';
   return [...document.querySelectorAll('body *')].filter((e) => !e.closest(skip)).map((e) => {
     const st = {};
     const cs = getComputedStyle(e);

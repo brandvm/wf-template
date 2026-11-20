@@ -21,7 +21,6 @@ pnpm install
 ## Commands
 
 ```bash
-pnpm dev      # esbuild watch + server on the project's devPort (in memory, sourcemaps)
 pnpm build    # minified -> dist/ (commit the result)
 pnpm check    # tsc --noEmit
 pnpm test     # build + browser checks
@@ -44,8 +43,7 @@ a `TEMPLATE_UPDATE_TOKEN` secret (contents and pull-requests write) for
 that, or close and reopen it. Run it now from Actions › template-update ›
 Run workflow; delete the file to stop it.
 
-`dist/` is committed. `pnpm dev` serves from memory and never touches it;
-run `pnpm build` and commit `dist/` together with any `src/` change — CI
+`dist/` is committed: run `pnpm build` and commit `dist/` together with any `src/` change — CI
 fails the push if they disagree, and staging does not deploy until it passes.
 
 ## Starting a project
@@ -111,31 +109,14 @@ What `pnpm new-project` does, and the person's steps after it, in order.
 
 ## Daily
 
-- Run `pnpm dev`, then click the small **Staging** pill in the bottom-left of
-  the `.webflow.io` site and choose **Dev**. Choose **Staging** to switch back.
-  The page reloads and remembers your choice. The control starts collapsed;
-  click elsewhere or press Escape to collapse it again.
-- The pill shows the bundle actually loaded. If localhost fails and the loader
-  uses staging, it shows **Staging** with a fallback note when expanded.
-  Start `pnpm dev` and select **Dev** again to retry. If staging falls back to a
-  pinned release, the note identifies that fallback; select **Staging** to retry.
-- `?wfc-dev=1` / `?wfc-dev=0` still work, including when localStorage is blocked.
-- `git push` → client-facing staging bundle updates in ~1 min (no Webflow publish)
-- Live reload works in the browser. It does **not** work on the Designer canvas,
-  which never runs scripts — reload the Designer tab instead.
+- Edit `src/`, run `pnpm build`, commit `src/` and `dist/` together and
+  push. The staging bundle updates in ~1 min (no Webflow publish): reload
+  the `.webflow.io` page, and reload the Designer tab for CSS on the canvas.
+- There is no local mode: no page ever loads code from this machine. Try a
+  module first in the localhost prototype (its `src/modules/` work like the
+  repo's), then push it to staging.
 
-The switcher is limited to `*.webflow.io`, hidden in the Webflow editor/Designer
-and print, and isolated from site styles with Shadow DOM. Its implementation is
-`src/modules/environment-switcher.ts`; `src/index.ts` initializes it after the DOM
-is ready. It has no runtime dependencies or client-specific URLs.
-
-New projects created from this template include it automatically. Existing
-projects can copy the module, merge the types from `src/globals.d.ts`, add the initializer, and update
-all three snippets from `loader.html` (move their version into `RELEASE`).
-The loader's `window.WFC.source` field records fallback selection before the bundle
-runs. A JS fallback also removes local CSS and selects the fallback stylesheet.
-
-### Verify the switcher
+### Verify the loader
 
 ```sh
 pnpm exec playwright install chromium  # one-time browser setup
@@ -143,8 +124,8 @@ pnpm test                              # build + browser checks
 ```
 
 The tests use a generic example project and mocked asset responses, covering
-mode selection, URL/storage persistence, fallback, keyboard/mobile interaction,
-and host/editor restrictions without starting a local server.
+staging, production with and without `RELEASE`, the release fallback, first
+paint on a release domain and the scroll lock, without starting a server.
 
 ## Release (launch / retainer updates)
 
@@ -186,18 +167,9 @@ before touching any of them.
 | -------------- | ----------------------- |
 | Production     | pinned jsDelivr tag (`RELEASE`) |
 | `*.webflow.io` | GitHub Pages staging    |
-| `?wfc-dev=1`    | `http://localhost:<devPort>` |
 
-Each project has its own dev port, `devPort` in `webflow-build.config.json`
-(`pnpm new-project` picks one from the slug, 3100–3899, and writes it into
-the head code's `DEV`), so two clients' `pnpm dev` can run at once. Without
-`devPort` it is 3000. `PORT=<port> pnpm dev` overrides it for one run; the
-head code's `DEV` must point at the same port.
-
-Dev mode is localhost-only by design: `http://localhost` is a
-potentially-trustworthy origin so an https page may load it, but a LAN IP is
-not and gets blocked as mixed content. To check work on another device, push
-and use the staging bundle.
+If the staging bundle fails to load and a `RELEASE` is set, staging falls
+back to the pinned release, CSS included.
 
 Pushing to `master` triggers
 [`.github/workflows/staging.yml`](.github/workflows/staging.yml): type check,
@@ -207,9 +179,8 @@ Production is pinned to a tag, so a staging deploy never touches the live
 site.
 
 The Designer canvas shows the **staging** stylesheet, so seeing a CSS change
-there means push → ~1 min → reload the Designer tab. There is no static
-localhost link in the Embed (public visitors' browsers used to request it);
-`loader.html` explains how to add one temporarily while designing.
+there means push → ~1 min → reload the Designer tab. Never put a localhost
+link in the Embed: every public visitor's browser would request it.
 
 ## Project structure
 

@@ -5,20 +5,9 @@ version lives in ONE place: RELEASE in piece 1.
 
   prod        = pinned jsDelivr tag (immutable)
   webflow.io  = latest pushed staging bundle (JS + CSS)
-  dev flag    = the dev server on this machine (staging only)
 
-The bundle includes a compact Dev / Staging switcher in the bottom-left
-corner of *.webflow.io pages. Click the current mode to expand it.
-
-Dev flag — also available via URL param on the staging site:
-   ?wfc-dev=1   → dev mode on (persists in localStorage)
-   ?wfc-dev=0   → back to normal
-Console equivalent: localStorage.setItem('wfc-dev','1') / removeItem.
-
-Dev mode is localhost-only by design. http://localhost is a
-potentially-trustworthy origin, so an https page is allowed to load
-it; a LAN IP is not and gets blocked as mixed content. To check work
-on another device, git push and use the staging bundle (~1 min).
+There is no local mode: a page never loads code from this machine. To
+see a change on staging, git push and reload (~1 min).
 
 Everything that is not below lives in src/ and ships through the
 bundle. Resist adding site logic to any of these three snippets —
@@ -51,27 +40,20 @@ published.
     var OWNER = "ORG"; // the GitHub org or user that owns this repo
     var SITE = "REPO"; // this repo's name
     var STAG = "https://" + OWNER + ".github.io/" + SITE + "/";
-    var DEV = "http://localhost:3000/"; // the dev server: devPort in webflow-build.config.json (3000 if unset)
-    // *.canvas.webflow.com is the Designer's custom-code preview: a separate
-    // origin, with its own URL flag and localStorage.
+    // *.canvas.webflow.com is the Designer's custom-code preview: it runs
+    // the staging bundle like webflow.io.
     var staging = /\.webflow\.io$|\.canvas\.webflow\.com$/.test(location.hostname);
-    var q = new URLSearchParams(location.search);
-    var flag = staging && q.get("wfc-dev") === "1";
-    try {
-      if (staging && q.has("wfc-dev")) localStorage.setItem("wfc-dev", flag ? "1" : "0");
-      if (staging && !q.has("wfc-dev")) flag = localStorage.getItem("wfc-dev") === "1";
-    } catch (e) { /* An explicit URL flag still works without storage. */ }
     var prod = RELEASE
       ? "https://cdn.jsdelivr.net/gh/" + OWNER + "/" + SITE + "@" + RELEASE + "/dist/"
       : STAG;
     if (!staging && !RELEASE)
       console.error("[wfc] RELEASE is not set in head code; serving the staging bundle. Tag a release and set RELEASE before launch.");
     // Warm the connection to wherever the bundle comes from (GitHub Pages
-    // on staging, jsDelivr with a RELEASE, localhost in dev mode). A fixed
+    // on staging, jsDelivr with a RELEASE). A fixed
     // jsDelivr preconnect went unused on staging and before the first
     // release. Two links on purpose: the stylesheet and its font fetches
     // are CORS-different and open separate connections.
-    var origin = new URL(flag ? DEV : staging ? STAG : prod).origin;
+    var origin = new URL(staging ? STAG : prod).origin;
     [false, true].forEach(function (cors) {
       var warm = document.createElement("link");
       warm.rel = "preconnect";
@@ -115,7 +97,7 @@ published.
     }
     // Shared config — the Embed, the footer loader and the bundle read this.
     window.WFC = {
-      staging: staging, dev: flag, devBase: DEV, stag: STAG,
+      staging: staging, stag: STAG,
       release: RELEASE, prod: prod, releaseCSSFailed: releaseCSSFailed,
     };
 
@@ -156,19 +138,11 @@ published.
    loads, so production never waits for the staging sheet (2b's swap is
    then a fallback); on webflow.io 2b keeps the
    sheet the parser already fetched and swaps in a cache-busted copy only
-   after `load`. It adds the localhost sheet only when the dev flag is on.
+   after `load`.
 
-   There is deliberately no static localhost <link> here. It used to
-   let the canvas show unsaved local CSS, but every public visitor's
-   browser then requested the localhost dev server before the script could
-   remove it — which can block rendering and triggers Chrome's
-   local-network-access prompt. To see local CSS on the canvas while
-   designing, add this link below wfc-css TEMPORARILY, with `pnpm dev`
-   running, and remove it before publishing:
-     <link id="wfc-css-dev" rel="stylesheet" href="http://localhost:3000/styles.css" />
-   While both are live they are ADDITIVE: deleting a rule locally does
-   not delete staging's copy of it. Deletions can only be verified
-   after a push.
+   Never add a localhost <link> here, not even for a moment: every
+   public visitor's browser would request this machine, which can block
+   rendering and triggers Chrome's local-network-access prompt.
 
    GitHub Pages caches ~10 min; bump ?v=1 below to pull fresh staging
    CSS into the canvas.
@@ -231,18 +205,10 @@ published.
       // sheet from 2a. Swapping before first paint fetched it a second time,
       // render-blocking, and shifted the layout when it arrived. GitHub
       // Pages caches ~10 min, so a cache-busted copy follows after `load`,
-      // unless dev mode or a fallback has taken the bundle elsewhere.
+      // unless a fallback has taken the bundle elsewhere.
       window.addEventListener("load", function () {
         if (C.source === C.stag) C.setCSS(C.stag + "styles.css?v=" + Date.now());
       });
-    if (C.dev && !document.getElementById("wfc-css-dev")) {
-      var dev = document.createElement("link");
-      dev.id = "wfc-css-dev";
-      dev.rel = "stylesheet";
-      dev.href = C.devBase + "styles.css";
-      var css = document.getElementById("wfc-css");
-      css.parentNode.insertBefore(dev, css.nextSibling); // after the active sheet, so it wins
-    }
   })();
 </script>
 
@@ -264,33 +230,25 @@ Rollback = set RELEASE in piece 1 back to the previous tag and publish.
     if (!document.getElementById("wfc-css"))
       console.warn("[wfc] CSS embed not found on this page; styles are missing.");
     function js(src, fallback) {
-      // Set before execution so the switcher sees the bundle that actually
-      // loads, including local -> staging and staging -> pinned fallbacks.
+      // Set before execution: the base the bundle actually loads from,
+      // including the staging -> pinned release fallback.
       C.source = new URL(".", src).href;
-      if (C.source !== C.devBase) {
-        var devCSS = document.getElementById("wfc-css-dev");
-        if (devCSS) devCSS.remove();
-        var baseCSS = document.getElementById("wfc-css");
-        var cssURL = C.source + "styles.css" + new URL(src).search;
-        // Re-point the sheet only when it comes from somewhere else (a
-        // fallback), so CSS and JS match: staging keeps the sheet 2b left.
-        // setCSS (piece 2b) swaps without an unstyled gap; fall back to a
-        // plain href if 2b is an older copy.
-        if (baseCSS && baseCSS.href.indexOf(C.source) === 0) { /* already there */ }
-        else if (C.setCSS) C.setCSS(cssURL);
-        else if (baseCSS) baseCSS.href = cssURL;
-      }
+      var baseCSS = document.getElementById("wfc-css");
+      var cssURL = C.source + "styles.css" + new URL(src).search;
+      // Re-point the sheet only when it comes from somewhere else (a
+      // fallback), so CSS and JS match: staging keeps the sheet 2b left.
+      // setCSS (piece 2b) swaps without an unstyled gap; fall back to a
+      // plain href if 2b is an older copy.
+      if (baseCSS && baseCSS.href.indexOf(C.source) === 0) { /* already there */ }
+      else if (C.setCSS) C.setCSS(cssURL);
+      else if (baseCSS) baseCSS.href = cssURL;
       var s = document.createElement("script");
       s.src = src;
       if (fallback) s.onerror = fallback;
       document.head.appendChild(s);
     }
     var v = "?v=" + Date.now();
-    if (C.dev)
-      js(C.devBase + "index.js", function () {
-        js(C.stag + "index.js" + v);
-      });
-    else if (C.staging)
+    if (C.staging)
       js(C.stag + "index.js" + v, C.release ? function () {
         js(C.prod + "index.js");
       } : null);

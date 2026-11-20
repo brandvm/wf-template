@@ -1,8 +1,8 @@
 // loader.html's three pieces run in node:vm against a small fake DOM: host
-// detection, the dev flag and its storage, RELEASE null or set, the
-// preconnect origin, the missing-config guards and the fallbacks. No
-// browser, so it runs in well under a second; the Playwright spec
-// (environment-switcher.spec.mjs) covers what needs real loading.
+// detection, RELEASE null or set, the preconnect origin, the
+// missing-config guards and the fallbacks. No browser, so it runs in well
+// under a second; the Playwright spec (loader.spec.mjs) covers what needs
+// real loading.
 // Run by `pnpm test` with node --test.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -20,12 +20,11 @@ const scripts = [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) =>
 const cssLink = source.match(/<link\b[^>]*id="wfc-css"[^>]*>/)?.[0];
 const [head, embed, footer] = scripts;
 const stage = `https://${org}.github.io/${repo}/`;
-const local = 'http://localhost:3000/';
 const release = (v) => `https://cdn.jsdelivr.net/gh/${org}/${repo}@${v}/dist/`;
 
 // A page with the loader pieces in it. `pieces` picks which ones are
 // installed (a missing head code is the "config missing" case).
-function load({ host = 'example.webflow.io', search = '', stored = null, denyStorage = false, RELEASE = null, pieces = ['head', 'embed', 'footer'] } = {}) {
+function load({ host = 'example.webflow.io', search = '', RELEASE = null, pieces = ['head', 'embed', 'footer'] } = {}) {
   const logs = { error: [], warn: [] };
   const timers = [];
   const listeners = {};
@@ -59,10 +58,6 @@ function load({ host = 'example.webflow.io', search = '', stored = null, denySto
     document,
     location: { hostname: host, search, href: `https://${host}/${search}` },
     URL, URLSearchParams,
-    localStorage: {
-      getItem() { if (denyStorage) throw new Error('Storage blocked'); return stored; },
-      setItem(_, value) { if (denyStorage) throw new Error('Storage blocked'); stored = value; },
-    },
     console: { error: (m) => logs.error.push(String(m)), warn: (m) => logs.warn.push(String(m)) },
     setTimeout: (fn, ms) => timers.push({ fn, ms }),
     addEventListener: (type, fn) => (listeners[type] ??= []).push(fn),
@@ -78,13 +73,12 @@ function load({ host = 'example.webflow.io', search = '', stored = null, denySto
   }
   for (const piece of pieces) vm.runInContext(code[piece], page);
   return {
-    page, logs, timers, classes, stored: () => stored,
+    page, logs, timers, classes,
     WFC: page.WFC,
     preconnects: () => nodes.filter((n) => n.rel === 'preconnect'),
     written: () => nodes.filter((n) => n.written),
     scripts: () => nodes.filter((n) => n.tagName === 'SCRIPT'),
     css: () => document.getElementById('wfc-css'),
-    devCSS: () => document.getElementById('wfc-css-dev'),
     fire: (type) => (listeners[type] ?? []).forEach((fn) => fn()),
   };
 }
@@ -94,7 +88,7 @@ test('loader.html has the four pieces and ships with RELEASE null', () => {
   assert.ok(cssLink, 'Embed 2a is a <link id="wfc-css">');
   assert.match(cssLink, new RegExp(`href="${stage}styles\\.css\\?v=1"`));
   assert.ok(raw.includes('var RELEASE = null;'), 'loader.html must ship with `var RELEASE = null;`');
-  assert.doesNotMatch(source, /localhost:3000\/styles\.css"/, 'no static localhost link outside the comments');
+  assert.doesNotMatch(source, /localhost|127\.0\.0\.1|wfc-dev/, 'no localhost and no dev flag in the installed code');
 });
 
 test('host detection: webflow.io and the Designer preview are staging, anything else is production', () => {
@@ -107,44 +101,16 @@ test('host detection: webflow.io and the Designer preview are staging, anything 
     ['example.canvas.webflow.com.evil.example', false],
     ['webflow.io', false],
   ]) {
-    const h = load({ host, search: '?wfc-dev=1', RELEASE: '1.0.0' });
+    const h = load({ host, RELEASE: '1.0.0' });
     assert.equal(h.WFC.staging, staging, host);
-    assert.equal(h.WFC.dev, staging, `${host}: the dev flag only works on staging`);
   }
 });
 
-test('production ignores a dev flag in the URL and in storage', () => {
-  const h = load({ host: 'www.client.example', search: '?wfc-dev=1', stored: '1', RELEASE: '1.0.0' });
-  assert.equal(h.WFC.dev, false);
-  assert.equal(h.stored(), '1', 'production never writes the flag');
-  assert.deepEqual(h.scripts().map((s) => s.src), [release('1.0.0') + 'index.js']);
-  assert.equal(h.devCSS(), null);
-});
-
-test('staging: the URL flag is stored, a stored flag applies, ?wfc-dev=0 turns it off', () => {
-  const on = load({ search: '?wfc-dev=1' });
-  assert.equal(on.WFC.dev, true);
-  assert.equal(on.stored(), '1');
-  assert.equal(on.scripts()[0].src, local + 'index.js');
-  assert.equal(on.devCSS().href, local + 'styles.css');
-
-  const saved = load({ stored: '1' });
-  assert.equal(saved.WFC.dev, true);
-
-  const off = load({ search: '?wfc-dev=0', stored: '1' });
-  assert.equal(off.WFC.dev, false);
-  assert.equal(off.stored(), '0');
-  assert.ok(off.scripts()[0].src.startsWith(stage + 'index.js?v='));
-  assert.equal(off.devCSS(), null);
-});
-
-test('storage denied: the URL flag still works and nothing throws', () => {
-  for (const [search, dev] of [['?wfc-dev=1', true], ['?wfc-dev=0', false], ['', false]]) {
-    const h = load({ search, denyStorage: true });
-    assert.equal(h.WFC.dev, dev, search || 'no flag');
-    assert.ok(h.scripts()[0].src.startsWith(dev ? local : stage));
-    assert.deepEqual(h.logs.error, []);
-  }
+test('the old ?wfc-dev=1 flag does nothing on staging or production', () => {
+  const staging = load({ search: '?wfc-dev=1' });
+  assert.ok(staging.scripts()[0].src.startsWith(stage + 'index.js?v='));
+  const prod = load({ host: 'www.client.example', search: '?wfc-dev=1', RELEASE: '1.0.0' });
+  assert.deepEqual(prod.scripts().map((s) => s.src), [release('1.0.0') + 'index.js']);
 });
 
 test('missing config: Embed 2b and the footer log an error and load nothing', () => {
@@ -194,13 +160,6 @@ test('RELEASE null: staging has no release to fall back to', () => {
   assert.equal(h.scripts()[0].onerror, undefined);
 });
 
-test('dev mode falls back to staging when localhost is down', () => {
-  const h = load({ search: '?wfc-dev=1' });
-  h.scripts()[0].onerror();
-  assert.ok(h.scripts()[1].src.startsWith(stage + 'index.js?v='));
-  assert.equal(h.devCSS(), null, 'the local stylesheet is removed with the fallback');
-});
-
 test('staging swaps in a cache-busted stylesheet only after load', () => {
   const h = load();
   const parsed = h.css().href;
@@ -214,7 +173,6 @@ test('preconnect warms the origin the bundle comes from, twice (plain and CORS)'
   for (const [opts, origin] of [
     [{}, new URL(stage).origin],
     [{ host: 'example.canvas.webflow.com' }, new URL(stage).origin],
-    [{ search: '?wfc-dev=1' }, new URL(local).origin],
     [{ host: 'www.client.example', RELEASE: '1.0.0' }, 'https://cdn.jsdelivr.net'],
     [{ host: 'www.client.example' }, new URL(stage).origin],
   ]) {

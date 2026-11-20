@@ -15,7 +15,7 @@ up skill changes with `pnpm update-skills`.
   write it up.
 - **A fix or a new check** in `scripts/` or the skills' `scripts/`.
 - **A checklist or convention** that turned out missing or wrong.
-- **A bug** in the loader, the switcher or a script: open an issue with
+- **A bug** in the loader or a script: open an issue with
   the **Bug** template.
 
 ## How

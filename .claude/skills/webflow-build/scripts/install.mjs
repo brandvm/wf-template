@@ -69,7 +69,7 @@ for (const route of paths(cfg, pos)) {
   const p = await page(b, cfg, url, cfg.widths[0], { live: true });
   const local = [];
   await p.route(/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])([:/]|$)/, (r) => { local.push(r.request().url()); r.abort(); });
-  const res = await p.goto(bust(url) + '&wfc-dev=0', { waitUntil: 'load' }).catch((e) => ({ error: e }));
+  const res = await p.goto(bust(url), { waitUntil: 'load' }).catch((e) => ({ error: e }));
   const out = [];
   const say = (msg) => { out.push(`  ${msg}`); problems++; };
   if (res.error || !res.ok()) { say(`page did not load: ${res.error?.message.split('\n')[0] ?? 'HTTP ' + res.status()}`); console.log(`\n${route}\n${out.join('\n')}`); await p.close(); continue; }
@@ -90,7 +90,7 @@ for (const route of paths(cfg, pos)) {
   if (!embeds) say('Embed 2a (<link id="wfc-css">) is not on this page: the component holding Embeds 2a and 2b is missing here.');
   else if (embeds > 1) say(`Embed 2a is on this page ${embeds} times: one copy of the component per page.`);
   else if (/\bid="wfc-css"/.test(head)) say('Embed 2a is in head code: the Designer canvas never shows it there. Move it to an Embed in the global component.');
-  if (/\bid="wfc-css-dev"/.test(served)) say('a static wfc-css-dev link is installed: remove it before publishing (loader.html piece 2).');
+  if (/\bid="wfc-css-dev"/.test(served)) say('a static localhost stylesheet (wfc-css-dev) is installed: every visitor requests this machine. Remove it and publish.');
 
   const dom = await p.evaluate(() => ({
     viewport: document.querySelectorAll('meta[name="viewport"]').length,
