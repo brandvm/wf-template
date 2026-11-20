@@ -6,11 +6,11 @@ of them every session.
 
 | File | Covers | Entries |
 | --- | --- | --- |
-| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 92 |
-| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 40 |
-| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 24 |
-| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 38 |
-| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 18 |
+| [mcp.md](mcp.md) | Webflow MCP and API: What the Webflow MCP tools (element and WHTML builders, styles, variables, components, CMS) do differently from what you would expect, and the workaround for each. | 111 |
+| [designer.md](designer.md) | Designer and canvas: How the Designer, the canvas and publishing behave: combos, components, tag styles, forms, grids, empty elements. | 52 |
+| [css.md](css.md) | Repo CSS: Repo CSS against the Designer: cascade, focus, fixed children, overflow. | 32 |
+| [js.md](js.md) | JavaScript modules: Modules, GSAP, Lenis, Barba, Finsweet and Webflow's own scripts. | 51 |
+| [loader-release-ci.md](loader-release-ci.md) | Loader, release and CI: The three snippets, releases with jsDelivr tags, and the CI checks. | 23 |
 
 Webflow's own default stylesheet, what any unset property falls back
 to, is in [../reference/](../reference/README.md).
@@ -19,6 +19,25 @@ to, is in [../reference/](../reference/README.md).
 
 **Webflow MCP and API** ([mcp.md](mcp.md))
 
+- Sitemap indexing off adds noindex; the sitemap API publishes drafts
+- Collection List conflicts: drafts, write order and the Designer route
+- Webflow Form Blocks through the importer: names, ids, buttons and placeholders
+- Importing buttons and form controls: `<i data-wftag>` stand-ins
+- Webflow rewrites an Image's `sizes`; a DOM `<img>` keeps its own
+- A desktop app session didn't load the repo's Webflow MCP server
+- CMS field groups can be written through the API
+- A phone link set to "tel:…" publishes as `tel:835:…`
+- A publish from an old Designer tab left API style changes off staging
+- Radios and checkboxes built through the MCP: native style, a lagging name, a label that won't go
+- Page folders and duplicated pages through the API
+- Tabs fade durations aren't in the data API
+- Building a page in a slot: placeholders first, then builder elements
+- Refresh the Webflow snapshot after every variables batch
+- A CMS Image field can't bind to a text prop (video poster)
+- CMS drafts stay live; unpublishing needs references cleared
+- Redirects and robots.txt have no API below Enterprise
+- A Block can't become a heading; build a DOM heading with DOM spans
+- Form and field names set through the API never publish
 - IX2 is invisible to the MCP; `data-w-id` is not an attribute
 - Breakpoint auto-modes: link them in the Designer, never through the API
 - The style API rejects `-webkit-box-orient` and drops `-webkit-line-clamp`
@@ -114,6 +133,18 @@ to, is in [../reference/](../reference/README.md).
 
 **Designer and canvas** ([designer.md](designer.md))
 
+- Icons rebuilt as SVG instead of the Icon component
+- Typing right after inserting an element goes to keyboard shortcuts
+- Conditional visibility can match the CMS item itself
+- The style guide generator ignores specimens inside included partials
+- Changing one semantic colour: add a primitive, don't edit a shared one
+- A `target` attribute on a component's root link opens every instance in a new tab
+- Renaming a page or CMS slug breaks typed links
+- A class that sets `display` beats the `hidden` attribute
+- Clicking a row in the Components panel inserts an instance
+- A component used on the 404 page can't hold a Collection List
+- Copy and paste between pages: switch pages in the Designer, never reload
+- Nested `sg:start` markers cut a style guide specimen short
 - A Grid element publishes Webflow's 2×2 template when the class sets none
 - Style guide specimens can't show hover or focus
 - A style guide row that wraps a whole section squeezes the component
@@ -157,6 +188,14 @@ to, is in [../reference/](../reference/README.md).
 
 **Repo CSS** ([css.md](css.md))
 
+- Rich-text margin trims flatten designed embeds
+- Embed markup collides with the site's own class names
+- A decorative image behind a canvas became the LCP and a flicker
+- Backdrop blur on a moving element stutters
+- A later stylesheet's base rule beats an earlier breakpoint rule
+- Inside an embedded form's iframe, breakpoints read the iframe's width
+- Double, missing and clipped focus rings on wrapped controls
+- `mix-blend-mode` stops blending inside S Wrapper
 - Font fallback metrics: calibrate `size-adjust` on the site's own text
 - Figma sizes come out small on classes with their own type size
 - Library CSS in new-classes.css fails the style guide check
@@ -184,6 +223,19 @@ to, is in [../reference/](../reference/README.md).
 
 **JavaScript modules** ([js.md](js.md))
 
+- WebGL scores fine locally and badly on PageSpeed Insights
+- Anchor links draw a focus ring around the target section
+- Motion on a live site that isn't in Webflow: ask the browser
+- Finsweet TOC highlights a link its scrolling box never shows
+- A marquee paused for good when one set was wider than its strip
+- A GSAP `scale` tween on a parallax image jitters
+- A custom dropdown over a native select: what bites
+- A before/after slider selects or drags the photo on press
+- Finsweet "load all" skips a hidden list; Lenis keeps its boot height
+- Several sliders in one wrapper all take the first one's arrows
+- A screenshot of a canvas includes what sits on top of it
+- Form validation must not toggle Webflow's disabled submit
+- Modules must start after Webflow wires tabs and dropdowns
 - SplitText with `tag: 'span'` leaves pieces inline (IX3 did not)
 - A line split cuts a not-yet-split heading into several headings
 - Nested Collection Lists and Finsweet's late pages
@@ -225,6 +277,11 @@ to, is in [../reference/](../reference/README.md).
 
 **Loader, release and CI** ([loader-release-ci.md](loader-release-ci.md))
 
+- Template tests assume the template's own state and fail in a client repo
+- A GitHub Pages outage leaves staging on the old bundle
+- A site duplicated from the starter runs the template's bundle
+- A tag name in an HTML comment: crawlers report "Missing body"
+- `wf:* --live` measures staging, not the live domain
 - A staging page can't load a localhost bundle; port 3000 is shared across projects
 - Lighthouse counts anything that finishes before the first paint
 - The Embed editor reformats pasted loader code

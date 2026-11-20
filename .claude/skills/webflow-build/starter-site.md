@@ -99,8 +99,9 @@ the Designer (a `calc()` with variables can't go through the MCP;
 checked again 2026-10-13: `custom_value` on a Size variable still
 fails). A project that needs the same sums elsewhere (a negative section
 padding for a full-bleed element, the nav height plus the section
-padding) has a [Person] add them once as Layout variables with a custom
-value, `calc(var(--_layout---section--padding-v) * -1)` and
+padding) adds them once as Layout variables with a custom value (Claude
+through the MCP with `value: {type: "custom", value: "calc(…)"}`, which
+works since 2026-11; else a [Person] in the Designer), `calc(var(--_layout---section--padding-v) * -1)` and
 `calc(var(--_layout---nav--height) + var(--_layout---section--padding-v))`,
 so classes can bind them.
 

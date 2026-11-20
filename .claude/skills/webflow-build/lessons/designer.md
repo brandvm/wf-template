@@ -6,6 +6,161 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-11-19 · Icons rebuilt as SVG instead of the Icon component
+- Area: designer
+- Symptom: UI icons from Figma were exported as SVG or built as custom
+  elements, although the starter site has a Phosphor Icon component.
+- Cause: the prototype skill's asset steps say "icons as SVG", and
+  nothing said to check the site's components first.
+- Fix: query the site's components before making anything. Every UI icon
+  is an Icon instance (`ph ph-<name>`); SVG only for logos and
+  illustrations.
+- Status: open
+
+### 2026-11-17 · Typing right after inserting an element goes to keyboard shortcuts
+- Area: designer, mcp
+- Symptom: after inserting an element from the Add panel, typing a class
+  name into the style selector triggered single-key shortcuts (a panel
+  opened, the selection changed); the element had landed inside the
+  selected Section.
+- Cause: the new element wasn't selected yet when the selector was
+  clicked, so focus stayed on the canvas.
+- Fix: check the selection (breadcrumb) and that the selector field has
+  focus before typing. Insert temporary elements with a top-level
+  component instance selected (they go beside it), not a Section (they go
+  inside). Also: `set_link` with `linkType: page` works on links inside
+  components, and the Designer's "Use alt text from asset" is stored as
+  `altText: "inherit"`, which the API refuses to write.
+- Status: workaround confirmed
+
+### 2026-11-13 · Conditional visibility can match the CMS item itself
+- Area: designer
+- Symptom: per-item icons in a CMS list were driven by an extra Option
+  field, because a condition on the Name breaks when an editor renames an
+  item.
+- Cause: missed that the Visibility condition's field list starts with
+  "Current <Item>".
+- Fix: `Current <Item> is any [item]` matches by item, not by text, and
+  keeps matching after a rename. No helper Option field is needed.
+- Status: fixed in that project
+
+### 2026-11-12 · The style guide generator ignores specimens inside included partials
+- Area: designer
+- Symptom: a section moved into a shared partial (used on several pages)
+  dropped out of the style guide, so its classes failed the class check.
+- Cause: `gen-style-guide.mjs` reads each page raw and matches
+  `sg:start`/`sg:end` before `<!-- @include -->` is expanded.
+- Fix: match on `expand(read(f))`; keep the `sg:` markers on one page
+  around the include, so a partial used on several pages is one specimen.
+- Status: fixed in that project; open in the template
+
+### 2026-11-11 · Changing one semantic colour: add a primitive, don't edit a shared one
+- Area: designer
+- Symptom: raising the contrast of muted text by editing the tint
+  primitive it aliased would also have changed other roles (a form
+  placeholder) that alias the same step; editing the next step's value
+  would have made its name wrong.
+- Cause: semantic variables alias steps of a shared primitive scale, and
+  several roles point at the same step.
+- Fix: add a new primitive step with an honest name (e.g. White 55) and
+  repoint only the semantic variable that has to change, in only the mode
+  that has to change. Never edit a primitive's value to fix one role.
+- Status: fixed in that project
+
+### 2026-11-10 · A `target` attribute on a component's root link opens every instance in a new tab
+- Area: designer
+- Symptom: every button instance, internal links and same-page anchors
+  included, opened in a new tab; turning "open in new tab" off on an
+  instance changed nothing.
+- Cause: the Button component's root Link carried a hard-coded custom
+  attribute `target="_blank"`, which applies to every instance whatever
+  the link prop says.
+- Fix: bind the attribute's value to a string prop (Link Target) and
+  expose it on the components that nest the button; set `_self` on
+  internal links. Better: no custom `target` attribute on a component
+  root; use the link setting's new-tab option per instance. Check
+  component roots for custom `target`/`rel` attributes.
+- Status: fixed in that project
+
+### 2026-11-09 · Renaming a page or CMS slug breaks typed links
+- Area: designer, mcp
+- Symptom: after page and collection slugs were renamed, a dozen nav,
+  footer and home links returned 404.
+- Cause: those links were typed URLs, not page or CMS links, so Webflow
+  did not rewrite them. For links on button component props the API only
+  accepts typed URLs, so links set through the API are often typed.
+- Fix: before renaming a slug, list every link to the old path (published
+  HTML or the element tree); set them as page links in the Designer, then
+  rename. After the rename, crawl the site for 404s (`pnpm wf:links`).
+- Status: fixed in that project
+
+### 2026-11-09 · A class that sets `display` beats the `hidden` attribute
+- Area: designer, js
+- Symptom: every tab panel showed at once; the tabs module had set
+  `hidden` on all but the first and they still computed `display: flex`.
+- Cause: a class's `display` outranks the browser's
+  `[hidden] { display: none }`. A page with one panel never shows the
+  problem.
+- Fix: keep the first-paint state in Designer styles: the panel class is
+  `display: none`, a combo (Is Active) sets `display: flex`, the open
+  panel carries it in the markup, and the module toggles the combo as
+  well as `hidden`. Any class that sets `display` on an element a module
+  hides with `hidden` needs the same; a class without `display` can rely
+  on `hidden`. Make sure the markup has one panel per tab.
+- Status: fixed in that project
+
+### 2026-11-09 · Clicking a row in the Components panel inserts an instance
+- Area: designer
+- Symptom: clicking a component's row in the Components panel (to edit
+  it) added a new instance at the end of the page body.
+- Cause: a click on a panel row inserts the component; editing is the
+  row's hover icon (Edit component) or a double-click on an instance.
+- Fix: undo (Cmd+Z) and check the Navigator. Open a definition only with
+  the row's Edit icon, never by clicking the row.
+- Status: worked around
+
+### 2026-11-09 · A component used on the 404 page can't hold a Collection List
+- Area: designer
+- Symptom: adding a Collection List to the nav component (for a
+  CMS-driven mega menu) failed: "you can't add a Collection List to a
+  Component that's used on 404 page". The page shell holding the nav is
+  on the 404 utility page.
+- Cause: utility pages allow no CMS, so no component used there can hold
+  a Collection List.
+- Fix: on the 404 page, unlink the shell instance and then the nav
+  instance inside it (right-click › Unlink instance); the 404 keeps a
+  static copy that must be updated by hand when the nav changes. Then add
+  the lists to the component. Build one list, bind it, copy it (Cmd+C)
+  into the other columns (select the column, Cmd+V) and change only the
+  filter value: bindings travel with the copy.
+- Status: worked around
+
+### 2026-11-09 · Copy and paste between pages: switch pages in the Designer, never reload
+- Area: designer
+- Symptom: copying a block, loading another page by URL and pasting gave
+  "For pasting cross-site we had to drop some custom fonts. Renamed 18
+  classes in order to avoid conflicts": the paste brought duplicate,
+  renamed classes.
+- Cause: a reloaded Designer treats the clipboard as coming from another
+  site.
+- Fix: undo (the renamed classes go with it; check the style list), then
+  copy, switch page through the Pages panel and paste: classes, custom
+  attributes, DOM elements and images come through intact. Re-bind CMS
+  fields on the pasted copy and change static text afterwards.
+- Status: worked around
+
+### 2026-11-06 · Nested `sg:start` markers cut a style guide specimen short
+- Area: designer
+- Symptom: a generated style guide specimen had two more opening than
+  closing divs and the inner row was missing; importing it would have
+  nested every later row inside it. `check:style-guide` still passed.
+- Cause: one `sg:start` block sat inside another. `gen-style-guide.mjs`
+  pairs each start with the next `sg:end`, so the outer specimen ended at
+  the inner one's end marker.
+- Fix: never nest `sg:` markers; remove the inner pair (the outer
+  specimen still uses the inner classes) and regenerate.
+- Status: fixed in that project; open in the template
+
 ### 2026-11-09 · A Grid element publishes Webflow's 2×2 template when the class sets none
 - Area: designer
 - Symptom: a grid whose class sets no columns or rows lays its children
@@ -105,7 +260,11 @@ refer to the project the lesson came from; Status is that project's.
 - Fix: put the layout class (flex/grid and gap) on the list's items
   wrapper (Collection List, `.w-dyn-items`), not on an outer wrapper. Any
   CMS list built inside a flex or grid parent needs the same: accordions,
-  card grids, sliders.
+  card grids, sliders. A Designer-made Collection List Wrapper has no
+  class, so inside a flex column with `align-items: flex-start` it
+  shrinks to its content: give it a class with `width: 100%`. (Also: an
+  API call with another page's `pageId` switches the open Designer to
+  that page.)
 - Status: fixed in that project's Webflow styles
 - Found by: claude
 
@@ -118,7 +277,12 @@ refer to the project the lesson came from; Status is that project's.
   it loads; the prototype's `<img width height>` reserved the space.
 - Fix: set `aspect-ratio` on the image's class (the style API takes it).
   Any small lazy image with `height: auto` (icons, quote marks, logos)
-  needs its aspect ratio on the class.
+  needs its aspect ratio on the class. With no width either (an image
+  with no class), the lazy image is 0×0, never intersects the viewport
+  and is never requested at all: give every image a class with its size;
+  an image class that sets only a width also needs `aspect-ratio`.
+  `data_element_builder` refuses `width` as an attribute ("reserved
+  attribute name").
 - Status: fixed in that project's Webflow styles
 - Found by: claude
 
@@ -240,7 +404,11 @@ refer to the project the lesson came from; Status is that project's.
   rather than `'` in fields that feed it. A template's Open Graph image
   (a collection image field) is a Designer setting too. Head code with
   `set_page_freeform_code` also works (mcp.md, "Page SEO through the API:
-  what sticks and where").
+  what sticks and where"). A static template also can't omit a property
+  whose field is empty on some items (`"author": {"name": ""}`,
+  `"image": [""]`); keep such schema in a browser-built script. What does
+  work: reference paths (`author:name`), and a Date token renders ISO
+  `YYYY-MM-DD`.
 - Status: open (Webflow behaviour)
 - Found by: claude
 
@@ -258,7 +426,11 @@ refer to the project the lesson came from; Status is that project's.
   `<source media>` works in Chrome/Firefox 120+ and Safari. Re-encoding the
   desktop files at matching quality saved nothing. A muted preview loop
   that is a full-length YouTube download (with audio) should be a short
-  clip instead: 56 MB → 4 MB.
+  clip instead: 56 MB → 4 MB. A transparent video, wrapper and section
+  leave only an overlay gradient painting the hero while the video loads
+  or if it fails, so it shows black: give the section a ground colour in
+  the Designer, and use the video recipe's `data-video-guard` failed
+  state for a fallback.
 - Status: done
 - Found by: claude
 
@@ -273,6 +445,11 @@ refer to the project the lesson came from; Status is that project's.
   the value on Section › Is Hero, then add the class back. The CSS
   `.section.is-hero` still matches the three-class element on the page.
   When planning combos, keep shared values on the shortest chain.
+  Adding an existing combo to an element that already has another combo
+  creates a new, empty three-class chain: create it with the same values
+  (`create_style` with `parent_style_names`), then pick it under Existing
+  Combo Classes; or size through a property the parent carries so one
+  combo per chain is enough.
 - Status: documented
 - Found by: human
 
@@ -394,6 +571,10 @@ refer to the project the lesson came from; Status is that project's.
   `font-size: inherit` (the live default, so the published page is unchanged).
   Do this for every class used on an empty element: markers, lines, dots,
   overlays, fades, dividers, swatches, map frames and empty wrappers.
+  Alternative for dots and small shapes: an inline SVG with a child
+  (`viewBox="0 0 6 6"`, `fill="currentColor"`, `aria-hidden`, a
+  `circle`), sized by the class and coloured with `color`; it is not
+  empty, so the canvas draws it at its real size.
 - Status: fixed (Webflow styles, 2026-10-06)
 - Found by: human
 
@@ -622,7 +803,16 @@ refer to the project the lesson came from; Status is that project's.
     own item reference, condition "is not", value Current item. It
     defaults to "is"; re-open the filter and check before closing;
   - template SEO title and description: page settings › "+ Add field"
-    inserts a field token; type plain text around it.
+    inserts a field token; type plain text around it;
+  - a bound date's format is the wrench icon next to the binding ›
+    Format (presets only). List sort and filters in Settings ›
+    Collection list settings took on lists the API refused. A list whose
+    filter hides every item can't be selected item by item: loosen the
+    filter temporarily, edit, put it back;
+  - links in a rich-text prop: Properties › Edit Rich Text, select words
+    with a DOM Range in the dialog, then the toolbar link button. Hidden
+    panels can be shown for editing with a temporary `<style>` injected
+    into the canvas iframe (not saved).
 - Status: workaround confirmed
 - Found by: claude
 
@@ -662,6 +852,9 @@ refer to the project the lesson came from; Status is that project's.
   opacity or transforms, so it can't fight the interaction. A module that
   hides content for its own entrance needs the same kind of exit (see
   js.md, "gsap.from() start state reverts on load: hero flickers").
+  When a site moves off IX3 (js.md, "Moving off IX3"), `w-mod-ix3` never
+  appears again, so the fallback then matches for good: remove it, or
+  the repo's entrance, at the cutover.
 - Status: fixed in that project's repo
 - Found by: codex
 

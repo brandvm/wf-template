@@ -6,6 +6,92 @@ Harvested from client builds made from this template (`Scope:
 template-candidate` entries in their `GOTCHAS.md`). Module and file names
 refer to the project the lesson came from; Status is that project's.
 
+### 2026-11-19 · Template tests assume the template's own state and fail in a client repo
+- Area: ci
+- Symptom: right after `pnpm new-project`, or once a build plan was
+  running, `pnpm test` failed, and with it CI and the staging deploy:
+  the loader tests expected `http://localhost:3000/index.js`, and the
+  progress tests failed on the project's own `progress.json`.
+- Cause: the loader tests (`tests/loader.check.mjs`,
+  `tests/environment-switcher.spec.mjs`) hard-code
+  `const local = 'http://localhost:3000/'`, while new-project writes the
+  project's devPort into loader.html's DEV. The progress test copies the
+  repo's `docs/handoff/progress.json` and asserts it is empty, which only
+  holds in the template. Earlier versions also tested template-only
+  scripts that new-project removes.
+- Fix: read the dev origin back from loader.html (`var DEV = "…"`), as
+  the tests already do for OWNER and SITE; seed the progress test repo
+  with `serialize(empty())` instead of the project's file; skip tests of
+  template-only files when the file is absent.
+- Status: open in the template (fixed in client repos)
+
+### 2026-11-06 · A GitHub Pages outage leaves staging on the old bundle
+- Area: release, ci
+- Symptom: the staging deploy sat in `deployment_queued`, was cancelled
+  twice on GitHub's side, and the test-browser install hung for minutes;
+  staging kept serving the old bundle.
+- Cause: a GitHub Pages outage. Staging has no other source, and while
+  `RELEASE = null` neither does a custom domain.
+- Fix: emergency only: in the head code point the staging URL at
+  jsDelivr for the pushed commit
+  (`https://cdn.jsdelivr.net/gh/<org>/<repo>@<full-sha>/dist/`, `dist/` is
+  committed), keep `loader.html` matching, and revert once Pages is back.
+  Don't publish Webflow after removing old interactions until the new
+  bundle is live. Long term, cut a release early so production never
+  depends on Pages.
+- Status: worked around
+
+### 2026-11-06 · A site duplicated from the starter runs the template's bundle
+- Area: loader
+- Symptom: staging loaded the template repo's `index.js` and `styles.css`;
+  none of the project's modules ran, although its batches were pushed.
+- Cause: the site was duplicated from the starter site with the head code
+  and Embeds already pasted for the template repo. `pnpm new-project`
+  fills in `loader.html` in the repo, but nothing re-pastes it into
+  Webflow, and `wf:install` normalises `OWNER`, `SITE` and the github.io
+  URL before comparing, so a loader pointing at another repo passes.
+- Fix: re-paste all four pieces from `loader.html`. Head and footer code
+  can be written through the MCP (`set_site_freeform_code`, read back
+  with `get_site_freeform_code`) and Embeds through `set_settings` key
+  `code` (mcp.md, "Three 'manual' steps the API can do after all"); only
+  the publish needs the person. Check the network panel on staging for
+  the project's own repo URL. Proposed: `wf:install` (or the staging
+  check) fails when the published `OWNER`/`SITE` differ from the repo's.
+- Status: fixed in that project; open in the template (check)
+
+### 2026-11-03 · A tag name in an HTML comment: crawlers report "Missing body"
+- Area: loader
+- Symptom: Screaming Frog (25.0) listed "Validation: Missing `<body>` Tag"
+  (Issue, High) on every HTML page, though every page has a body.
+- Cause: an HTML comment in the pasted head code contained the literal
+  text `<style>`. Browsers ignore comments; the crawler's validator treats
+  the text as a tag. Bisected on local copies of a live page: changing
+  only that word cleared it. Tag text inside `<script>` (JS comments,
+  strings) does not trigger it.
+- Fix: never write a tag name in angle brackets in an HTML comment in
+  anything pasted into Webflow (head code, footer code, Embeds); write
+  "the style tag" instead. JS comments inside a script are fine.
+- Status: fixed in that project
+
+### 2026-10-19 · `wf:* --live` measures staging, not the live domain
+- Area: ci, perf
+- Symptom: the webflow-audit skill runs every check with `--live`, but
+  only `seo`, `parity`, `install` (and a few newer scripts) read
+  `liveUrl`. `perf`, `baseline`, `outline`, `a11y`, `links`, `html`,
+  `film` and the rest build URLs from `stagingUrl`; with `--live` they
+  only stop swapping in the local bundle, so they check `*.webflow.io`,
+  not the custom domain.
+- Cause: in `lib.mjs`, `--live` meant "the deployed bundle" (written
+  before sites had a custom domain), while the audit skill means "the
+  live domain".
+- Fix: one project changed `loadConfig()` to point `stagingUrl` at
+  `liveUrl` when `--live` is passed and `liveUrl` is set, so every script
+  follows, and `perf.mjs` to use `liveUrl`. Until the template does the
+  same, point `stagingUrl` at the live domain for an audit, or check the
+  URLs a script prints.
+- Status: open in the template (`lib.mjs` `loadConfig()` and `perf.mjs`
+  still use `stagingUrl`)
+
 ### 2026-10-30 · A staging page can't load a localhost bundle; port 3000 is shared across projects
 - Area: loader
 - Symptom: checking unpushed code on webflow.io, the dev flag
@@ -21,7 +107,14 @@ refer to the project the lesson came from; Status is that project's.
   `dist/` and a static build of the prototype (`vite build --base
   /proto/`) to a scratch folder, save the published staging HTML there
   with the loader's staging URL rewritten to the local server, and serve
-  it all from one local origin.
+  it all from one local origin. Simpler, without a dev server: after
+  `pnpm build`, open staging in headless Playwright and answer the bundle
+  requests from `dist/` (`page.route(/<org>\.github\.io\/<repo>\/(.+)/)`
+  fulfilled from `dist/<file>`); it also avoids a hidden browser pane's
+  frozen animations. A launch config that runs `pnpm dev` from the
+  workspace root needs `"cwd": "<repo folder>"`: `pnpm --dir` there runs
+  the global pnpm against the repo's pinned version and fails
+  (ERR_PNPM_BAD_PM_VERSION).
 - Status: fixed in template 0.20.0 (a dev port per project: `devPort`)
 - Found by: claude
 
