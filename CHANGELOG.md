@@ -13,6 +13,15 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 1.0.2 — 2026-11-20
+
+`wf:seo` no longer fails a page whose heading is drawn as an inline SVG with a `<title>`.
+
+**For client repos:** `pnpm update-skills`. Nothing to change by hand.
+
+- **`wf:seo`:** reads the page title from `<head>` only. An inline SVG's `<title>` (its accessible name, e.g. an H1 whose lettering is an SVG) was counted as a second `<title>`, and the page failed with "2 <title> tags". Two `<title>` tags in `<head>` still fail.
+- **Tests:** `launch-checks.check.mjs` covers both cases.
+
 ## 1.0.1 — 2026-11-20
 
 `pnpm test` passes in a client repo straight after `pnpm new-project`; before this, a new client repo's first push failed CI.

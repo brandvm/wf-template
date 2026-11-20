@@ -7,7 +7,8 @@
 // config. Staging by default; --live checks `liveUrl`, the custom domain.
 // Reported per page (exit 1 on any):
 //   - a page that doesn't answer 200;
-//   - no <title>, meta description, og:title, og:description or og:image,
+//   - no <title> in <head> (an inline SVG's <title> doesn't count), meta
+//     description, og:title, og:description or og:image,
 //     or not exactly one <h1> (indexable pages only);
 //   - with --live, a noindex page listed in sitemap.xml (noted on staging);
 //   - a JSON-LD block that doesn't parse, has no @context or an item with
@@ -99,7 +100,10 @@ function check(p, { status, html, error, xRobots = '' }, inSitemap) {
   if (noindex && inSitemap) (live ? bad : note).push('noindex, but listed in sitemap.xml (exclude it in the page settings; plan-gated)');
   // Search tags only matter on pages that can be indexed.
   if (!noindex) {
-  const titles = [...html.matchAll(/<title\b[^>]*>([\s\S]*?)<\/title>/gi)].map((m) => decode(m[1].trim()));
+  // Only the head's <title> is the document title: an inline SVG's <title>
+  // (its accessible name, e.g. a heading drawn as an SVG) is not.
+  const head = html.split(/<\/head>/i)[0];
+  const titles = [...head.matchAll(/<title\b[^>]*>([\s\S]*?)<\/title>/gi)].map((m) => decode(m[1].trim()));
   if (titles.length !== 1 || !titles[0]) bad.push(titles.length > 1 ? `${titles.length} <title> tags` : 'no <title>');
   else { if (titles[0].length > 60) note.push(`title is ${titles[0].length} characters`); seenOn(titlesSeen, titles[0], p); }
   const desc = content(html, 'name', 'description');
