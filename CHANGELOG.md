@@ -15,13 +15,13 @@ by hand to follow (e.g. the loader snippets).
 
 ## 1.0.1 — 2026-11-20
 
-`pnpm test` passes in a client repo straight after `pnpm new-project`. Found on wf-roncelli, whose first push failed CI.
+`pnpm test` passes in a client repo straight after `pnpm new-project`; before this, a new client repo's first push failed CI.
 
 **For client repos:** `pnpm update-skills` doesn't copy `tests/`. If CI fails at `pnpm test` on the progress seed or the changelog, copy the two files below from this release.
 
 - **`tests/progress.check.mjs`:** the throwaway repos start from an empty seed instead of copying this repo's `progress.json`. A client's file holds its plans, so a second `plan add` was refused. The empty-seed test runs in the template only.
 - **`tests/update-skills.check.mjs`:** the what's-new test is skipped when there is no `CHANGELOG.md`, which `new-project` removes from client repos.
-- The hard-coded `localhost:3000` in the loader tests, also found on wf-roncelli, went away with dev mode in 1.0.0.
+- The hard-coded `localhost:3000` in the loader tests, also found in a client repo, went away with dev mode in 1.0.0.
 
 ## 1.0.0 — 2026-11-20
 
