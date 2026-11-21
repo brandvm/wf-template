@@ -57,6 +57,9 @@ error instead of a silent move to the next one. Change both together.
 | `src/css/prototype.css` | Stand-ins for what Webflow ships, and the tag styles; never moved. Element rules are in `:where()`, so a site's real tag styles in `webflow.css` win |
 | `src/main.ts`, `src/modules/` | The module manifest and one file per module |
 | `CLASSES.md` | **Generated** (`pnpm classes`): every new class with its Designer name |
+| `design/canvas/index.html`, `src/canvas/` | The prototype canvas (below). Needs kit; checked on its own (`pnpm check:canvas`) |
+| `scripts/presence-hook.mjs` | Claude Code hook: tells the canvas what each agent is doing (registered in the workspace's `.claude/settings.json` by `pnpm new-project`) |
+| `scripts/canvas-shots.mjs`, `public/canvas-shots/` | Pictures of every page for the canvas's All pages view (not in git) |
 
 ## Commands
 
@@ -73,6 +76,9 @@ pnpm classes             # new-classes*.css → CLASSES.md
 pnpm style-guide         # snapshot + CSS → design/style-guide/index.html
 pnpm check:style-guide   # every class is applied, and the layout is the fixed one
 pnpm check               # tsc
+pnpm check:canvas        # tsc for the canvas (needs kit)
+pnpm canvas:shots        # pictures of every page for the canvas's All pages view
+pnpm dev:lan             # the dev server on the local network (teammates on the same Wi-Fi)
 pnpm build               # sanity check
 ```
 
@@ -91,6 +97,40 @@ each link and button (no focus ring on a mouse click), and holds each
 button down (an `:active` rule on it or inside it, or a visible change).
 It finds controls itself, so it needs no list of selectors; the style
 guide's specimens are checked too (it lifts their `inert`).
+
+## Prototype canvas
+
+`/design/canvas` shows the site at Desktop 1440, Tablet 820 and Mobile 390
+side by side on a canvas you pan (scroll, space-drag) and zoom (⌘/pinch).
+It is a dev tool: never built in Webflow, `noindex`.
+
+- **Live** frames are a screen tall and scroll, with motion (sync scroll
+  keeps them together); **Full page** frames show the whole page with
+  motion off (`?static`, see `partials/head.html`: the page runs as for a
+  visitor who prefers reduced motion, so a module that pins or scrubs must
+  check reduced motion, or it stretches the page).
+- **All pages** (in Full page) lays every site page out at its three
+  breakpoints. It draws like Figma: pictures of the pages for the
+  overview (`pnpm canvas:shots`, or Update pictures in the toolbar; half
+  scale, JPEG); a frame runs live only on screen at 30 % zoom or closer
+  (at most four, once the canvas stops moving); nothing off screen is
+  drawn. A page's name opens it.
+- **Inspect** (⌥T): pick an element in any frame and edit it in the panel
+  at a breakpoint; edits cascade like Webflow's. "Copy for Claude" gives
+  the changes grouped by breakpoint.
+- **Presence:** each Claude session and agent working in the workspace
+  shows as an avatar, a status line and a cursor on the element its last
+  change touched, like teammates in Figma. The hook
+  (`scripts/presence-hook.mjs`) posts to the dev server's `/__presence`;
+  it never blocks or fails a tool.
+- **kit:** the canvas's controls are kit (Weftly's design system:
+  `@weftly/components`, `@weftly/editor`), which is private and not in
+  this template. It is read as source from a local checkout:
+  `WEFTLY_KIT=/path/to/kit`, or `~/Documents/Projects/weftlyhq/kit` as
+  seen from `<Client>/prototype`. Without it every other page works and
+  `/design/canvas` says what it needs.
+- The page list comes from `pages` in `vite.config.js` (each labelled by
+  its `<title>`); pages under `design/` are left out of All pages.
 
 ## Component and CMS markers
 

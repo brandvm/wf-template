@@ -1,3 +1,18 @@
+<!-- PROTOTYPE-ONLY: the prototype environment (/design/canvas) loads pages
+     with ?static for its Full page view. The page then runs as for a visitor
+     who prefers reduced motion (no pins, scrubs or scroll animations), so
+     every section shows laid out at once. Never in Webflow. -->
+<script>
+  if (/[?&]static\b/.test(location.search)) {
+    var mm = window.matchMedia.bind(window);
+    window.matchMedia = function (q) {
+      if (/prefers-reduced-motion:\s*reduce/.test(q)) {
+        return { matches: true, media: q, onchange: null, addListener: function () {}, removeListener: function () {}, addEventListener: function () {}, removeEventListener: function () {}, dispatchEvent: function () { return false; } };
+      }
+      return mm(q);
+    };
+  }
+</script>
 <!-- The default font, Geist (Typography Scale › Family/Base), served from
      public/fonts; its @font-face is in src/css/prototype.css. It is the
      official file, not Google Fonts': Google's build leaves out the

@@ -3,3 +3,6 @@ design/fig/
 
 # Screenshots and crops from pnpm screens and pnpm check:states.
 .screens/
+
+# Canvas All pages pictures (pnpm canvas:shots).
+public/canvas-shots/

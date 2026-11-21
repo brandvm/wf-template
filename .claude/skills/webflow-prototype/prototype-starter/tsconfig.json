@@ -9,5 +9,7 @@
     "skipLibCheck": true,
     "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  // The canvas needs kit (private): checked on its own, src/canvas/tsconfig.json.
+  "exclude": ["src/canvas"]
 }

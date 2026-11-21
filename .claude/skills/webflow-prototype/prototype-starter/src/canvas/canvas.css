@@ -1,0 +1,92 @@
+/* PROTOTYPE-ONLY: the prototype environment's own layout (the canvas, the
+   frames, the panel's rows). Everything else is kit's parts and tokens. */
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--w-bg-app); color: var(--w-text-1); font-family: var(--w-font); overflow: hidden; }
+
+.cv-shell { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100dvh; }
+.cv-title { font-weight: 600; padding-inline: var(--w-s-8); white-space: nowrap; }
+.cv-group { display: flex; align-items: center; gap: var(--w-s-8); }
+.cv-sep { width: 1px; height: 16px; background: var(--w-sep); }
+/* A narrow window: the toolbar's middle never runs under its right end
+   (avatars, Inspect). Below 1280 px the title and the long labels go (their
+   controls keep their icons and accessible names); below that the middle
+   scrolls sideways rather than overlapping. */
+.w-tb-mid { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.w-tb-mid::-webkit-scrollbar { display: none; }
+.cv-swap { display: contents; }
+.cv-narrow-show { display: none; }
+@container bar (max-width: 1280px) { .cv-narrow-hide { display: none; } .cv-narrow-show { display: inline-flex; } }
+.cv-switch { display: inline-flex; align-items: center; gap: var(--w-s-8); white-space: nowrap; cursor: pointer; }
+
+.cv-main { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 0; }
+.cv-viewport { position: relative; overflow: hidden; background: var(--w-bg-app); background-image: radial-gradient(var(--w-sep) 1px, transparent 1px); background-size: 24px 24px; cursor: default; touch-action: none; }
+.cv-viewport[data-panning] { cursor: grabbing; }
+.cv-world { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.cv-frame { position: absolute; top: 0; }
+/* All pages: a page's three frames, its name above them (constant size on
+   screen, above the frame labels); clicking it opens the page. */
+.cv-page { position: absolute; top: 0; }
+/* A page's picture fills its frame; a live frame sits over it. */
+.cv-shot { position: absolute; inset: 0; display: block; width: 100%; height: 100%; background: #fff; box-shadow: var(--w-shadow-page); border-radius: 2px; user-select: none; }
+.cv-frame iframe.cv-live { position: absolute; inset: 0; opacity: 0; transition: opacity 200ms ease-out; }
+.cv-frame iframe.cv-live[data-ready] { opacity: 1; }
+.cv-page-label { all: unset; position: absolute; left: 0; bottom: 100%; display: flex; align-items: center; gap: var(--w-s-8); height: 28px; margin-bottom: calc(44px / var(--cv-z, 1)); padding: 0 var(--w-s-8); border-radius: var(--w-r-md); color: var(--w-text-1); font-size: var(--w-fs-lg, 15px); font-weight: 600; white-space: nowrap; cursor: pointer; transform: scale(calc(1 / var(--cv-z, 1))); transform-origin: 0 100%; }
+.cv-page-label > * { overflow: hidden; text-overflow: ellipsis; }
+.cv-page-label > :first-child { flex: none; }
+/* All pages zoomed far out: the frame labels would overlap; the page names stay. */
+.cv-world[data-small] .cv-page .cv-label { display: none; }
+.cv-world[data-small] .cv-page-label { margin-bottom: calc(8px / var(--cv-z, 1)); }
+.cv-world[data-small] .cv-page-label .cv-dim { display: none; }
+.cv-page-label:hover { background: var(--w-bg-hover, rgba(0,0,0,0.06)); }
+.cv-page-label:focus-visible { outline: 2px solid var(--w-accent); }
+/* The frame's label: above the frame, drawn at the same size on screen at
+   any zoom (scaled by the inverse of the canvas zoom, from its bottom-left
+   corner), so it never overlaps the frame or gets tiny. */
+.cv-label { position: absolute; left: 0; bottom: 100%; display: flex; align-items: center; gap: var(--w-s-8); height: 28px; margin-bottom: calc(8px / var(--cv-z, 1)); color: var(--w-text-2); font-size: var(--w-fs-md); white-space: nowrap; transform: scale(calc(1 / var(--cv-z, 1))); transform-origin: 0 100%; }
+.cv-frame iframe { display: block; border: 0; background: #fff; box-shadow: var(--w-shadow-page); border-radius: 2px; }
+.cv-dim { color: var(--w-text-3); }
+.cv-hint { position: absolute; left: 50%; bottom: var(--w-s-16); transform: translateX(-50%); display: flex; align-items: center; gap: var(--w-s-8); padding: var(--w-s-8) var(--w-s-12); border-radius: var(--w-r-full); background: var(--w-bg-float); box-shadow: var(--w-shadow-float); color: var(--w-text-1); pointer-events: none; }
+
+.cv-panel { width: 320px; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid var(--w-sep); }
+.cv-panel-body { overflow-y: auto; overscroll-behavior: contain; min-height: 0; flex: 1; }
+.cv-strong { font-weight: 600; }
+.cv-pad { padding: var(--w-s-8) var(--w-pad-panel); }
+.cv-mono { font-family: var(--w-mono); }
+.cv-chain { font-size: var(--w-fs-xs); line-height: 1.4; word-break: break-word; }
+.cv-rows { display: grid; gap: var(--w-s-4); padding: var(--w-s-4) var(--w-pad-panel) var(--w-s-12); }
+.cv-row { display: grid; grid-template-columns: 88px minmax(0, 1fr); align-items: center; gap: var(--w-s-8); }
+.cv-row-label { color: var(--w-text-2); font-size: var(--w-fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-row[data-changed] .cv-row-label { color: var(--w-accent-text); font-weight: 600; }
+.cv-row-control { min-width: 0; }
+.cv-changes { margin: 0; padding: var(--w-s-8); border-radius: var(--w-r-md); background: var(--w-bg-control); font: var(--w-fs-xs)/1.5 var(--w-mono); white-space: pre-wrap; max-height: 220px; overflow: auto; }
+
+/* The active breakpoint's frame: an accent ring that keeps 2 px on screen at any zoom. */
+.cv-frame[data-active] iframe { outline: calc(2px / var(--cv-z, 1)) solid var(--w-accent); outline-offset: calc(2px / var(--cv-z, 1)); }
+.cv-frame[data-active] .cv-label { color: var(--w-text-1); }
+
+/* Presence: who is working and on what, in the canvas's bottom-left corner. */
+.cv-presence { position: absolute; left: var(--w-s-16); bottom: var(--w-s-16); display: grid; gap: var(--w-s-4); width: 300px; max-height: 40%; overflow: auto; padding: var(--w-s-8); border-radius: var(--w-r-lg); background: var(--w-bg-float); box-shadow: var(--w-shadow-float); }
+.cv-presence-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--w-s-8); align-items: start; padding: var(--w-s-4); }
+.cv-presence-row[data-idle] { opacity: 0.6; }
+.cv-presence-text { display: grid; gap: var(--w-s-4); min-width: 0; line-height: 1.35; }
+.cv-presence-line { display: flex; align-items: center; gap: var(--w-s-8); font-size: var(--w-fs-md); }
+.cv-presence-status, .cv-presence-task { display: block; font-size: var(--w-fs-sm); color: var(--w-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-presence-task { font-size: var(--w-fs-xs); color: var(--w-text-3); }
+
+.cv-presence-row { all: unset; box-sizing: border-box; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--w-s-12); align-items: start; padding: var(--w-s-8); border-radius: var(--w-r-md); cursor: pointer; }
+.cv-presence-row .w-swatch, .cv-presence-row > :first-child { margin-top: 2px; }
+.cv-presence-row:hover { background: var(--w-hover); }
+.cv-presence-row:focus-visible { outline: 2px solid var(--w-focus); }
+/* Going to an agent glides the canvas there (Figma's follow jump). */
+.cv-world[data-gliding] { transition: transform 450ms cubic-bezier(0.23, 1, 0.32, 1); }
+
+/* Agents' cursors on the canvas (screen space: a constant size at any zoom). */
+.cv-cursors { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.cv-cursor { position: absolute; left: 0; top: 0; }
+.cv-cursor[data-gliding] { transition: transform 450ms cubic-bezier(0.23, 1, 0.32, 1); }
+.cv-cursor[data-idle] { opacity: 0.55; }
+.cv-cursor-arrow { position: relative; z-index: 0; display: block; overflow: visible; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25)); }
+/* The tag's top-left corner lies on the line through the arrow's tip (0.5 × 1.2) and its bottom middle vertex (the notch, 5.65 × 12.37), 4.5 px past the notch, with a near-square corner there. */
+.cv-cursor-tag { position: absolute; z-index: 1; left: 7.5px; top: 16.4px; max-width: 240px; padding: 3px 7px 4px; border-radius: 2px 6px 6px 6px; color: #fff; font: 500 11px/16px var(--w-font); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
+.cv-cursor-name, .cv-cursor-status { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-cursor-status { font-weight: 400; opacity: 0.85; }

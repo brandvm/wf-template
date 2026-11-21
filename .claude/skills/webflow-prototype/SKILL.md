@@ -120,6 +120,11 @@ duplicated the starter site under the client's name
   479), the Webflow class names, and the page shell and section structure
   of `conventions.md`. Nav and footer are single partials (one component
   each).
+- **It has a canvas:** `/design/canvas` shows every page at the three
+  check breakpoints side by side, with Inspect and presence; All pages
+  lays the whole site out
+  ([prototype-starter/README.md](prototype-starter/README.md) › Prototype
+  canvas). It needs kit locally; without it, skip it.
 - **It marks components and CMS:** `data-component="<Component name>"` on
   a component instance's root (the Nav and Footer partials have theirs),
   `data-prop="<Prop name>"` on what a component property sets,

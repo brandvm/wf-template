@@ -189,10 +189,22 @@ if (!flag('no-workspace')) {
     make('prototype', (p) => {
       fs.cpSync(path.join(root, '.claude/skills/webflow-prototype/prototype-starter'), p, { recursive: true });
       const pkg = path.join(p, 'package.json');
-      fs.writeFileSync(pkg, fs.readFileSync(pkg, 'utf8').replace('--port 5173', `--port ${new URL(prototypeUrl).port || 5173}`));
+      fs.writeFileSync(pkg, fs.readFileSync(pkg, 'utf8').replaceAll('--port 5173', `--port ${new URL(prototypeUrl).port || 5173}`));
     });
+    // Presence on the prototype canvas: each Claude session and agent shows
+    // there with a cursor on its work (prototype/scripts/presence-hook.mjs).
+    make('.claude/settings.json', (p) => fs.writeFileSync(p, `${JSON.stringify(presenceSettings(), null, 2)}\n`));
     make('Assets/figma', (p) => fs.mkdirSync(p, { recursive: true }));
   }
+}
+function presenceSettings() {
+  const hook = { type: 'command', command: 'node "$CLAUDE_PROJECT_DIR/prototype/scripts/presence-hook.mjs"', timeout: 2 };
+  return {
+    hooks: {
+      PreToolUse: [{ matcher: '*', hooks: [hook] }],
+      ...Object.fromEntries(['UserPromptSubmit', 'Stop', 'SubagentStop', 'SessionEnd'].map((e) => [e, [{ hooks: [hook] }]])),
+    },
+  };
 }
 function isLink(p) { try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; } }
 function workspaceClaudeMd() {

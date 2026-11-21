@@ -13,6 +13,18 @@ entry here in the same pull request as the change: patch for fixes and wording, 
 checks, scripts or lessons, major when a client repo has to change something
 by hand to follow (e.g. the loader snippets).
 
+## 1.1.0 — 2026-11-20
+
+The prototype canvas: `/design/canvas` in the prototype starter shows the site at three breakpoints on a pannable, zoomable canvas, with Inspect, presence for Claude sessions and agents, and an All pages overview.
+
+**For client repos:** new projects get it from `pnpm new-project`. An existing prototype isn't in git and isn't touched by `pnpm update-skills`: copy `src/canvas/`, `design/canvas/`, `scripts/presence-hook.mjs`, `scripts/canvas-shots.mjs`, the `?static` script at the top of `partials/head.html` and the new parts of `vite.config.js`, `tsconfig.json` and `package.json` from the starter by hand, then `pnpm install`.
+
+- **Needs kit:** the canvas is built from kit (Weftly's design system), which is private and not in this repo. It is read as source from a local checkout (`WEFTLY_KIT`); without it the prototype runs as before and `/design/canvas` explains. The canvas has its own type check (`pnpm check:canvas`), so `pnpm check` passes without kit.
+- **Live, Full page and All pages:** All pages draws pictures of every page (`pnpm canvas:shots`) and runs a page live only where you zoom in, so it stays smooth.
+- **Presence:** `pnpm new-project` writes the workspace's `.claude/settings.json` with the presence hook; the hook finds the dev server's port in the prototype's dev script.
+- **`?static`:** a page loaded with it runs as for a visitor who prefers reduced motion; modules that pin or scrub must check reduced motion or they stretch the canvas's Full page frames.
+- `pnpm dev:lan` serves the prototype on the local network; `new-project` now sets the project's port in both dev scripts.
+
 ## 1.0.1 — 2026-11-20
 
 `pnpm test` passes in a client repo straight after `pnpm new-project`; before this, a new client repo's first push failed CI.
