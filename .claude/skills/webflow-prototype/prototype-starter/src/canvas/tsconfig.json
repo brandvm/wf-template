@@ -1,0 +1,23 @@
+{
+  // The prototype canvas, checked on its own (pnpm check:canvas): it needs
+  // kit, read as source from a local checkout (see vite.config.js). Edit the
+  // two @weftly paths if kit is elsewhere.
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    // kit's source uses ES2023 (findLast).
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "paths": {
+      // One copy of React's types for the prototype and kit's source.
+      "react": ["../../node_modules/@types/react/index.d.ts"],
+      "react/*": ["../../node_modules/@types/react/*"],
+      "react-dom": ["../../node_modules/@types/react-dom/index.d.ts"],
+      "react-dom/*": ["../../node_modules/@types/react-dom/*"],
+      "@weftly/components": ["../../../../../Projects/weftlyhq/kit/packages/components/src/index.ts"],
+      "@weftly/editor": ["../../../../../Projects/weftlyhq/kit/packages/editor/src/index.ts"]
+    }
+  },
+  "include": ["."],
+  "exclude": []
+}
