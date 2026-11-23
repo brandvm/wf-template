@@ -1,10 +1,9 @@
 # Session report: 2026-11-23
 
-The Claude Code sessions listed below were archived on 2026-11-23 to keep the Claude app responsive. This file records where each one left off, so a new session can pick up the work.
+The Claude Code sessions listed below were archived and then deleted on 2026-11-23 to keep the Claude app responsive. This file records where each one left off, so a new session can pick up the work.
 
 Read this with `HANDOFF.md` (the project brief and its Status section). If something here conflicts with `HANDOFF.md`, `HANDOFF.md` and the git history are more current.
 
-To reopen a session, go to the Claude app's sidebar → Archived, or use the session link while the app is installed.
 
 ## Open items
 
@@ -45,7 +44,7 @@ Open pull requests:
 ### Harvest client lessons, then audit 8 client sites
 
 - **Active:** 2026-11-20 → 2026-11-23 12:54
-- **Session:** [local_63d734be-a5b4-428c-b937-21a62dc9c2d3](claude://claude.ai/epitaxy/local_63d734be-a5b4-428c-b937-21a62dc9c2d3) (archived)
+- **Session:** `local_63d734be-a5b4-428c-b937-21a62dc9c2d3` (deleted 2026-11-23)
 - **Started with:** "Task (from the session that started this one): Background (from the session that started this one): The template workspace is `/Users/Work/Documents/Webflow Projects/00 Template/`. It holds `wf-template/` (GitHub brandvm/wf-template, branch `master`, latest tag v0.24.1 on 3638d23; master, origin and…"
 - **Recent progress:**
   - 2026-11-20 16:59 UTC: The Figma documentation file now holds the six-site baseline with live screenshots, a 79-item change tracker with 36 watched speed values, an empty Steps page, and the components with their design rules. wf-template 0.25.0 is committed as aa74aa3 on master, not pushed.
@@ -55,7 +54,7 @@ Open pull requests:
 ### 00 Master
 
 - **Active:** 2026-11-09 → 2026-11-23 10:00
-- **Session:** [local_9473ffcf-6d23-4428-9103-228d904710ec](claude://claude.ai/epitaxy/local_9473ffcf-6d23-4428-9103-228d904710ec) (archived)
+- **Session:** `local_9473ffcf-6d23-4428-9103-228d904710ec` (deleted 2026-11-23)
 - **Started with:** "check if the clone is uptodate"
 - **Status:** TeraWulf staging blocked until webflow-terawulf is signed in
 - **Recent progress:**
@@ -66,7 +65,7 @@ Open pull requests:
 ### Release wf-template fix: pnpm test in client repos
 
 - **Active:** 2026-11-20 → 2026-11-20 17:19
-- **Session:** [local_2e57a6f6-a48c-4531-8969-efddc03b30a4](claude://claude.ai/epitaxy/local_2e57a6f6-a48c-4531-8969-efddc03b30a4) (archived)
+- **Session:** `local_2e57a6f6-a48c-4531-8969-efddc03b30a4` (deleted 2026-11-23)
 - **Where it ended:** Pages is on for wf-homewrap and wf-toronique, CI passes in full, and both staging stylesheets are live.
 - **Recent progress:**
   - 2026-11-20 21:07 UTC: wf-template v1.0.1 is released: master is at d8213c3, CI passed and the tag is pushed. Running `pnpm test` in a fresh client repo made from the tag gives 46 passed, 7 skipped, 0 failed. Client repos were not touched, and `update-skills` alone won't fix their tests.
